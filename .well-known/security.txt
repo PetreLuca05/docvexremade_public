@@ -1,0 +1,6 @@
+# DocVex security contact (RFC 9116). Fill in the e-mail before publishing.
+Contact: mailto:[DE COMPLETAT: e-mail de securitate]
+Expires: 2027-10-17T00:00:00.000Z
+Preferred-Languages: ro, en
+Canonical: https://docvex.ro/.well-known/security.txt
+Policy: https://docvex.ro/informatii-legale.html#securitate

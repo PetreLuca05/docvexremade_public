@@ -1187,3 +1187,49 @@ th {
     display: none;
   }
 }
+
+/* ---- Legal notices --------------------------------------------------- */
+
+.ai-note {
+  margin: 20px 0 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+.legal-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.legal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.legal-badge b {
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--ink);
+  color: var(--cream);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.legal-badge:hover {
+  border-color: var(--accent);
+}
+
+.doc th[scope='row'] {
+  width: 34%;
+}
