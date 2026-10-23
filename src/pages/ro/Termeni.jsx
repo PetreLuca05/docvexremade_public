@@ -1,0 +1,110 @@
+export default function Termeni() {
+  return (
+    <article className="doc">
+      <h1>Termeni și condiții</h1>
+      <p className="updated">Ultima actualizare: 17 octombrie 2026</p>
+      <h2 id="cine">1. Cine suntem</h2>
+      <p>
+        Site-ul și aplicația DocVex sunt puse la dispoziție de{' '}
+        <strong>[DE COMPLETAT: denumirea operatorului]</strong>, cu datele de identificare din
+        pagina <a href="informatii-legale.html#identificare">Informații legale</a>. Folosind
+        site-ul sau aplicația, accepți acești termeni.
+      </p>
+      <h2 id="testare">2. Versiuni de testare</h2>
+      <p>
+        Versiunile publicate în prezent sunt destinate testării interne. Pot conține erori, se pot
+        schimba fără notificare și nu sunt garantate pentru uz profesional. Păstrează copii de
+        siguranță ale documentelor tale.
+      </p>
+      <h2 id="consultanta">3. Nu oferim consultanță juridică</h2>
+      <p>
+        DocVex este un instrument de lucru. Informațiile afișate, inclusiv răspunsurile generate
+        de inteligența artificială și trimiterile recunoscute automat la legislație sau la coduri
+        CAEN, pot fi incomplete sau greșite și nu țin loc de consultanță juridică. Verifică
+        întotdeauna textul oficial al actelor normative (de exemplu în Monitorul Oficial sau pe
+        legislatie.just.ro).
+      </p>
+      <h2 id="date">4. Datele și documentele tale</h2>
+      <p>
+        Documentele tale îți aparțin și rămân pe computerul tău, cu excepțiile descrise în{' '}
+        <a href="confidentialitate.html#aplicatie">Politica de confidențialitate</a>. Ești
+        responsabil pentru a avea un temei legal pentru datele altor persoane pe care le
+        prelucrezi cu aplicația, inclusiv pentru respectarea secretului profesional (de exemplu
+        potrivit Legii nr. 51/1995 pentru organizarea și exercitarea profesiei de avocat).
+      </p>
+      <h2 id="ai">5. Funcțiile de inteligență artificială</h2>
+      <p>
+        „Cercetare juridică” și „AI pass” folosesc un sistem de inteligență artificială (modelele
+        Claude ale Anthropic). Când le folosești, interacționezi cu un sistem AI, iar textul
+        primit este generat automat (art. 50 din Regulamentul (UE) 2024/1689). Te obligi:
+      </p>
+      <ul>
+        <li>să verifici răspunsurile în sursele oficiale înainte de a te baza pe ele;</li>
+        <li>
+          să nu folosești funcțiile AI pentru a lua, fără control uman, decizii cu efect juridic
+          asupra unor persoane;
+        </li>
+        <li>
+          să trimiți doar documentele pentru care ai un temei legal și să respecti{' '}
+          <a href="https://www.anthropic.com/legal/aup" rel="noopener">
+            politica de utilizare acceptabilă a Anthropic
+          </a>
+          .
+        </li>
+      </ul>
+      <h2 id="utilizare">6. Folosirea permisă</h2>
+      <p>
+        Nu ai voie să folosești DocVex în scopuri ilegale, să încerci să ocolești măsurile de
+        securitate, să decompilezi aplicația dincolo de ce permite legea sau să o folosești pentru
+        a prelucra date fără temei legal. Putem suspenda contul în caz de încălcare gravă, după ce
+        te anunțăm, cu excepția cazurilor în care legea ne obligă să acționăm imediat.
+      </p>
+      <h2 id="proprietate">7. Proprietate intelectuală</h2>
+      <p>
+        Aplicația, numele și elementele de identitate vizuală DocVex sunt protejate de Legea nr.
+        8/1996 privind dreptul de autor și drepturile conexe. Textele actelor normative nu fac
+        obiectul dreptului de autor (art. 9 din aceeași lege).
+      </p>
+      <h2 id="consumatori">8. Drepturile consumatorilor</h2>
+      <p>
+        Versiunile de testare sunt puse la dispoziție gratuit. Dacă vom introduce abonamente
+        plătite, îți vom prezenta înainte de comandă prețul, caracteristicile și condițiile,
+        potrivit OUG nr. 34/2014 privind drepturile consumatorilor, inclusiv dreptul de retragere
+        în 14 zile și situațiile în care acesta se pierde când furnizarea conținutului digital
+        începe imediat, cu acordul tău expres.
+      </p>
+      <p>
+        Dacă ești consumator, ai drepturile privind conformitatea conținutului și serviciilor
+        digitale prevăzute de OUG nr. 141/2021, inclusiv dreptul la actualizările necesare pentru
+        a păstra aplicația conformă. Prevederile acestor termeni nu îți limitează aceste drepturi.
+      </p>
+      <h2 id="raspundere">9. Răspundere</h2>
+      <p>
+        În limitele permise de lege, nu răspundem pentru pierderi rezultate din folosirea
+        versiunilor de testare sau din bazarea exclusivă pe informațiile generate automat. Nimic
+        din acești termeni nu limitează drepturile pe care le ai ca un consumator potrivit legii.
+      </p>
+      <h2 id="modificari">10. Modificarea termenilor</h2>
+      <p>
+        Putem modifica acești termeni când se schimbă aplicația sau legislația. Te anunțăm despre
+        modificările importante cu cel puțin 15 zile înainte să intre în vigoare; dacă nu ești de
+        acord, poți înceta oricând folosirea aplicației și poți cere ștergerea contului.
+      </p>
+      <h2 id="litigii">11. Legea aplicabilă și litigii</h2>
+      <p>
+        Acești termeni sunt guvernați de legea română. Litigiile se soluționează pe cale amiabilă
+        sau, în lipsa unei înțelegeri, de instanțele competente din România. Consumatorii se pot
+        adresa și Autorității Naționale pentru Protecția Consumatorilor (
+        <a href="https://anpc.ro/" rel="noopener">
+          anpc.ro
+        </a>
+        ) sau entităților de{' '}
+        <a href="https://anpc.ro/ce-este-sal/" rel="noopener">
+          soluționare alternativă a litigiilor
+        </a>{' '}
+        (OG nr. 38/2015); detalii în{' '}
+        <a href="informatii-legale.html#litigii">Informații legale</a>.
+      </p>
+    </article>
+  );
+}

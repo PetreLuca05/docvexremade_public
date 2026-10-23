@@ -1,0 +1,227 @@
+export default function InformatiiLegale() {
+  return (
+    <article className="doc">
+      <h1>Informații legale</h1>
+      <p className="updated">Ultima actualizare: 17 octombrie 2026</p>
+      <p>
+        Pe această pagină găsești cine pune la dispoziție site-ul și aplicația DocVex, cui te poți
+        adresa și ce reguli respectăm. Detaliile despre datele personale sunt în{' '}
+        <a href="confidentialitate.html">Politica de confidențialitate</a>, iar regulile de
+        folosire în <a href="termeni.html">Termeni și condiții</a>.
+      </p>
+      <h2 id="identificare">1. Date de identificare</h2>
+      <p>Potrivit art. 5 din Legea nr. 365/2002 privind comerțul electronic:</p>
+      <div className="table-wrap">
+        <table>
+          <tbody>
+            <tr>
+              <th scope="row">Denumire</th>
+              <td>[DE COMPLETAT: denumirea operatorului]</td>
+            </tr>
+            <tr>
+              <th scope="row">Sediu</th>
+              <td>[DE COMPLETAT: adresa sediului social]</td>
+            </tr>
+            <tr>
+              <th scope="row">CUI / cod TVA</th>
+              <td>[DE COMPLETAT]</td>
+            </tr>
+            <tr>
+              <th scope="row">Nr. Registrul Comerțului / EUID</th>
+              <td>[DE COMPLETAT]</td>
+            </tr>
+            <tr>
+              <th scope="row">E-mail</th>
+              <td>
+                <a href="mailto:[DE COMPLETAT: e-mail]">[DE COMPLETAT: e-mail de contact]</a>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Telefon</th>
+              <td>[DE COMPLETAT]</td>
+            </tr>
+            <tr>
+              <th scope="row">Găzduire</th>
+              <td>
+                GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, SUA (GitHub
+                Pages și GitHub Releases)
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h2 id="autoritati">2. Autorități competente</h2>
+      <ul>
+        <li>
+          Protecția datelor: Autoritatea Națională de Supraveghere a Prelucrării Datelor cu
+          Caracter Personal (ANSPDCP),{' '}
+          <a href="https://www.dataprotection.ro/" rel="noopener">
+            dataprotection.ro
+          </a>
+          .
+        </li>
+        <li>
+          Protecția consumatorilor: Autoritatea Națională pentru Protecția Consumatorilor (ANPC),{' '}
+          <a href="https://anpc.ro/" rel="noopener">
+            anpc.ro
+          </a>
+          .
+        </li>
+        <li>
+          Comerț electronic (Legea nr. 365/2002): Autoritatea Națională pentru Administrare și
+          Reglementare în Comunicații (ANCOM),{' '}
+          <a href="https://www.ancom.ro/" rel="noopener">
+            ancom.ro
+          </a>
+          .
+        </li>
+      </ul>
+      <h2 id="litigii">3. Reclamații și soluționarea litigiilor</h2>
+      <p>
+        Dacă ai o nemulțumire, scrie-ne mai întâi la adresa de e-mail de mai sus; răspundem în cel
+        mult 30 de zile. Dacă ești consumator și nu ajungem la o înțelegere, poți apela la
+        soluționarea alternativă a litigiilor (SAL) prin entitățile coordonate de ANPC, potrivit
+        Ordonanței Guvernului nr. 38/2015, sau te poți adresa instanțelor competente.
+      </p>
+      <p className="legal-badges">
+        <a className="legal-badge" href="https://anpc.ro/ce-este-sal/" rel="noopener">
+          <b>ANPC</b>
+          <span>Soluționarea alternativă a litigiilor</span>
+        </a>
+      </p>
+      <p className="note">
+        Platforma europeană de soluționare online a litigiilor (SOL) a fost închisă pe 20 iulie
+        2025, prin Regulamentul (UE) 2024/3228, de aceea nu mai afișăm un link către ea.
+      </p>
+      <h2 id="ai">4. Transparență privind inteligența artificială</h2>
+      <p>
+        Funcțiile „Cercetare juridică” și „AI pass” din aplicație folosesc un sistem de
+        inteligență artificială bazat pe modelele Claude ale Anthropic. Când le folosești,
+        interacționezi cu un sistem AI, nu cu o persoană, iar textul primit este generat automat.
+        Informăm despre acest lucru potrivit art. 50 din Regulamentul (UE) 2024/1689 privind
+        inteligența artificială.
+      </p>
+      <ul>
+        <li>Funcțiile AI pornesc doar la cererea ta; restul aplicației funcționează fără ele.</li>
+        <li>
+          Răspunsurile pot conține erori. Ele citează sursele din care provin, ca să le poți
+          verifica, și nu țin loc de consultanță juridică (vezi{' '}
+          <a href="termeni.html#ai">Termenii</a>).
+        </li>
+        <li>
+          DocVex nu ia decizii cu efect juridic asupra ta și nu este destinat folosirii de
+          autoritățile judiciare pentru soluționarea cauzelor.
+        </li>
+        <li>
+          Ce date ajung la furnizorul AI este descris în{' '}
+          <a href="confidentialitate.html#aplicatie">Politica de confidențialitate</a>.
+        </li>
+      </ul>
+      <h2 id="accesibilitate">5. Declarație de accesibilitate</h2>
+      <p>
+        Ne propunem ca site-ul să fie accesibil potrivit standardului EN 301 549 și Ghidului WCAG
+        2.1, nivel AA, în spiritul Directivei (UE) 2019/882 privind cerințele de accesibilitate
+        (transpusă prin Legea nr. 232/2022).
+      </p>
+      <ul>
+        <li>textul se poate mări până la 200% fără pierderi de conținut;</li>
+        <li>
+          site-ul se poate parcurge integral de la tastatură și are link de salt la conținut;
+        </li>
+        <li>respectă setările sistemului pentru tema întunecată și pentru mișcare redusă;</li>
+        <li>ilustrațiile decorative sunt ascunse cititoarelor de ecran.</li>
+      </ul>
+      <p>
+        Dacă întâmpini o barieră de accesibilitate, scrie-ne la adresa din secțiunea 1. Poți
+        sesiza și ANPC dacă nu ești mulțumit de răspuns.
+      </p>
+      <h2 id="securitate">6. Raportarea vulnerabilităților</h2>
+      <p>
+        Dacă descoperi o vulnerabilitate în site sau în aplicație, te rugăm să ne-o raportezi
+        confidențial la adresa din secțiunea 1, cu subiectul „Securitate”. Confirmăm primirea în
+        cel mult 5 zile lucrătoare și te ținem la curent cu remedierea. Datele de contact pentru
+        securitate sunt publicate și în <a href=".well-known/security.txt">security.txt</a> (RFC
+        9116), în spiritul Regulamentului (UE) 2024/2847 privind reziliența cibernetică.
+      </p>
+      <h2 id="cadru">7. Cadrul legal aplicabil</h2>
+      <div className="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Act normativ</th>
+              <th>Unde îl aplicăm</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <a href="https://eur-lex.europa.eu/eli/reg/2016/679/oj" rel="noopener">
+                  Regulamentul (UE) 2016/679 (GDPR)
+                </a>{' '}
+                și Legea nr. 190/2018
+              </td>
+              <td>
+                <a href="confidentialitate.html">Politica de confidențialitate</a>
+              </td>
+            </tr>
+            <tr>
+              <td>Directiva 2002/58/CE (ePrivacy) și Legea nr. 506/2004</td>
+              <td>
+                <a href="cookies.html">Politica de cookie-uri</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <a href="https://eur-lex.europa.eu/eli/reg/2024/1689/oj" rel="noopener">
+                  Regulamentul (UE) 2024/1689 privind inteligența artificială
+                </a>
+              </td>
+              <td>
+                <a href="#ai">Transparență AI</a>, <a href="termeni.html#ai">Termeni</a>
+              </td>
+            </tr>
+            <tr>
+              <td>Legea nr. 365/2002 privind comerțul electronic</td>
+              <td>
+                <a href="#identificare">Date de identificare</a>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                OUG nr. 34/2014 privind drepturile consumatorilor și OUG nr. 141/2021 privind
+                conținutul și serviciile digitale (Directivele 2011/83/UE și (UE) 2019/770)
+              </td>
+              <td>
+                <a href="termeni.html#consumatori">Termeni</a>
+              </td>
+            </tr>
+            <tr>
+              <td>OG nr. 38/2015 privind soluționarea alternativă a litigiilor</td>
+              <td>
+                <a href="#litigii">Reclamații și litigii</a>
+              </td>
+            </tr>
+            <tr>
+              <td>Directiva (UE) 2019/882 și Legea nr. 232/2022 (accesibilitate)</td>
+              <td>
+                <a href="#accesibilitate">Declarație de accesibilitate</a>
+              </td>
+            </tr>
+            <tr>
+              <td>Regulamentul (UE) 2024/2847 (reziliență cibernetică)</td>
+              <td>
+                <a href="#securitate">Raportarea vulnerabilităților</a>
+              </td>
+            </tr>
+            <tr>
+              <td>Legea nr. 8/1996 privind dreptul de autor</td>
+              <td>
+                <a href="termeni.html#proprietate">Termeni</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  );
+}

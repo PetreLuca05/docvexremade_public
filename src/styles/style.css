@@ -1,5 +1,5 @@
-/* DocVex: the public site (GitHub Pages). An editorial look: deep ink
-   sections, cream paper sections, a serif display face and a sand-gold
+/* DocVex: the public site (GitHub Pages). An editorial look: a deep ink
+   hero, white content sections, a serif display face and a sand-gold
    accent, taken from the app's palette (ink, sand, cream, cognac). System
    fonts only: nothing is loaded from a third party, so a visit sends nothing
    beyond the page request to GitHub. */
@@ -172,6 +172,45 @@ h3,
   border-radius: 7px;
 }
 
+.head-tools {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.lang-switch {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.lang-switch button {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+}
+
+.lang-switch button:hover {
+  color: var(--text);
+}
+
+.lang-switch button[aria-pressed='true'] {
+  background: var(--text);
+  color: var(--night);
+}
+
+.lang-switch button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
 .site-nav {
   display: flex;
   flex-wrap: wrap;
@@ -248,7 +287,8 @@ h3,
 }
 
 .btn.is-gold:hover {
-  background: var(--cream);
+  background: var(--ink);
+  color: var(--cream);
 }
 
 .note {
@@ -258,7 +298,15 @@ h3,
 
 /* ---- Sections -------------------------------------------------------- */
 
+/* Everything below the hero is white with ink text, whatever the system
+   theme. */
 .section {
+  --bg: #fff;
+  --text: var(--ink);
+  --muted: rgba(21, 33, 58, 0.64);
+  --line: rgba(21, 33, 58, 0.13);
+  --accent: var(--cognac);
+  color-scheme: light;
   padding: 112px 0;
   background: var(--bg);
   color: var(--text);
@@ -288,11 +336,37 @@ h3,
   color: var(--text);
 }
 
-.hero-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  align-items: center;
-  gap: 56px;
+.hero > .wrap {
+  position: relative;
+}
+
+/* Background photos, cross-fading under a navy veil that keeps the copy
+   readable and fades into solid night at the bottom. */
+.hero-photos,
+.hero-photos::after {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-photos img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.6s ease-in-out;
+}
+
+.hero-photos img.is-on {
+  opacity: 1;
+}
+
+.hero-photos::after {
+  content: '';
+  background:
+    linear-gradient(180deg, transparent 35%, var(--night) 92%),
+    linear-gradient(90deg, rgba(13, 20, 36, 0.92) 0%, rgba(13, 20, 36, 0.72) 55%, rgba(13, 20, 36, 0.6) 100%);
 }
 
 .hero h1 {
@@ -301,110 +375,16 @@ h3,
   line-height: 1.02;
 }
 
+.hero-copy {
+  max-width: 620px;
+  padding: 40px 0 24px;
+}
+
 .hero-copy p {
   max-width: 480px;
   margin: 0 0 36px;
   color: var(--muted);
   font-size: 15px;
-}
-
-.hero-visual {
-  position: relative;
-}
-
-.glow {
-  position: absolute;
-  inset: -20% -10% auto 10%;
-  height: 70%;
-  background: radial-gradient(closest-side, rgba(230, 207, 154, 0.35), transparent);
-  filter: blur(30px);
-}
-
-/* The app window, drawn in HTML so the page loads no images. */
-.app {
-  position: relative;
-  border: 1px solid rgba(245, 242, 234, 0.14);
-  border-radius: 12px;
-  overflow: hidden;
-  background: #f7f4ed;
-  color: var(--ink);
-  box-shadow:
-    0 40px 80px -20px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(0, 0, 0, 0.2);
-  transform: perspective(1400px) rotateY(-6deg) rotateX(2deg);
-}
-
-.app-bar {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
-  background: var(--ink);
-  color: rgba(245, 242, 234, 0.7);
-  font-size: 11px;
-}
-
-.app-bar i {
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: rgba(245, 242, 234, 0.22);
-}
-
-.app-bar span {
-  margin-left: 10px;
-}
-
-.app-body {
-  display: grid;
-  grid-template-columns: 170px 1fr;
-  min-height: 300px;
-}
-
-.app-side {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 14px 10px;
-  border-right: 1px solid rgba(21, 33, 58, 0.1);
-  background: #efeadf;
-  font-size: 11.5px;
-}
-
-.app-side b {
-  margin: 8px 6px 4px;
-  color: rgba(21, 33, 58, 0.5);
-  font-size: 9.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-
-.app-side b:first-child {
-  margin-top: 0;
-}
-
-.app-side span {
-  padding: 4px 8px;
-  border-radius: 5px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.app-side .is-on {
-  background: var(--ink);
-  color: var(--cream);
-}
-
-.app-doc {
-  padding: 22px 26px;
-  font-family: var(--serif);
-  font-size: 13px;
-  line-height: 1.6;
-}
-
-.app-doc p {
-  margin: 10px 0;
 }
 
 mark {
@@ -879,7 +859,7 @@ mark.is-caen {
 .case-tag {
   display: block;
   margin-bottom: 14px;
-  color: var(--gold);
+  color: var(--accent);
   font-size: 10.5px;
   font-weight: 600;
   letter-spacing: 0.2em;
@@ -953,9 +933,6 @@ mark.is-caen {
 
 .cta {
   text-align: center;
-  background:
-    radial-gradient(50% 80% at 50% 0%, rgba(230, 207, 154, 0.14), transparent 70%),
-    var(--night);
 }
 
 .cta .display {
@@ -970,6 +947,81 @@ mark.is-caen {
 
 .cta .note {
   margin-top: 28px;
+}
+
+/* ---- Download page --------------------------------------------------- */
+
+.release-latest {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 8px 0 20px;
+  padding: 28px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.release-latest .eyebrow,
+.release-latest .note {
+  margin: 0;
+}
+
+.doc ol.steps {
+  padding-left: 22px;
+}
+
+.release-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.doc .release-list li {
+  margin: 0;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.release-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+
+.doc .release-head h3 {
+  margin: 0;
+}
+
+.release-head span {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.badge {
+  margin-left: 10px;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.release-notes {
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.release-notes h1,
+.release-notes h2,
+.release-notes h3 {
+  margin: 14px 0 4px;
+  font-size: 16px;
 }
 
 /* ---- Legal pages ----------------------------------------------------- */
@@ -1079,7 +1131,6 @@ th {
 /* ---- Small screens --------------------------------------------------- */
 
 @media (max-width: 960px) {
-  .hero-grid,
   .split,
   .module,
   .faq {
@@ -1089,10 +1140,6 @@ th {
 
   .module.is-flip .frame {
     order: 0;
-  }
-
-  .app {
-    transform: none;
   }
 
   .tiles {
@@ -1122,6 +1169,12 @@ th {
     padding-bottom: 14px;
   }
 
+  .head-tools {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
   .site-nav {
     gap: 4px 18px;
   }
@@ -1136,14 +1189,6 @@ th {
 
   .section .display {
     margin-bottom: 36px;
-  }
-
-  .app-body {
-    grid-template-columns: 1fr;
-  }
-
-  .app-side {
-    display: none;
   }
 
   .tiles {
