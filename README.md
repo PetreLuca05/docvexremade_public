@@ -128,4 +128,4 @@ Every push to `main` then builds the site and publishes `dist/`
 (`.github/workflows/deploy.yml`) at https://docvex.ro (the domain in
 `public/CNAME`). Publishing, editing or deleting a release starts a fresh deploy from `main`
 (the `redeploy` job): the `github-pages` environment accepts deployments from
-`main` only, so no tag rule is needed.g. `v*`).
+`main` only, so no tag rule is needed.
