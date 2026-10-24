@@ -2,12 +2,12 @@ export default function Cookies() {
   return (
     <article className="doc">
       <h1>Politica de cookie-uri</h1>
-      <p className="updated">Ultima actualizare: 18 octombrie 2026</p>
+      <p className="updated">Ultima actualizare: 24 octombrie 2026</p>
       <div className="callout">
         <strong>Acest site nu folosește cookie-uri</strong>, pixeli de urmărire sau amprentarea
-        browserului. Singurul lucru pe care îl poate salva în browserul tău este limba pe care o
-        alegi (română sau engleză), și doar dacă o schimbi. Fiind o setare cerută de tine, este
-        strict necesară și nu îți cerem consimțământul printr-un banner.
+        browserului. În browserul tău poate salva doar limba pe care o alegi (română sau engleză),
+        dacă o schimbi, și sesiunea contului, dacă te autentifici pe pagina Autentificare. Amândouă sunt
+        cerute de tine, deci strict necesare, și nu îți cerem consimțământul printr-un banner.
       </div>
       <h2>Ce sunt cookie-urile</h2>
       <p>
@@ -40,6 +40,10 @@ export default function Cookies() {
               <td>Da, strict necesară</td>
             </tr>
             <tr>
+              <td>Stocare locală (local storage) pentru sesiunea contului</td>
+              <td>Da, strict necesară, doar dacă te autentifici</td>
+            </tr>
+            <tr>
               <td>Cookie-uri de analiză (statistici)</td>
               <td>Nu</td>
             </tr>
@@ -51,7 +55,9 @@ export default function Cookies() {
         </table>
       </div>
       <p>
-        Paginile nu încarcă scripturi, fonturi sau alte resurse de la terți. Tema (luminoasă sau
+        Paginile nu încarcă scripturi, fonturi sau alte resurse de la terți. Doar paginile Autentificare
+        și Contul meu (și Descărcare, cât ești autentificat) se conectează la Supabase, furnizorul
+        conturilor DocVex. Fotografia de profil de la Google, dacă ai una, se încarcă de la Google. Tema (luminoasă sau
         întunecată) urmează setarea sistemului tău și nu este salvată.
       </p>
       <h2 id="limba">Limba aleasă</h2>
@@ -61,6 +67,17 @@ export default function Cookies() {
         aceeași limbă și la vizita următoare. Valoarea rămâne doar pe dispozitivul tău: nu ne este
         trimisă și nu te identifică. Nu are dată de expirare; o poți șterge oricând din setările
         browserului (datele site-ului docvex.ro), iar site-ul revine la limba română.
+      </p>
+      <h2 id="sesiune">Sesiunea contului</h2>
+      <p>
+        Când te autentifici pe pagina <a href="autentificare.html">Autentificare</a>, browserul tău păstrează
+        în local storage sesiunea contului (o valoare <code>sb-…-auth-token</code>), ca să rămâi
+        autentificat până ieși din cont. Ea este folosită doar pentru a-ți arăta contul și planul
+        și se șterge când apeși „Ieși din cont”. Plata se face pe pagina Stripe, care are propria{' '}
+        <a href="https://stripe.com/cookies-policy/legal" rel="noopener">
+          politică de cookie-uri
+        </a>
+        .
       </p>
       <h2>Linkuri către alte site-uri</h2>
       <p>

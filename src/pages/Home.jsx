@@ -1,6 +1,10 @@
 import HeroCarousel from '../components/HeroCarousel.jsx';
 import Layout from '../components/Layout.jsx';
 import { useLang, useMeta } from '../i18n.jsx';
+import { CLIENT_OS, OS_NAMES } from '../os.js';
+
+// The visitor's system, or both when it is neither (Linux, a phone).
+const SYSTEM = OS_NAMES[CLIENT_OS];
 
 export const META = {
   ro: {
@@ -20,10 +24,10 @@ export const META = {
 // translated.
 const T = {
   ro: {
-    eyebrow: 'Testare internă · Windows',
+    eyebrow: `Testare internă · ${SYSTEM ?? 'Windows și macOS'}`,
     title: ['Fiecare dosar.', 'Un singur loc.'],
     lead: 'Aplicație desktop pentru avocați și juriști din România: proiecte cu fișierele lor, previzualizare pentru Word, PDF, Excel și WhatsApp, trimiteri la legislație și coduri CAEN recunoscute, cercetare juridică în surse oficiale.',
-    download: 'Descarcă pentru Windows',
+    download: SYSTEM ? `Descarcă pentru ${SYSTEM}` : 'Descarcă aplicația',
     discover: 'Descoperă modulele',
     modulesLabel: 'Module',
     tiles: ['Proiecte', 'Legislație și CAEN', 'Cercetare juridică'],
@@ -120,7 +124,8 @@ const T = {
       [
         'Pe ce sisteme funcționează?',
         <>
-          Pe Windows. Instalatorul este fișierul <code>docvex-…-setup.exe</code> de pe{' '}
+          Pe Windows și macOS. Instalatorul (<code>docvex-…-setup.exe</code> pentru Windows,{' '}
+          <code>docvex-….dmg</code> pentru macOS) este pe{' '}
           <a href="instalare.html">pagina de descărcare</a>.
         </>,
       ],
@@ -145,16 +150,16 @@ const T = {
     ctaEyebrow: 'Descărcare',
     ctaTitle: 'Găsește-ți dosarele, mai repede.',
     ctaText:
-      'Instalatorul pentru Windows și notele fiecărei versiuni, care descriu ce s-a schimbat, sunt pe pagina de descărcare.',
+      `Instalatorul pentru ${SYSTEM ?? 'Windows și macOS'} și notele fiecărei versiuni, care descriu ce s-a schimbat, sunt pe pagina de descărcare.`,
     ctaDownload: 'Descarcă ultima versiune',
     ctaAll: 'Toate versiunile',
     ctaNote: 'Versiunile actuale sunt destinate testării interne.',
   },
   en: {
-    eyebrow: 'Internal testing · Windows',
+    eyebrow: `Internal testing · ${SYSTEM ?? 'Windows and macOS'}`,
     title: ['Every case file.', 'One place.'],
     lead: 'A desktop app for lawyers and legal professionals in Romania: projects with their files, previews for Word, PDF, Excel and WhatsApp, recognised references to legislation and CAEN codes, and legal research in official sources.',
-    download: 'Download for Windows',
+    download: SYSTEM ? `Download for ${SYSTEM}` : 'Download the app',
     discover: 'Explore the modules',
     modulesLabel: 'Modules',
     tiles: ['Projects', 'Legislation and CAEN', 'Legal research'],
@@ -251,7 +256,8 @@ const T = {
       [
         'Which systems does it run on?',
         <>
-          Windows. The installer is the <code>docvex-…-setup.exe</code> file on the{' '}
+          Windows and macOS. The installer (<code>docvex-…-setup.exe</code> for Windows,{' '}
+          <code>docvex-….dmg</code> for macOS) is on the{' '}
           <a href="instalare.html">download page</a>.
         </>,
       ],
@@ -276,7 +282,7 @@ const T = {
     ctaEyebrow: 'Download',
     ctaTitle: 'Find your case files, faster.',
     ctaText:
-      'The Windows installer and the notes for each version, describing what changed, are on the download page.',
+      `The ${SYSTEM ?? 'Windows and macOS'} installer and the notes for each version, describing what changed, are on the download page.`,
     ctaDownload: 'Download the latest version',
     ctaAll: 'All versions',
     ctaNote: 'The current versions are meant for internal testing.',
@@ -316,12 +322,14 @@ export default function Home() {
   useMeta(META);
 
   return (
-    <Layout page="index">
+    <Layout page="index" overlay>
       {/* ---- Hero ---------------------------------------------------- */}
 
       <section className="hero is-dark">
         <HeroCarousel />
-        <div className="wrap">
+        {/* Copy and module tiles side by side (stacked on narrow screens),
+            the feature strip below: together they fit one screen. */}
+        <div className="wrap hero-main">
           <div className="hero-copy">
             <span className="eyebrow">{t.eyebrow}</span>
             <h1>
@@ -339,8 +347,6 @@ export default function Home() {
               </a>
             </div>
           </div>
-        </div>
-        <div className="wrap">
           <ul className="tiles" aria-label={t.modulesLabel}>
             {TILES.map(([id, art], i) => (
               <li key={id}>

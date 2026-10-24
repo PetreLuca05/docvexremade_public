@@ -2,16 +2,16 @@ export default function Cookies() {
   return (
     <article className="doc">
       <h1>Cookie policy</h1>
-      <p className="updated">Last updated: 18 October 2026</p>
+      <p className="updated">Last updated: 24 October 2026</p>
       <div className="callout">
         This English translation is provided for convenience. The Romanian version is the legally
         binding one.
       </div>
       <div className="callout">
         <strong>This site does not use cookies</strong>, tracking pixels or browser fingerprinting.
-        The only thing it may save in your browser is the language you choose (Romanian or English),
-        and only if you change it. Because it is a setting you request, it is strictly necessary and
-        we do not ask for your consent through a banner.
+        In your browser it may save only the language you choose (Romanian or English), if you change
+        it, and your account session, if you sign in on the Sign in page. You request both, so they
+        are strictly necessary and we do not ask for your consent through a banner.
       </div>
       <h2>What cookies are</h2>
       <p>
@@ -44,6 +44,10 @@ export default function Cookies() {
               <td>Yes, strictly necessary</td>
             </tr>
             <tr>
+              <td>Local storage for the account session</td>
+              <td>Yes, strictly necessary, only if you sign in</td>
+            </tr>
+            <tr>
               <td>Analytics (statistics) cookies</td>
               <td>No</td>
             </tr>
@@ -55,7 +59,9 @@ export default function Cookies() {
         </table>
       </div>
       <p>
-        The pages do not load scripts, fonts or other resources from third parties. The theme (light
+        The pages do not load scripts, fonts or other resources from third parties. Only the Sign in
+        and My account pages (and Download, while you are signed in) connect to Supabase, the
+        provider of DocVex accounts. A profile photo from Google, if you have one, loads from Google. The theme (light
         or dark) follows your system setting and is not saved.
       </p>
       <h2 id="limba">Chosen language</h2>
@@ -65,6 +71,17 @@ export default function Cookies() {
         language on your next visit as well. The value stays only on your device: it is not sent to
         us and does not identify you. It has no expiry date; you can delete it at any time from your
         browser settings (the site data for docvex.ro), and the site then reverts to Romanian.
+      </p>
+      <h2 id="sesiune">Account session</h2>
+      <p>
+        When you sign in on the <a href="autentificare.html">Sign in</a> page, your browser keeps your
+        account session in local storage (a <code>sb-…-auth-token</code> value), so that you stay
+        signed in until you sign out. It is used only to show you your account and plan, and it is
+        deleted when you press “Sign out”. Payment takes place on Stripe’s page, which has its own{' '}
+        <a href="https://stripe.com/cookies-policy/legal" rel="noopener">
+          cookie policy
+        </a>
+        .
       </p>
       <h2>Links to other sites</h2>
       <p>

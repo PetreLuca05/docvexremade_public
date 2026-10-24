@@ -1,44 +1,53 @@
+import { useEffect, useState } from 'react';
+import newest from 'virtual:latest-release';
+import { AUTH_EVENT, isNewer, storedUser } from '../auth.js';
 import { LANGS, useLang } from '../i18n.jsx';
+import { CLIENT_OS } from '../os.js';
+import ContinueButton from './ContinueButton.jsx';
 
 const icon = `${import.meta.env.BASE_URL}assets/icon.png`;
 
+// Links are root-relative so the header and footer also work on 404.html,
+// which GitHub Pages serves at any missing path.
 const T = {
   ro: {
     skip: 'Sari la conținut',
     nav: 'Principal',
-    sections: [
-      ['functii', 'Funcții'],
-      ['module', 'Module'],
-      ['intrebari', 'Întrebări'],
-    ],
+    home: 'Acasă',
     install: 'Descărcare',
-    privacy: 'Confidențialitate',
+    update: 'Actualizare',
+    updateNew: (v) => `Versiune nouă: ${v}`,
+    pricing: 'Prețuri',
+    signIn: 'Autentificare',
+    account: (email) => `Contul tău: ${email}`,
+    start: 'Începe',
     langs: 'Limba',
     legalNav: 'Informații legale',
     legal: [
-      ['confidentialitate.html', 'Politica de confidențialitate'],
-      ['cookies.html', 'Politica de cookie-uri'],
-      ['termeni.html', 'Termeni și condiții'],
-      ['informatii-legale.html', 'Informații legale'],
+      ['/confidentialitate.html', 'Politica de confidențialitate'],
+      ['/cookies.html', 'Politica de cookie-uri'],
+      ['/termeni.html', 'Termeni și condiții'],
+      ['/informatii-legale.html', 'Informații legale'],
     ],
   },
   en: {
     skip: 'Skip to content',
     nav: 'Main',
-    sections: [
-      ['functii', 'Features'],
-      ['module', 'Modules'],
-      ['intrebari', 'FAQ'],
-    ],
+    home: 'Home',
     install: 'Download',
-    privacy: 'Privacy',
+    update: 'Update',
+    updateNew: (v) => `New version: ${v}`,
+    pricing: 'Pricing',
+    signIn: 'Sign in',
+    account: (email) => `Your account: ${email}`,
+    start: 'Get started',
     langs: 'Language',
     legalNav: 'Legal information',
     legal: [
-      ['confidentialitate.html', 'Privacy policy'],
-      ['cookies.html', 'Cookie policy'],
-      ['termeni.html', 'Terms and conditions'],
-      ['informatii-legale.html', 'Legal information'],
+      ['/confidentialitate.html', 'Privacy policy'],
+      ['/cookies.html', 'Cookie policy'],
+      ['/termeni.html', 'Terms and conditions'],
+      ['/informatii-legale.html', 'Legal information'],
     ],
   },
 };
@@ -65,33 +74,158 @@ function LanguageSwitcher({ label }) {
   );
 }
 
-// `page` is the current page's file stem; on the home page the section links
-// stay in-page anchors, elsewhere they lead back to the home page.
-function SiteHeader({ page, t }) {
-  const home = page === 'index' ? '' : './';
-  const current = (p) => (page === p ? 'page' : undefined);
+// True while the page is scrolled to the very top: the header is then taller
+// and has no background.
+function useAtTop() {
+  const [atTop, setAtTop] = useState(() => window.scrollY < 8);
+  useEffect(() => {
+    const update = () => setAtTop(window.scrollY < 8);
+    update();
+    window.addEventListener('scroll', update, { passive: true });
+    return () => window.removeEventListener('scroll', update);
+  }, []);
+  return atTop;
+}
+
+// The signed-in user, kept in step with sign-in and sign-out on this page
+// and in other tabs.
+function useStoredUser() {
+  const [user, setUser] = useState(storedUser);
+  useEffect(() => {
+    const update = () => setUser(storedUser());
+    window.addEventListener(AUTH_EVENT, update);
+    window.addEventListener('storage', update);
+    return () => {
+      window.removeEventListener(AUTH_EVENT, update);
+      window.removeEventListener('storage', update);
+    };
+  }, []);
+  return user;
+}
+
+function initials(user) {
+  const words = (user.name || user.email).split(/[\s@._-]+/).filter(Boolean);
+  return words
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('');
+}
+
+// The account's photo (from its Google profile, for example), or its
+// initials when it has none or the photo does not load.
+export function Avatar({ user, className = 'account-avatar' }) {
+  const [failed, setFailed] = useState(false);
+  useEffect(() => setFailed(false), [user.photo]);
   return (
-    <header className="site-head">
+    <span className={className} aria-hidden="true">
+      {user.photo && !failed ? (
+        <img src={user.photo} alt="" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
+      ) : (
+        initials(user)
+      )}
+    </span>
+  );
+}
+
+function AccountPill({ user, page, t }) {
+  return (
+    <a
+      className="account-pill"
+      href="/cont.html"
+      aria-label={t.account(user.email)}
+      aria-current={page === 'cont' ? 'page' : undefined}
+      title={user.email}
+    >
+      <Avatar user={user} />
+      <span className="account-name">{user.name || user.email}</span>
+    </a>
+  );
+}
+
+// The newest version for the visitor's system (either, on other systems).
+const latest =
+  (CLIENT_OS && newest[CLIENT_OS]) ||
+  [newest.windows, newest.mac]
+    .filter(Boolean)
+    .sort((a, b) => (isNewer(a.version, b.version) ? -1 : 1))[0] ||
+  null;
+
+// For a signed-in visitor (who has the app): Update, highlighted with the new
+// version for their system when one is out since the version the account
+// last downloaded.
+function UpdateLink({ user, t, current }) {
+  const fresh = latest && user.downloaded && isNewer(latest.version, user.downloaded);
+  if (!fresh) {
+    return (
+      <a href="/instalare.html" aria-current={current}>
+        {t.update}
+      </a>
+    );
+  }
+  return (
+    <a
+      className="update-link is-new"
+      href="/instalare.html"
+      aria-current={current}
+      title={t.updateNew(latest.version)}
+    >
+      <span className="update-dot" aria-hidden="true" />
+      {t.update}
+      <span className="update-version">{latest.version}</span>
+    </a>
+  );
+}
+
+// The same header on every page. `page` is the current page's file stem;
+// `navPage`, when given, is the link to mark instead (the sign-in page marks
+// Sign in only on its Sign in tab); `overlay` lays the header over a dark
+// hero (the home page).
+function SiteHeader({ page, navPage = page, overlay, t }) {
+  const atTop = useAtTop();
+  const user = useStoredUser();
+  const current = (p) => (navPage === p ? 'page' : undefined);
+  const className = ['site-head', overlay && 'is-overlay', atTop && 'is-top']
+    .filter(Boolean)
+    .join(' ');
+  return (
+    <header className={className}>
       <div className="wrap">
-        <a className="brand" href="./">
+        <a className="brand" href="/">
           <img src={icon} alt="" />
           docvex
         </a>
         <div className="head-tools">
-          <LanguageSwitcher label={t.langs} />
           <nav className="site-nav" aria-label={t.nav}>
-            {t.sections.map(([id, label]) => (
-              <a key={id} href={`${home}#${id}`}>
-                {label}
+            <a href="/" aria-current={current('index')}>
+              {t.home}
+            </a>
+            {user ? (
+              <UpdateLink user={user} t={t} current={current('instalare')} />
+            ) : (
+              <a href="/instalare.html" aria-current={current('instalare')}>
+                {t.install}
               </a>
-            ))}
-            <a href="instalare.html" aria-current={current('instalare')}>
-              {t.install}
-            </a>
-            <a href="confidentialitate.html" aria-current={current('confidentialitate')}>
-              {t.privacy}
-            </a>
+            )}
+            {!user && (
+              <a href="/preturi.html" aria-current={current('preturi')}>
+                {t.pricing}
+              </a>
+            )}
+            {!user && (
+              <a href="/autentificare.html#autentificare" aria-current={current('autentificare')}>
+                {t.signIn}
+              </a>
+            )}
           </nav>
+          <div className="head-actions">
+            {user && <AccountPill user={user} page={page} t={t} />}
+            {!user && (
+              <ContinueButton href="/autentificare.html" small>
+                {t.start}
+              </ContinueButton>
+            )}
+            <LanguageSwitcher label={t.langs} />
+          </div>
         </div>
       </div>
     </header>
@@ -118,7 +252,8 @@ function SiteFooter({ t }) {
   );
 }
 
-export default function Layout({ page, mainClassName, children }) {
+// The shared frame of every page: header, main and footer.
+export default function Layout({ page, navPage, overlay = false, mainClassName, children }) {
   const { lang } = useLang();
   const t = T[lang];
   return (
@@ -126,7 +261,7 @@ export default function Layout({ page, mainClassName, children }) {
       <a className="skip" href="#continut">
         {t.skip}
       </a>
-      <SiteHeader page={page} t={t} />
+      <SiteHeader page={page} navPage={navPage} overlay={overlay} t={t} />
       <main id="continut" className={mainClassName}>
         {children}
       </main>

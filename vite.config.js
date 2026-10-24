@@ -7,6 +7,9 @@ import react from '@vitejs/plugin-react';
 const pages = [
   'index',
   'instalare',
+  'preturi',
+  'cont',
+  'autentificare',
   'confidentialitate',
   'cookies',
   'termeni',
@@ -19,6 +22,13 @@ const REPO = 'PetreLuca05/docvexremade_public';
 // The published versions, read from this repository's GitHub Releases when the
 // site is built (the deploy workflow rebuilds on every new release), so the
 // download page needs no request to GitHub until the visitor clicks download.
+function dmgArch(name) {
+  if (/universal/i.test(name)) return 'universal';
+  if (/arm64|aarch64/i.test(name)) return 'arm64';
+  if (/x64|x86_64|intel/i.test(name)) return 'x64';
+  return null;
+}
+
 async function fetchReleases() {
   const headers = { Accept: 'application/vnd.github.html+json', 'User-Agent': 'docvex-site' };
   if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
@@ -28,23 +38,34 @@ async function fetchReleases() {
     });
     if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
     const list = await res.json();
+    const file = (a, extra) => ({
+      file: a.name,
+      size: a.size,
+      url: a.browser_download_url,
+      ...extra,
+    });
     return list
       .filter((r) => !r.draft)
       .map((r) => {
         const exe =
           r.assets.find((a) => /-setup\.exe$/i.test(a.name)) ??
           r.assets.find((a) => /\.exe$/i.test(a.name));
-        return (
-          exe && {
-            version: r.tag_name.replace(/^v/, ''),
-            date: r.published_at,
-            prerelease: r.prerelease,
-            notes: r.body_html ?? '',
-            file: exe.name,
-            size: exe.size,
-            url: exe.browser_download_url,
-          }
-        );
+        // Every .dmg (electron-builder names them by processor when it builds
+        // more than one); the Universal one first, then Apple silicon.
+        const rank = { universal: 0, arm64: 1, x64: 2 };
+        const dmgs = r.assets
+          .filter((a) => /\.dmg$/i.test(a.name))
+          .map((a) => file(a, { arch: dmgArch(a.name) }))
+          .sort((a, b) => (rank[a.arch] ?? 3) - (rank[b.arch] ?? 3));
+        if (!exe && !dmgs.length) return null;
+        return {
+          version: r.tag_name.replace(/^v/, ''),
+          date: r.published_at,
+          prerelease: r.prerelease,
+          notes: r.body_html ?? '',
+          windows: exe ? file(exe) : null,
+          mac: dmgs,
+        };
       })
       .filter(Boolean);
   } catch (error) {
@@ -55,16 +76,24 @@ async function fetchReleases() {
   }
 }
 
+// `virtual:releases`: every release (the download page); `virtual:latest-release`:
+// just the newest version for each system, { windows, mac } (the header, on
+// every page).
 function releases() {
-  const id = 'virtual:releases';
+  const ids = ['virtual:releases', 'virtual:latest-release'];
   let data;
   return {
     name: 'docvex-releases',
-    resolveId: (source) => (source === id ? `\0${id}` : undefined),
+    resolveId: (source) => (ids.includes(source) ? `\0${source}` : undefined),
     async load(source) {
-      if (source !== `\0${id}`) return;
+      if (!ids.some((id) => source === `\0${id}`)) return;
       data ??= await fetchReleases();
-      return `export default ${JSON.stringify(data)};`;
+      if (source === `\0${ids[0]}`) return `export default ${JSON.stringify(data)};`;
+      const newest = (os) => {
+        const r = data.find((x) => (os === 'mac' ? x.mac.length : x.windows));
+        return r ? { version: r.version, date: r.date } : null;
+      };
+      return `export default ${JSON.stringify({ windows: newest('windows'), mac: newest('mac') })};`;
     },
   };
 }

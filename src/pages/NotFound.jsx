@@ -1,3 +1,5 @@
+import BackButton from '../components/BackButton.jsx';
+import Layout from '../components/Layout.jsx';
 import { useLang, useMeta } from '../i18n.jsx';
 
 const META = {
@@ -15,14 +17,12 @@ export default function NotFound() {
   const t = T[lang];
   useMeta(META);
   return (
-    <main className="wrap">
+    <Layout page="404" mainClassName="wrap">
       <article className="doc">
         <h1>{t.title}</h1>
         <p className="updated">{t.code}</p>
-        <p>
-          <a href="/">{t.back}</a>
-        </p>
+        <BackButton href="/">{t.back}</BackButton>
       </article>
-    </main>
+    </Layout>
   );
 }

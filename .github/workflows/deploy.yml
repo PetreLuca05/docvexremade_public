@@ -33,6 +33,11 @@ jobs:
       - run: npm run build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VITE_SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          VITE_STRIPE_LINK_PRO: ${{ vars.STRIPE_LINK_PRO }}
+          VITE_STRIPE_LINK_CABINET: ${{ vars.STRIPE_LINK_CABINET }}
+          VITE_STRIPE_PORTAL: ${{ vars.STRIPE_PORTAL }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

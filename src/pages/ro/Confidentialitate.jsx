@@ -2,7 +2,7 @@ export default function Confidentialitate() {
   return (
     <article className="doc">
       <h1>Politica de confidențialitate</h1>
-      <p className="updated">Ultima actualizare: 18 octombrie 2026</p>
+      <p className="updated">Ultima actualizare: 24 octombrie 2026</p>
       <p>
         Această politică explică ce date cu caracter personal sunt prelucrate atunci când vizitezi
         acest site și când folosești aplicația DocVex, în ce scop, pe ce temei și ce drepturi ai,
@@ -27,11 +27,35 @@ export default function Confidentialitate() {
       </p>
       <h2 id="site">2. Vizitarea acestui site</h2>
       <p>
-        Site-ul este static: nu are formulare, conturi, instrumente de analiză (analytics),
-        reclame, pluginuri de social media sau fonturi încărcate de la terți. Nu plasăm cookie-uri;
-        singura informație păstrată în browserul tău este limba pe care o alegi, care rămâne pe
-        dispozitivul tău și nu ne este trimisă (vezi{' '}
-        <a href="cookies.html#limba">Politica de cookie-uri</a>).
+        Site-ul este static: nu are instrumente de analiză (analytics), reclame, pluginuri de
+        social media sau fonturi încărcate de la terți. Nu plasăm cookie-uri; în browserul tău
+        păstrăm doar limba pe care o alegi și, dacă te autentifici pe pagina Autentificare, sesiunea
+        contului (vezi <a href="cookies.html">Politica de cookie-uri</a>).
+      </p>
+      <h3 id="cont">Contul și plata pe site</h3>
+      <p>
+        Pe pagina <a href="autentificare.html">Autentificare</a> îți poți crea contul DocVex sau te poți
+        autentifica. Numele, e-mailul, parola (păstrată doar sub formă de hash) și planul ales sau,
+        dacă alegi „Continuă cu Google”, numele, e-mailul și fotografia din contul Google sunt
+        trimise direct către Supabase, furnizorul conturilor DocVex, și formează același cont pe care îl
+        folosești în aplicație (vezi secțiunea 3). Temeiul este încheierea și executarea
+        contractului (art. 6 alin. (1) lit. b) GDPR). Pe pagina <a href="cont.html">Contul meu</a> vezi
+        și modifici aceste date. Dacă descarci aplicația
+        cât ești autentificat, contul reține versiunea descărcată, ca să-ți arătăm când apare una
+        nouă. Doar paginile Autentificare, Contul meu și, când ești autentificat, Descărcare se conectează
+        la Supabase. Fotografia de profil, dacă ai una de la Google, se încarcă direct de pe
+        serverele Google.
+      </p>
+      <p>
+        Planurile plătite se plătesc pe pagina de plată găzduită de Stripe Payments Europe, Ltd.
+        (Irlanda). Datele cardului le introduci direct la Stripe; noi nu le vedem și nu le
+        păstrăm. Primim de la Stripe confirmarea plății, suma, planul și e-mailul, pentru a activa
+        planul în contul tău și pentru obligațiile contabile și fiscale (art. 6 alin. (1) lit. b) și
+        c) GDPR). Stripe prelucrează datele și ca operator independent, potrivit{' '}
+        <a href="https://stripe.com/privacy" rel="noopener">
+          politicii sale de confidențialitate
+        </a>
+        .
       </p>
       <h3 id="github">Găzduirea pe GitHub Pages</h3>
       <p>
@@ -124,7 +148,7 @@ export default function Confidentialitate() {
       </p>
       <h2 id="transferuri">4. Transferuri în afara SEE</h2>
       <p>
-        Unii furnizori (GitHub, Anthropic, Supabase) sunt companii din SUA. Transferurile se fac
+        Unii furnizori (GitHub, Anthropic, Supabase, Stripe) sunt companii din SUA sau fac parte din grupuri din SUA. Transferurile se fac
         pe baza deciziei de adecvare pentru EU-U.S. Data Privacy Framework, acolo unde furnizorul
         este certificat, sau a clauzelor contractuale standard adoptate de Comisia Europeană (art.
         45 și art. 46 GDPR).

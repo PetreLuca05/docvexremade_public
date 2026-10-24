@@ -2,7 +2,7 @@ export default function Confidentialitate() {
   return (
     <article className="doc">
       <h1>Privacy policy</h1>
-      <p className="updated">Last updated: 18 October 2026</p>
+      <p className="updated">Last updated: 24 October 2026</p>
       <div className="callout">
         This English translation is provided for convenience. The Romanian version is the legally
         binding one.
@@ -32,10 +32,34 @@ export default function Confidentialitate() {
       </p>
       <h2 id="site">2. Visiting this website</h2>
       <p>
-        This website is static: it has no forms, accounts, analytics tools, advertising, social
-        media plugins or fonts loaded from third parties. We do not set cookies; the only
-        information stored in your browser is the language you choose, which remains on your device
-        and is not sent to us (see the <a href="cookies.html#limba">Cookie policy</a>).
+        This website is static: it has no analytics tools, advertising, social media plugins or
+        fonts loaded from third parties. We do not set cookies; in your browser we keep only the
+        language you choose and, if you sign in on the Sign in page, your account session (see the{' '}
+        <a href="cookies.html">Cookie policy</a>).
+      </p>
+      <h3 id="cont">Your account and payment on the site</h3>
+      <p>
+        On the <a href="autentificare.html">Sign in</a> page you can create your DocVex account or sign
+        in. Your name, email, password (kept only in hashed form) and chosen plan or, if you choose
+        “Continue with Google”, the name, email and photo from your Google account are sent directly
+        to Supabase, the provider of DocVex accounts, and make up the same account you use in the
+        app (see section 3). The legal basis is entering into and performing the contract (Article
+        6(1)(b) GDPR). On the <a href="cont.html">My account</a> page you can see and change this data. If you download the app while signed in, the
+        account keeps the version you downloaded, so that we can show you when a new one is out.
+        Only the Sign in and My account pages and, while you are signed in, the Download page connect
+        to Supabase. Your profile photo, if you have one from Google, loads directly from Google’s
+        servers.
+      </p>
+      <p>
+        Paid plans are paid on the checkout page hosted by Stripe Payments Europe, Ltd. (Ireland).
+        You enter your card details directly with Stripe; we neither see nor keep them. Stripe
+        sends us the payment confirmation, amount, plan and email, so that we can activate the plan
+        on your account and meet our accounting and tax obligations (Article 6(1)(b) and (c) GDPR).
+        Stripe also processes data as an independent controller, under its{' '}
+        <a href="https://stripe.com/privacy" rel="noopener">
+          privacy policy
+        </a>
+        .
       </p>
       <h3 id="github">Hosting on GitHub Pages</h3>
       <p>
@@ -123,7 +147,7 @@ export default function Confidentialitate() {
       </p>
       <h2 id="transferuri">4. Transfers outside the EEA</h2>
       <p>
-        Some providers (GitHub, Anthropic, Supabase) are US companies. Transfers take place on the
+        Some providers (GitHub, Anthropic, Supabase, Stripe) are US companies or part of US groups. Transfers take place on the
         basis of the adequacy decision for the EU-U.S. Data Privacy Framework, where the provider is
         certified, or of the standard contractual clauses adopted by the European Commission
         (Articles 45 and 46 GDPR).
