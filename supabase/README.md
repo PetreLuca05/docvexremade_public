@@ -6,16 +6,24 @@ tables and functions from the desktop app's repository (`ai_usage`,
 `ai_sessions`, `ai_usage_totals`, and the `ai`, `billing` and `stripe-webhook`
 functions). Nothing here changes them.
 
-| Migration                         | What it adds                                                                                                                                                            |
-| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `001_ask_usage.sql`               | `ask_usage`, `ask_take`, `ask_give` (the FAQ assistant's daily limits)                                                                                                  |
-| `002_admin_billing_analytics.sql` | `is_admin()`, `billing_events`, `subscriptions`, the views `subscriptions_summary`, `billing_events_daily`, `subscription_lifecycle_daily`, and `admin_signups_daily()` |
+| Migration                          | What it adds                                                                                                                                                            |
+| ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `001_ask_usage.sql`                | `ask_usage`, `ask_take`, `ask_give` (the FAQ assistant's daily limits)                                                                                                  |
+| `002_admin_billing_analytics.sql`  | `is_admin()`, `billing_events`, `subscriptions`, the views `subscriptions_summary`, `billing_events_daily`, `subscription_lifecycle_daily`, and `admin_signups_daily()` |
+| `003_admin_insights.sql`           | `admin_retention_weekly()`, `admin_user_firsts()`, `admin_ai_usage_by_user()` (the dashboard's Key metrics; read the app's tables, admins only)                         |
+| `004_admin_reliability.sql`        | `admin_release_health()`, `admin_law_tools_daily()`, `admin_law_errors()` (reliability per release and the legal sources; admins only)                                  |
+| `005_alerts.sql`                   | `alerts_log`, and the pg_cron job that runs the `alerts` function every 10 minutes (needs the Vault secrets `alerts_url` and `alerts_secret`)                           |
+| `006_admin_push_subscriptions.sql` | `admin_push_subscriptions` (the installed dashboard's push devices; admins manage their own)                                                                            |
 
 | Function        | Purpose                                                           | Deploy                                                    |
 | --------------- | ----------------------------------------------------------------- | --------------------------------------------------------- |
 | `ask-docvex`    | The FAQ's AI assistant                                            | `supabase functions deploy ask-docvex --no-verify-jwt`    |
 | `stripe-events` | Logs every Stripe event; links Payment Link checkouts to accounts | `supabase functions deploy stripe-events --no-verify-jwt` |
 | `admin`         | The admin dashboard's data (admins only)                          | `supabase functions deploy admin --no-verify-jwt`         |
+| `alerts`        | Phone alerts (ntfy), run by pg_cron                               | `supabase functions deploy alerts --no-verify-jwt`        |
+
+`admin` and `alerts` import `functions/_shared/push.ts` (Web Push); the CLI
+uploads `_shared` with them.
 
 `--no-verify-jwt`: each function checks its caller itself (Stripe's signature,
 or the admin's token), and answers CORS preflights without a token.
@@ -78,6 +86,19 @@ supabase secrets set PLAUSIBLE_API_KEY=… PLAUSIBLE_SITE_ID=docvex.ro
 supabase secrets set PLAUSIBLE_HOST=https://plausible.io   # optional; a self-hosted instance
 supabase secrets set GITHUB_TOKEN=…                         # optional; a read-only token, for GitHub's rate limit
 ```
+
+```sh
+# alerts: a long random topic (anyone who knows it can read it) and the cron's secret
+supabase secrets set NTFY_TOPIC=docvex-<random> ALERTS_SECRET=<random>
+supabase secrets set TELEGRAM_BOT_TOKEN=… TELEGRAM_CHAT_ID=…   # optional, a second channel
+supabase secrets set ALERT_ERRORS_PER_HOUR=10 ALERT_LIMIT_USERS=5   # optional thresholds
+
+# Web Push to the installed dashboard (admin, alerts): a P-256 key pair, base64url
+supabase secrets set VAPID_PUBLIC_KEY=… VAPID_PRIVATE_KEY=… VAPID_SUBJECT=https://docvex.ro
+```
+
+The cron job reads the function's address and `ALERTS_SECRET` from the
+Vault (see `005_alerts.sql`).
 
 ## Registering the `stripe-events` webhook
 

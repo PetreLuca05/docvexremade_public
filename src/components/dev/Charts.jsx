@@ -133,13 +133,13 @@ export function Donut({ data, format }) {
 }
 
 // Stacked bars: `keys` is [{ key, name, color }].
-export function StackedBars({ data, xKey, keys, tickFormat, height = 240, format }) {
+export function StackedBars({ data, xKey, keys, tickFormat, height = 240, format, yFormat }) {
   return (
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data} margin={{ top: 10, right: 8, left: -18, bottom: 0 }}>
         <CartesianGrid stroke={COLORS.line} vertical={false} />
         <XAxis dataKey={xKey} {...axis} tickFormatter={tickFormat} minTickGap={16} />
-        <YAxis {...axis} allowDecimals={false} width={48} />
+        <YAxis {...axis} allowDecimals={false} width={yFormat ? 56 : 48} tickFormatter={yFormat} />
         <Tooltip
           cursor={{ fill: 'rgba(245, 242, 234, 0.04)' }}
           content={<ChartTooltip labelFormat={tickFormat} format={format} />}

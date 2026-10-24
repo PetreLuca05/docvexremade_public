@@ -24,8 +24,128 @@ So no consent banner is needed. The cookie and privacy policies describe it
 `subscriptions`.** These are the record of subscriptions. They are linked to
 accounts, and the privacy policy's payment paragraph describes them.
 
+**The desktop app: its own anonymous telemetry.** Since 1.2.0 the app sends
+usage events to the `events` function (in the app's repository, documented in
+its `docs/telemetry.md`). The dashboard's **App** section reads the app's
+views (`app_active_users_daily`, `app_feature_usage_daily`, `ai_usage_daily`,
+`app_versions_current`, `app_update_funnel_daily`, `app_errors_recent`,
+`app_users_overview`, …) through the `admin` function's `app` action, with the
+admin's token. Emails are joined in from the Admin API; they never enter the
+app's tables.
+
+**Key metrics** (the dashboard's first section) join these sources through
+the `admin` function's `insights` action and the SQL functions in
+`supabase/migrations/003_admin_insights.sql`:
+
+- **The path to paying:** website visitors, Download clicks and new installs
+  for the range, then the accounts created in the range and how many opened
+  the app, asked the AI and subscribed.
+- **Retention by start week:** installs grouped by their first week, and the
+  share active in each week after (the last 8 weeks).
+- **AI cost per plan:** tokens per model at Claude's list prices (`PRICES` in
+  the function; update it when prices or models change), converted at the
+  National Bank of Romania's daily USD rate, against each plan's MRR
+  prorated to the range.
+- **Subscription health:** paying subscribers, MRR, revenue per subscriber,
+  monthly churn, lifetime value, new and ended subscriptions, and Stripe's
+  cancellation reasons (turn them on in the customer portal's settings).
+- **Reliability per release:** sessions per version, the share with no
+  error, and window crashes (`supabase/migrations/004_admin_reliability.sql`).
+- **Legal sources:** the AI's searches per source, with failures and slow
+  calls, failures per day, and failed AI requests by kind.
+
 **Accounts and downloads** are read when needed: from Supabase Auth and from
 GitHub Releases' download counts. Nothing new is collected for them.
+
+## Phone alerts
+
+The `alerts` function runs every 10 minutes (pg_cron) and pushes to the
+admin's phone through [ntfy](https://ntfy.sh): install the ntfy app and
+subscribe to the topic shown in the dashboard's Health section, then press
+"Send a test alert". It sends each of these once:
+
+| Alert           | When                                                         |
+| --------------- | ------------------------------------------------------------ |
+| App errors      | `ALERT_ERRORS_PER_HOUR` (10) or more error events in an hour |
+| Payment failed  | a Stripe `invoice.payment_failed` event                      |
+| Stripe delivery | Stripe could not deliver an event for over 30 minutes        |
+| A legal source  | half or more of a source's searches failed in an hour (5+)   |
+| AI limits       | `ALERT_LIMIT_USERS` (5) or more users hit a limit in a day   |
+| A function down | an Edge Function answers with a 5xx                          |
+
+## Push notifications on the installed dashboard
+
+`dev.html` installs as an app ("Docvex Dev") and receives Web Push, with our
+own VAPID keys and no third party. Only `dev.html` links the manifest
+(`public/dev.webmanifest`) and registers the service worker
+(`public/dev-sw.js`, scope `/dev.html`), so no public page is controlled or
+cached by it.
+
+**Turning it on**
+
+- **iPhone / iPad** (iOS 16.4+): open docvex.ro/dev.html in Safari → Share →
+  Add to Home Screen → open Docvex Dev from the icon → sign in → Settings →
+  "Enable on this device" → Allow. Safari only offers push to a dashboard
+  opened from the Home Screen.
+- **Android:** open it in Chrome → ⋮ → Install app (or Add to Home screen) →
+  Settings → "Enable on this device" → Allow.
+- **Desktop** (Chrome, Edge, Firefox, Safari): Settings → "Enable on this
+  device".
+
+Then "Send a test notification". Tapping a notification opens the dashboard
+at its link (`#/settings`, `#insights`, later `#/reports/R-0042`).
+
+**The `admin` actions** (admins only, with the admin's token; the table's
+policy also requires `is_admin()` and the caller's own rows):
+
+| Action             | Body                             | Does                                                   |
+| ------------------ | -------------------------------- | ------------------------------------------------------ |
+| `push.subscribe`   | `{ subscription, device_label }` | saves this browser's subscription (upsert by endpoint) |
+| `push.unsubscribe` | `{ endpoint }`                   | removes one device                                     |
+| `push.list`        | —                                | the caller's devices                                   |
+| `push.test`        | `{ lang? }`                      | a test push to the caller's devices                    |
+
+The `alerts` function sends every alert to all devices too, as well as to
+ntfy.
+
+**Keys.** `VITE_VAPID_PUBLIC_KEY` (Actions variable `VAPID_PUBLIC_KEY`, and
+`.env.local`) is the public key the browser subscribes with. The functions'
+secrets `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` and `VAPID_SUBJECT`
+(`https://docvex.ro`) sign the pushes. To rotate them, make a new P-256 pair,
+set all four, redeploy the site, and delete the rows of
+`admin_push_subscriptions`: every subscription was made for the old key, so
+each device has to press "Enable on this device" again.
+
+**Sending a push from another function** (the app's `report-dossier`):
+
+1. Copy `supabase/functions/_shared/push.ts` (Web Crypto only, no
+   dependencies) and give the function the three VAPID secrets.
+2. With the service role, read `admin_push_subscriptions`
+   (`endpoint, p256dh, auth`), or call
+   `pushToAdmins(db, payload, vapidFromEnv(Deno.env.get))`, which does steps
+   2 to 4.
+3. Send the payload `{ title, body, url, urgent?, tag? }`: `url` a full
+   dashboard link (`https://docvex.ro/dev.html#/reports/R-0042`), `urgent`
+   for a notification that stays on screen and vibrates, `tag` so a newer
+   push about the same thing replaces the older one.
+4. On 404 or 410 from the push service, delete that row (the device
+   unsubscribed). On success set `last_used_at` (and `failures` to 0); on
+   another error add 1 to `failures`.
+
+## Asking about the metrics
+
+The dashboard's "Ask about the metrics" box sends the question, the
+conversation so far and a fresh snapshot of every section for the selected
+range to Claude (`claude-opus-5-5`) through the `admin` function's `ask`
+action. Email addresses are removed from the snapshot. It uses the project's
+`ANTHROPIC_API_KEY`; each question costs a few cents.
+
+## Search terms (Google Search Console)
+
+docvex.ro's DNS (Cloudflare) has a Google site-verification record. To see
+the Google searches that bring visitors, link Search Console in Plausible:
+Site settings → Integrations → Google Search Console. The terms then appear
+in Plausible's own dashboard (Sources → Google), after a few days.
 
 ## Goals to create in Plausible
 
@@ -99,5 +219,6 @@ the dashboard still reads the real Plausible stats through the function.
   (`localStorage['docvex:dev-downloads']`).
 - **MRR history.** Rebuilt from each subscription's start and end dates. Every
   price is monthly today; a yearly price would need dividing by 12.
-- **The globe's hover** shows the country nearest the pointer among those
-  facing you. Hovering the country list turns the globe to that country.
+- **The audience map** covers Romania only, by county (Plausible's
+  `visit:region`, filtered to `RO`). Other countries are in the Countries
+  card. Hovering a county in the list highlights it on the map.
