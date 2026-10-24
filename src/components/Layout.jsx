@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import newest from 'virtual:latest-release';
-import { AUTH_EVENT, isNewer, storedUser } from '../auth.js';
+import { AUTH_EVENT, authHref, isNewer, storedUser } from '../auth.js';
 import { LANGS, useLang } from '../i18n.jsx';
 import { track } from '../analytics.js';
 import { CLIENT_OS } from '../os.js';
@@ -216,7 +216,7 @@ function SiteHeader({ page, navPage = page, overlay, t }) {
               </a>
             )}
             {!user && (
-              <a href="/autentificare.html#autentificare" aria-current={current('autentificare')}>
+              <a href={authHref({ signin: true })} aria-current={current('autentificare')}>
                 {t.signIn}
               </a>
             )}
@@ -224,7 +224,7 @@ function SiteHeader({ page, navPage = page, overlay, t }) {
           <div className="head-actions">
             {user && <AccountPill user={user} page={page} t={t} />}
             {!user && (
-              <ContinueButton href="/autentificare.html" small>
+              <ContinueButton href={authHref()} small>
                 {t.start}
               </ContinueButton>
             )}

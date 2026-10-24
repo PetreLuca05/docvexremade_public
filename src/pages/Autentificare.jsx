@@ -3,7 +3,14 @@ import Layout from '../components/Layout.jsx';
 import { PLAN_IDS, PlanDetails, usePlanText } from '../components/Plans.jsx';
 import { GoogleButton, SignIn, SignUp, useAuthText } from '../components/AuthForms.jsx';
 import { track, trackThen } from '../analytics.js';
-import { authConfigured, authRedirect, checkoutUrl, getSupabase, paymentLink } from '../auth.js';
+import {
+  authConfigured,
+  authRedirect,
+  checkoutUrl,
+  getSupabase,
+  nextPage,
+  paymentLink,
+} from '../auth.js';
 import { useLang, useMeta } from '../i18n.jsx';
 
 const META = {
@@ -153,7 +160,7 @@ function AuthPanel({ t, lang, plan, setPlan, mode, setMode, step, setStep }) {
   }, [savedPlan, setPlan]);
 
   // Signed in (by signing in, creating an account or coming back from
-  // Google): on to the landing page, logged in; or first to Stripe, when a
+  // Google): back to the page that sent here (?next=), else the landing page; or first to Stripe, when a
   // paid plan was picked while creating the account. The panel below stays
   // only for the return from Stripe.
   const leaving = Boolean(session) && !paidBack;
@@ -164,7 +171,7 @@ function AuthPanel({ t, lang, plan, setPlan, mode, setMode, step, setStep }) {
     if (checkout) {
       trackThen('Checkout Redirect', { plan }).then(() => window.location.replace(checkout));
     } else {
-      window.location.replace('/');
+      window.location.replace(nextPage() ?? '/');
     }
   }, [leaving]); // eslint-disable-line react-hooks/exhaustive-deps
 

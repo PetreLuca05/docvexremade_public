@@ -65,10 +65,48 @@ export async function getSupabase() {
   return client;
 }
 
+// The page to return to after signing in: ?next= on the sign-in page, a path
+// on this site only (never another site, never the sign-in page itself).
+export function safeNext(value) {
+  if (typeof value !== 'string' || !value.startsWith('/') || value.startsWith('//')) return null;
+  try {
+    const url = new URL(value, window.location.origin);
+    if (url.origin !== window.location.origin) return null;
+    if (url.pathname === '/autentificare.html') return null;
+    return url.pathname + url.search + url.hash;
+  } catch {
+    return null;
+  }
+}
+
+// The ?next= this sign-in page was opened with, if any.
+export function nextPage() {
+  return safeNext(new URLSearchParams(window.location.search).get('next'));
+}
+
+// A link to the sign-in page that comes back here afterwards: `signin` opens
+// it on Sign in (else New account), `plan` preselects a plan. On the sign-in
+// page itself the page to return to stays the one it was opened for.
+export function authHref({ signin = false, plan } = {}) {
+  const params = new URLSearchParams();
+  if (plan) params.set('plan', plan);
+  const here = window.location.pathname === '/autentificare.html';
+  const next = here
+    ? nextPage()
+    : safeNext(window.location.pathname + window.location.search + window.location.hash);
+  if (next && next !== '/' && next !== '/index.html') params.set('next', next);
+  const query = params.toString();
+  return `/autentificare.html${query ? `?${query}` : ''}${signin ? '#autentificare' : ''}`;
+}
+
 // Where Google sign-in and the e-mail links return to (allowed in Supabase →
-// Authentication → URL Configuration).
+// Authentication → URL Configuration): the sign-in page, keeping ?next= so
+// the visitor still ends up where they started.
 export function authRedirect() {
-  return `${window.location.origin}/autentificare.html`;
+  const url = new URL(`${window.location.origin}/autentificare.html`);
+  const next = nextPage();
+  if (next) url.searchParams.set('next', next);
+  return url.toString();
 }
 
 // Remembers on the account the version it last downloaded from the site, so

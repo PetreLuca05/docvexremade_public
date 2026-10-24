@@ -2,7 +2,7 @@ import HeroCarousel from '../components/HeroCarousel.jsx';
 import Layout from '../components/Layout.jsx';
 import { useLang, useMeta } from '../i18n.jsx';
 import { CLIENT_OS, OS_NAMES } from '../os.js';
-import { storedUser } from '../auth.js';
+import { authHref, storedUser } from '../auth.js';
 import AskDocvex from '../components/AskDocvex.jsx';
 import ContinueButton from '../components/ContinueButton.jsx';
 
@@ -539,7 +539,7 @@ export default function Home() {
               <ContinueButton href="/cont.html">{t.ctaSignedIn}</ContinueButton>
             ) : (
               <>
-                <ContinueButton href="/autentificare.html">{t.ctaStart}</ContinueButton>
+                <ContinueButton href={authHref()}>{t.ctaStart}</ContinueButton>
                 <ContinueButton href="/preturi.html" outline>
                   {t.ctaPricing}
                 </ContinueButton>

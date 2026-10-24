@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Layout, { Avatar } from '../components/Layout.jsx';
 import ContinueButton from '../components/ContinueButton.jsx';
 import Plans, { PLAN_IDS } from '../components/Plans.jsx';
-import { billingUrl, getSupabase } from '../auth.js';
+import { authHref, billingUrl, getSupabase } from '../auth.js';
 import { useLang, useMeta } from '../i18n.jsx';
 import { useSession } from '../useSession.js';
 
@@ -1299,7 +1299,7 @@ export default function Cont() {
         {session === undefined && <p className="note">{t.loading}</p>}
         {session === null && (
           <div className="callout">
-            {t.signedOut} <a href="/autentificare.html#autentificare">{t.signIn}</a>
+            {t.signedOut} <a href={authHref({ signin: true })}>{t.signIn}</a>
           </div>
         )}
         {session && <Account t={t} user={session.user} />}

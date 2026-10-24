@@ -1,5 +1,6 @@
 import Layout from '../components/Layout.jsx';
 import Plans from '../components/Plans.jsx';
+import { authHref } from '../auth.js';
 import { useLang, useMeta } from '../i18n.jsx';
 
 const META = {
@@ -40,7 +41,7 @@ export default function Preturi() {
         <span className="eyebrow">{t.eyebrow}</span>
         <h1 className="display">{t.title}</h1>
         <p>{t.lead}</p>
-        <Plans href={(id) => `/autentificare.html?plan=${id}`} />
+        <Plans href={(id) => authHref({ plan: id })} />
       </section>
     </Layout>
   );

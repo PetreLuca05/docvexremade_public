@@ -5,7 +5,7 @@ import { countryName } from '../components/dev/countries.js';
 import { countyName } from '../components/dev/counties.js';
 import { useLang, useMeta } from '../i18n.jsx';
 import { useSession } from '../useSession.js';
-import { validUrl } from '../auth.js';
+import { authHref, validUrl } from '../auth.js';
 
 // The admin dashboard (dev.html): website traffic (Plausible), subscriptions
 // (Stripe, through the stripe-events log), accounts, downloads and health,
@@ -3021,7 +3021,7 @@ export default function Dev() {
     content = (
       <div className="dev-signed-out">
         <p>{t.signedOut}</p>
-        <a className="btn is-outline" href="/autentificare.html#autentificare">
+        <a className="btn is-outline" href={authHref({ signin: true })}>
           {t.signIn}
         </a>
       </div>
