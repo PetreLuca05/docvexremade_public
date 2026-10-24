@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import newest from 'virtual:latest-release';
 import { AUTH_EVENT, isNewer, storedUser } from '../auth.js';
 import { LANGS, useLang } from '../i18n.jsx';
+import { track } from '../analytics.js';
 import { CLIENT_OS } from '../os.js';
 import ContinueButton from './ContinueButton.jsx';
 
@@ -65,7 +66,10 @@ function LanguageSwitcher({ label }) {
           lang={l}
           aria-pressed={l === lang}
           aria-label={LANG_NAMES[l]}
-          onClick={() => setLang(l)}
+          onClick={() => {
+            if (l !== lang) track('Language Switch', { to: l });
+            setLang(l);
+          }}
         >
           {l.toUpperCase()}
         </button>

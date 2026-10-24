@@ -116,3 +116,29 @@ export function checkPassword(password, { email = '', name = '' } = {}) {
   if (!valid) score = Math.min(score, 1);
   return { rules, valid, score: password ? score : 0 };
 }
+
+// A strong random password for the sign-up's "Suggest a strong password":
+// at least one lower-case letter, upper-case letter, digit and symbol, the
+// rest from all of them, shuffled; no look-alikes (l, 1, I, O, 0).
+const SETS = ['abcdefghijkmnpqrstuvwxyz', 'ABCDEFGHJKLMNPQRSTUVWXYZ', '23456789', '!#$%&*?@+-='];
+
+// A uniform random index below n.
+function randomIndex(n) {
+  const limit = Math.floor(0x100000000 / n) * n;
+  const buf = new Uint32Array(1);
+  do crypto.getRandomValues(buf);
+  while (buf[0] >= limit);
+  return buf[0] % n;
+}
+
+export function generatePassword(length = 16) {
+  const all = SETS.join('');
+  const chars = SETS.map((set) => set[randomIndex(set.length)]);
+  while (chars.length < length) chars.push(all[randomIndex(all.length)]);
+  // Fisher–Yates shuffle.
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = randomIndex(i + 1);
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  return chars.join('');
+}

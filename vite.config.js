@@ -1,5 +1,5 @@
 import { resolve } from 'node:path';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 // Each page keeps its own HTML file (and URL), so the site stays a multi-page
@@ -10,6 +10,7 @@ const pages = [
   'preturi',
   'cont',
   'autentificare',
+  'dev',
   'confidentialitate',
   'cookies',
   'termeni',
@@ -98,13 +99,45 @@ function releases() {
   };
 }
 
-export default defineConfig({
+// Plausible (cookieless, EU-hosted analytics) on every page but the admin
+// dashboard (dev.html): the script with outbound-link tracking, and a queue
+// so events fired before it loads are kept. VITE_PLAUSIBLE_DOMAIN (default
+// docvex.ro) and VITE_PLAUSIBLE_HOST (default https://plausible.io, or a
+// self-hosted instance). Left out of `npm run dev` unless
+// VITE_ANALYTICS_IN_DEV=true.
+function plausibleScript(mode) {
+  const env = loadEnv(mode, process.cwd(), 'VITE_');
+  const domain = env.VITE_PLAUSIBLE_DOMAIN || 'docvex.ro';
+  const host = (env.VITE_PLAUSIBLE_HOST || 'https://plausible.io').replace(/\/$/, '');
+  const enabled = mode !== 'development' || env.VITE_ANALYTICS_IN_DEV === 'true';
+  return {
+    name: 'docvex-plausible',
+    transformIndexHtml(html, ctx) {
+      if (!enabled || /(^|\/)dev\.html$/.test(ctx.filename ?? ctx.path ?? '')) return html;
+      return [
+        {
+          tag: 'script',
+          attrs: { defer: true, 'data-domain': domain, src: `${host}/js/script.outbound-links.js` },
+          injectTo: 'head',
+        },
+        {
+          tag: 'script',
+          children:
+            'window.plausible=window.plausible||function(){(window.plausible.q=window.plausible.q||[]).push(arguments)}',
+          injectTo: 'head',
+        },
+      ];
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => ({
   // Served from the root of the custom domain in public/CNAME.
   base: '/',
-  plugins: [react(), releases()],
+  plugins: [react(), releases(), plausibleScript(mode)],
   build: {
     rollupOptions: {
       input: Object.fromEntries(pages.map((p) => [p, resolve(import.meta.dirname, `${p}.html`)])),
     },
   },
-});
+}));

@@ -1,6 +1,7 @@
 import releases from 'virtual:releases';
 import Layout from '../components/Layout.jsx';
 import { recordDownload, storedUser } from '../auth.js';
+import { track } from '../analytics.js';
 import { useLang, useMeta } from '../i18n.jsx';
 import { OSES, OS_NAMES, useOS } from '../os.js';
 
@@ -119,12 +120,24 @@ const T = {
     notForOs: (os) => `No build for ${OS_NAMES[os]}`,
     privacy: (
       <>
-        The file downloads directly from GitHub’s servers, where the app’s versions are
-        published; see the <a href="/confidentialitate.html#github">privacy policy</a>.
+        The file downloads directly from GitHub’s servers, where the app’s versions are published;
+        see the <a href="/confidentialitate.html#github">privacy policy</a>.
       </>
     ),
   },
 };
+
+// A download: remembered on a signed-in account (the header's Update badge)
+// and counted in Plausible.
+function downloaded(file, version, location) {
+  recordDownload(version);
+  track('Download Click', {
+    platform: /\.dmg$/i.test(file.file) ? 'mac' : 'windows',
+    arch: file.arch ?? 'x64',
+    version,
+    location,
+  });
+}
 
 function formatDate(iso, locale) {
   return new Intl.DateTimeFormat(locale, { dateStyle: 'long' }).format(new Date(iso));
@@ -155,13 +168,7 @@ function OsSwitch({ os, setOs, t }) {
   return (
     <div className="os-switch" role="radiogroup" aria-label={t.system}>
       {OSES.map((o) => (
-        <button
-          key={o}
-          type="button"
-          role="radio"
-          aria-checked={o === os}
-          onClick={() => setOs(o)}
-        >
+        <button key={o} type="button" role="radio" aria-checked={o === os} onClick={() => setOs(o)}>
           <OsIcon os={o} />
           {OS_NAMES[o]}
         </button>
@@ -205,7 +212,11 @@ function ReleaseHero({ release, os, setOs, t }) {
           {formatSize(main.size, t.locale)}
           {main.arch && ` · ${t.arch[main.arch]}`}
         </p>
-        <a className="btn is-gold" href={main.url} onClick={() => recordDownload(release.version)}>
+        <a
+          className="btn is-gold"
+          href={main.url}
+          onClick={() => downloaded(main, release.version, 'hero')}
+        >
           {t.download(release.version, os)} <span aria-hidden="true">↓</span>
         </a>
         {rest.length > 0 && (
@@ -214,7 +225,7 @@ function ReleaseHero({ release, os, setOs, t }) {
             {rest.map((f, i) => (
               <span key={f.file}>
                 {i > 0 && ' · '}
-                <a href={f.url} onClick={() => recordDownload(release.version)}>
+                <a href={f.url} onClick={() => downloaded(f, release.version, 'hero-other')}>
                   {f.arch ? t.arch[f.arch] : f.file}
                 </a>
               </span>
@@ -228,7 +239,7 @@ function ReleaseHero({ release, os, setOs, t }) {
 
 function FileLinks({ files, version, t }) {
   return files.map((f) => (
-    <a key={f.file} href={f.url} onClick={() => recordDownload(version)}>
+    <a key={f.file} href={f.url} onClick={() => downloaded(f, version, 'history')}>
       {f.file} ({formatSize(f.size, t.locale)}
       {f.arch && `, ${t.arch[f.arch]}`})
     </a>
@@ -279,7 +290,10 @@ export default function Instalare() {
                     </div>
                     {/* Release notes as GitHub renders (and sanitises) them. */}
                     {r.notes && (
-                      <div className="release-notes" dangerouslySetInnerHTML={{ __html: r.notes }} />
+                      <div
+                        className="release-notes"
+                        dangerouslySetInnerHTML={{ __html: r.notes }}
+                      />
                     )}
                     <div className="release-files">
                       {mine.length ? (

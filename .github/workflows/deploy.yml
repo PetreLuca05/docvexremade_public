@@ -38,6 +38,8 @@ jobs:
           VITE_STRIPE_LINK_PRO: ${{ vars.STRIPE_LINK_PRO }}
           VITE_STRIPE_LINK_CABINET: ${{ vars.STRIPE_LINK_CABINET }}
           VITE_STRIPE_PORTAL: ${{ vars.STRIPE_PORTAL }}
+          VITE_PLAUSIBLE_DOMAIN: ${{ vars.PLAUSIBLE_DOMAIN }}
+          VITE_PLAUSIBLE_HOST: ${{ vars.PLAUSIBLE_HOST }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:

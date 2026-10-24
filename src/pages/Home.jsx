@@ -2,6 +2,9 @@ import HeroCarousel from '../components/HeroCarousel.jsx';
 import Layout from '../components/Layout.jsx';
 import { useLang, useMeta } from '../i18n.jsx';
 import { CLIENT_OS, OS_NAMES } from '../os.js';
+import { storedUser } from '../auth.js';
+import AskDocvex from '../components/AskDocvex.jsx';
+import ContinueButton from '../components/ContinueButton.jsx';
 
 // The visitor's system, or both when it is neither (Linux, a phone).
 const SYSTEM = OS_NAMES[CLIENT_OS];
@@ -147,12 +150,13 @@ const T = {
         'Versiunile actuale sunt destinate testării interne, nu uzului public.',
       ],
     ],
-    ctaEyebrow: 'Descărcare',
+    ctaEyebrow: 'Începe',
     ctaTitle: 'Găsește-ți dosarele, mai repede.',
     ctaText:
-      `Instalatorul pentru ${SYSTEM ?? 'Windows și macOS'} și notele fiecărei versiuni, care descriu ce s-a schimbat, sunt pe pagina de descărcare.`,
-    ctaDownload: 'Descarcă ultima versiune',
-    ctaAll: 'Toate versiunile',
+      'Creează-ți contul DocVex în câteva minute, alege planul potrivit și descarcă aplicația. Același cont te autentifică pe site și în aplicație.',
+    ctaStart: 'Creează cont',
+    ctaPricing: 'Vezi planurile',
+    ctaSignedIn: 'Mergi la contul tău',
     ctaNote: 'Versiunile actuale sunt destinate testării interne.',
   },
   en: {
@@ -257,8 +261,7 @@ const T = {
         'Which systems does it run on?',
         <>
           Windows and macOS. The installer (<code>docvex-…-setup.exe</code> for Windows,{' '}
-          <code>docvex-….dmg</code> for macOS) is on the{' '}
-          <a href="instalare.html">download page</a>.
+          <code>docvex-….dmg</code> for macOS) is on the <a href="instalare.html">download page</a>.
         </>,
       ],
       [
@@ -279,12 +282,13 @@ const T = {
         'The current versions are meant for internal testing, not for public use.',
       ],
     ],
-    ctaEyebrow: 'Download',
+    ctaEyebrow: 'Get started',
     ctaTitle: 'Find your case files, faster.',
     ctaText:
-      `The ${SYSTEM ?? 'Windows and macOS'} installer and the notes for each version, describing what changed, are on the download page.`,
-    ctaDownload: 'Download the latest version',
-    ctaAll: 'All versions',
+      'Create your DocVex account in a few minutes, choose the plan that fits and download the app. The same account signs you in on the site and in the app.',
+    ctaStart: 'Create account',
+    ctaPricing: 'See the plans',
+    ctaSignedIn: 'Go to your account',
     ctaNote: 'The current versions are meant for internal testing.',
   },
 };
@@ -320,6 +324,7 @@ export default function Home() {
   const { lang } = useLang();
   const t = T[lang];
   useMeta(META);
+  const signedIn = Boolean(storedUser());
 
   return (
     <Layout page="index" overlay>
@@ -516,23 +521,30 @@ export default function Home() {
               </details>
             ))}
           </div>
+          {/* Under the last question: ask the assistant; as a chat it spans
+              the whole section. */}
+          <AskDocvex />
         </div>
       </section>
 
-      {/* ---- Download ------------------------------------------------ */}
+      {/* ---- Get started --------------------------------------------- */}
 
-      <section className="section is-light cta" id="descarcare">
+      <section className="section is-light cta" id="incepe">
         <div className="wrap">
           <span className="eyebrow">{t.ctaEyebrow}</span>
           <h2 className="display">{t.ctaTitle}</h2>
           <p>{t.ctaText}</p>
           <div className="actions is-center">
-            <a className="btn is-gold" href="instalare.html">
-              {t.ctaDownload}
-            </a>
-            <a className="btn is-ghost" href="instalare.html#versiuni">
-              {t.ctaAll}
-            </a>
+            {signedIn ? (
+              <ContinueButton href="/cont.html">{t.ctaSignedIn}</ContinueButton>
+            ) : (
+              <>
+                <ContinueButton href="/autentificare.html">{t.ctaStart}</ContinueButton>
+                <ContinueButton href="/preturi.html" outline>
+                  {t.ctaPricing}
+                </ContinueButton>
+              </>
+            )}
           </div>
           <p className="note">{t.ctaNote}</p>
         </div>

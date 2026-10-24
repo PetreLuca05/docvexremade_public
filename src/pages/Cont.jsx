@@ -38,6 +38,8 @@ const KNOWN = new Set([
   'ai_usage',
   'downloaded_version',
   'has_password',
+  'newsletter',
+  'newsletter_at',
   'email',
   'email_verified',
   'phone_verified',
@@ -123,6 +125,11 @@ const T = {
     created: 'Creat',
     lastSignIn: 'Ultima autentificare',
     confirmed: 'E-mail confirmat',
+    newsletter: 'Newsletter',
+    newsletterLabel: 'Primesc newsletterul DocVex pe e-mail',
+    newsletterSince: (d) => `Abonat din ${d}.`,
+    newsletterSaved: (on) =>
+      on ? 'Te-ai abonat la newsletter.' : 'Te-ai dezabonat de la newsletter.',
     providers: 'Metode de autentificare',
     yes: 'Da',
     no: 'Nu',
@@ -216,6 +223,11 @@ const T = {
     created: 'Created',
     lastSignIn: 'Last sign-in',
     confirmed: 'Email confirmed',
+    newsletter: 'Newsletter',
+    newsletterLabel: 'I receive the DocVex newsletter by email',
+    newsletterSince: (d) => `Subscribed since ${d}.`,
+    newsletterSaved: (on) =>
+      on ? 'You are subscribed to the newsletter.' : 'You are unsubscribed from the newsletter.',
     providers: 'Sign-in methods',
     yes: 'Yes',
     no: 'No',
@@ -373,6 +385,51 @@ function ProviderPill({ provider, t }) {
       </span>
       {name}
     </span>
+  );
+}
+
+// The newsletter consent given at sign-up (user_metadata.newsletter and
+// newsletter_at): shown here and changed at once.
+function Newsletter({ t, user }) {
+  const meta = user.user_metadata ?? {};
+  const on = meta.newsletter === true;
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState(null);
+
+  async function change(next) {
+    setBusy(true);
+    setStatus(null);
+    try {
+      const supabase = await getSupabase();
+      const { error } = await supabase.auth.updateUser({
+        data: { newsletter: next, newsletter_at: next ? new Date().toISOString() : null },
+      });
+      if (error) throw error;
+      setStatus({ text: t.newsletterSaved(next) });
+    } catch (err) {
+      setStatus({ text: err.message || t.error, error: true });
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="account-newsletter">
+      <h3>{t.newsletter}</h3>
+      <label className="check">
+        <input
+          type="checkbox"
+          checked={on}
+          disabled={busy}
+          onChange={(e) => change(e.target.checked)}
+        />
+        <span>{t.newsletterLabel}</span>
+      </label>
+      {on && meta.newsletter_at && (
+        <p className="note">{t.newsletterSince(formatDate(meta.newsletter_at, t.locale))}</p>
+      )}
+      <Status value={status} />
+    </div>
   );
 }
 
@@ -1038,6 +1095,7 @@ function Account({ t, user }) {
               <dd>{user.email_confirmed_at ? t.yes : t.no}</dd>
             </div>
           </dl>
+          <Newsletter t={t} user={user} />
           {other.length > 0 && (
             <>
               <h3>{t.other}</h3>

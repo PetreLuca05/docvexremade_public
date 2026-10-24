@@ -1,9 +1,10 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { authRedirect, getSupabase } from '../auth.js';
+import { track } from '../analytics.js';
 import BackButton from './BackButton.jsx';
 import ContinueButton from './ContinueButton.jsx';
 import { useLang } from '../i18n.jsx';
-import { checkEmail, checkName, checkPassword } from '../validate.js';
+import { checkEmail, checkName, checkPassword, generatePassword } from '../validate.js';
 import { FEATURED, PLAN_IDS, usePlanText } from './Plans.jsx';
 
 const T = {
@@ -23,6 +24,18 @@ const T = {
     show: 'Arată parola',
     hide: 'Ascunde parola',
     capsLock: 'Caps Lock este activat.',
+    placeholders: {
+      name: 'ex. Andrei Popescu',
+      email: 'nume@exemplu.ro',
+      newPassword: 'Cel puțin 8 caractere',
+      passwordAgain: 'Scrie parola din nou',
+      password: 'Parola ta',
+    },
+    generate: 'Sugerează o parolă puternică',
+    generated: 'Am completat o parolă puternică și am copiat-o. Salveaz-o în managerul de parole.',
+    generatedNotCopied: 'Am completat o parolă puternică. Salveaz-o în managerul de parole.',
+    newsletter:
+      'Trimite-mi newsletterul DocVex: noutăți despre produs și sfaturi, pe e-mail. Te poți dezabona oricând.',
     didYouMean: 'Ai vrut să scrii',
     useIt: 'Folosește-l',
     nameErrors: {
@@ -118,6 +131,18 @@ const T = {
     show: 'Show password',
     hide: 'Hide password',
     capsLock: 'Caps Lock is on.',
+    placeholders: {
+      name: 'e.g. Andrei Popescu',
+      email: 'name@example.com',
+      newPassword: 'At least 8 characters',
+      passwordAgain: 'Type the password again',
+      password: 'Your password',
+    },
+    generate: 'Suggest a strong password',
+    generated: 'A strong password is filled in and copied. Save it in your password manager.',
+    generatedNotCopied: 'A strong password is filled in. Save it in your password manager.',
+    newsletter:
+      'Send me the DocVex newsletter: product news and tips, by email. You can unsubscribe at any time.',
     didYouMean: 'Did you mean',
     useIt: 'Use it',
     nameErrors: {
@@ -206,6 +231,12 @@ export function useAuthText() {
 
 const errorText = (t, err) => t.errors[err?.code] ?? t.errors.generic;
 
+// After a submit that failed its checks: the cursor in the first field with
+// an error (once the errors have rendered).
+function focusFirstError(form) {
+  requestAnimationFrame(() => form.querySelector('[aria-invalid="true"]')?.focus());
+}
+
 // ---- fields ----------------------------------------------------------------
 
 // A labelled input with its error (or hint) linked for screen readers. An
@@ -235,9 +266,19 @@ function TextField({ label, error, hint, children }) {
   );
 }
 
-// A password input with show / hide and a Caps Lock warning.
-function PasswordInput({ t, value, onChange, onBlur, autoComplete, inputProps }) {
-  const [shown, setShown] = useState(false);
+// A password input with show / hide and a Caps Lock warning; `defaultShown`
+// starts it revealed (a suggested password).
+function PasswordInput({
+  t,
+  value,
+  onChange,
+  onBlur,
+  autoComplete,
+  placeholder,
+  defaultShown = false,
+  inputProps,
+}) {
+  const [shown, setShown] = useState(defaultShown);
   const [caps, setCaps] = useState(false);
   const onKey = (e) => setCaps(e.getModifierState?.('CapsLock') ?? false);
   return (
@@ -248,6 +289,7 @@ function PasswordInput({ t, value, onChange, onBlur, autoComplete, inputProps })
           type={shown ? 'text' : 'password'}
           value={value}
           autoComplete={autoComplete}
+          placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
           onBlur={(e) => {
             setCaps(false);
@@ -284,8 +326,8 @@ function PasswordInput({ t, value, onChange, onBlur, autoComplete, inputProps })
 function StrengthMeter({ t, check, password }) {
   const level = check.score;
   return (
-    <div className="strength" aria-live="polite">
-      <div className="strength-bar" data-level={password ? level : undefined}>
+    <div className="strength" aria-live="polite" data-level={password ? level : undefined}>
+      <div className="strength-bar">
         {[0, 1, 2, 3].map((i) => (
           <span key={i} className={password && i < Math.max(level, 1) ? 'is-on' : undefined} />
         ))}
@@ -360,6 +402,10 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
   const [password, setPassword] = useState('');
   const [again, setAgain] = useState('');
   const [accept, setAccept] = useState(false);
+  // Marketing consent: an active opt-in, never ticked in advance (GDPR).
+  const [newsletter, setNewsletter] = useState(false);
+  // The suggested password, and whether it reached the clipboard.
+  const [suggested, setSuggested] = useState(null);
   const [touched, setTouched] = useState({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
@@ -380,25 +426,52 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
     first.current?.focus();
   }, [step]);
 
+  // Counted once, when the first step is shown.
+  const started = useRef(false);
+  useEffect(() => {
+    if (step === 0 && !started.current) {
+      started.current = true;
+      track('Signup Started');
+    }
+  }, [step]);
+
   function next(event) {
     event.preventDefault();
     setError(null);
+    const form = event.currentTarget;
     if (step === 0) {
       touch('name', 'email');
-      if (nameError || emailCheck.error) return;
+      if (nameError || emailCheck.error) return focusFirstError(form);
       setExists(false);
       setStep(1);
     } else if (step === 1) {
       touch('password', 'again');
-      if (!pw.valid || againError) return;
+      if (!pw.valid || againError) return focusFirstError(form);
       setStep(2);
     } else if (step === 2) {
       setStep(3);
     } else {
       touch('accept');
-      if (!accept) return;
+      if (!accept) return focusFirstError(form);
       create();
     }
+  }
+
+  // Fills both password fields with a strong random password, shows them and
+  // copies it.
+  async function suggest() {
+    const value = generatePassword();
+    setPassword(value);
+    setAgain(value);
+    touch('password', 'again');
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(value);
+      copied = true;
+    } catch {
+      // No clipboard access: it is still filled in and shown.
+    }
+    setSuggested({ password: value, copied });
   }
 
   async function create() {
@@ -410,7 +483,14 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
         password,
         options: {
           emailRedirectTo: authRedirect(),
-          data: { full_name: name.trim(), plan: plan ?? 'start', has_password: true },
+          data: {
+            full_name: name.trim(),
+            plan: plan ?? 'start',
+            has_password: true,
+            // The newsletter consent and when it was given.
+            newsletter,
+            newsletter_at: newsletter ? new Date().toISOString() : null,
+          },
         },
       });
       if (err) throw err;
@@ -420,6 +500,7 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
         setStep(0);
         return;
       }
+      track('Signup Completed', { plan: plan ?? 'start' });
       if (data.session) onCreated?.(data.session);
       else setSent(email.trim());
     } catch (err) {
@@ -455,6 +536,7 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
                 ref={first}
                 value={name}
                 autoComplete="name"
+                placeholder={t.placeholders.name}
                 onChange={(e) => setName(e.target.value)}
                 onBlur={() => name && touch('name')}
               />
@@ -477,6 +559,7 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
                 inputMode="email"
                 value={email}
                 autoComplete="email"
+                placeholder={t.placeholders.email}
                 spellCheck={false}
                 autoCapitalize="none"
                 onChange={(e) => {
@@ -517,15 +600,28 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
           >
             {(props) => (
               <PasswordInput
+                key={suggested?.password}
                 t={t}
                 value={password}
                 onChange={setPassword}
                 onBlur={() => password && touch('password')}
                 autoComplete="new-password"
+                placeholder={t.placeholders.newPassword}
+                defaultShown={Boolean(suggested)}
                 inputProps={{ ...props, ref: first }}
               />
             )}
           </TextField>
+          <p className="field-action">
+            <button type="button" className="link-button" onClick={suggest}>
+              {t.generate}
+            </button>
+          </p>
+          {suggested && password === suggested.password && (
+            <p className="field-suggestion" role="status">
+              {suggested.copied ? t.generated : t.generatedNotCopied}
+            </p>
+          )}
           <StrengthMeter t={t} check={pw} password={password} />
           <TextField
             label={t.passwordAgain}
@@ -534,11 +630,14 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
           >
             {(props) => (
               <PasswordInput
+                key={suggested?.password}
                 t={t}
                 value={again}
                 onChange={setAgain}
                 onBlur={() => again && touch('again')}
                 autoComplete="new-password"
+                placeholder={t.placeholders.passwordAgain}
+                defaultShown={Boolean(suggested)}
                 inputProps={props}
               />
             )}
@@ -591,7 +690,12 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
             {[
               [t.name, name.trim(), 0],
               [t.email, email.trim(), 0],
-              [t.password, '•'.repeat(Math.min(password.length, 12)), 1, t.strength[pw.score]],
+              [
+                t.password,
+                '•'.repeat(Math.min(password.length, 12)),
+                1,
+                <small data-level={pw.score}>{t.strength[pw.score]}</small>,
+              ],
               [
                 t.planLabel,
                 `${pt.plans[plan ?? 'start'].name} · ${pt.plans[plan ?? 'start'].price} ${pt.perMonth}`,
@@ -603,7 +707,7 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
                 <dd>
                   <span className="review-value">
                     {value}
-                    {extra && <small>{extra}</small>}
+                    {extra}
                   </span>
                   <button
                     type="button"
@@ -617,11 +721,21 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
               </div>
             ))}
           </dl>
-          <label className={`check${show('accept') && !accept ? ' has-error' : ''}`}>
+          {/* Optional, unticked: the step's first control. */}
+          <label className="check">
             <input
               ref={first}
               type="checkbox"
+              checked={newsletter}
+              onChange={(e) => setNewsletter(e.target.checked)}
+            />
+            <span>{t.newsletter}</span>
+          </label>
+          <label className={`check${show('accept') && !accept ? ' has-error' : ''}`}>
+            <input
+              type="checkbox"
               checked={accept}
+              aria-invalid={Boolean(show('accept') && !accept)}
               onChange={(e) => setAccept(e.target.checked)}
             />
             <span>{t.terms}</span>
@@ -730,7 +844,7 @@ export function SignIn({ initialEmail = '' }) {
   async function signIn(event) {
     event.preventDefault();
     setTouched({ email: true, password: true });
-    if (emailCheck.error || !password) return;
+    if (emailCheck.error || !password) return focusFirstError(event.currentTarget);
     setBusy(true);
     setError(null);
     try {
@@ -740,6 +854,7 @@ export function SignIn({ initialEmail = '' }) {
         password,
       });
       if (err) throw err;
+      track('Signin', { provider: 'email' });
     } catch (err) {
       setError(errorText(t, err));
     } finally {
@@ -750,7 +865,7 @@ export function SignIn({ initialEmail = '' }) {
   async function sendReset(event) {
     event.preventDefault();
     setTouched({ email: true });
-    if (emailCheck.error) return;
+    if (emailCheck.error) return focusFirstError(event.currentTarget);
     setBusy(true);
     setError(null);
     try {
@@ -759,6 +874,7 @@ export function SignIn({ initialEmail = '' }) {
         redirectTo: `${window.location.origin}/cont.html?parola=noua#metode`,
       });
       if (err) throw err;
+      track('Password Reset Requested');
       setSent(email.trim());
     } catch (err) {
       setError(errorText(t, err));
@@ -780,6 +896,7 @@ export function SignIn({ initialEmail = '' }) {
           inputMode="email"
           value={email}
           autoComplete="email"
+          placeholder={t.placeholders.email}
           spellCheck={false}
           autoCapitalize="none"
           onChange={(e) => setEmail(e.target.value)}
@@ -833,6 +950,7 @@ export function SignIn({ initialEmail = '' }) {
             value={password}
             onChange={setPassword}
             autoComplete="current-password"
+            placeholder={t.placeholders.password}
             inputProps={props}
           />
         )}

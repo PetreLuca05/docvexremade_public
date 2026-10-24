@@ -40,13 +40,34 @@ npm run preview   # serve dist/
 ```
 
 Built with GDPR (Regulation (EU) 2016/679, Law 190/2018) and Law 506/2004 in
-mind: no cookies, no analytics and nothing loaded from a third party (system
-fonts only). The browser stores only the language the visitor picks
-(`docvex-lang` in localStorage) and, after signing in on the pricing page, the
-Supabase session; both are strictly necessary and described in the cookie
-policy, so no consent banner is needed. Only the pricing page talks to a third
-party (Supabase). Adding anything else means updating the cookie policy and
-asking for consent first.
+mind: no cookies and system fonts only. The one third-party script is
+Plausible's cookieless, EU-hosted statistics (injected into every page but
+`dev.html` by a plugin in `vite.config.js`; events in `src/analytics.js`). The
+browser stores only the language the visitor picks (`docvex-lang` in
+localStorage) and, after signing in, the Supabase session; both are strictly
+necessary and described in the cookie policy, so no consent banner is needed.
+The sign-in, account and (signed in) download pages talk to Supabase. Adding
+anything else means updating the cookie policy and asking for consent first.
+
+## Admin dashboard
+
+`/dev.html` (not linked, not indexed) shows traffic (Plausible), subscriptions
+(Stripe, through the `stripe-events` log), accounts, downloads and health to
+accounts with `app_metadata.is_admin = true`; everyone else gets the 404
+page. Its data comes from the `admin` Edge Function; Recharts and cobe load
+only on that page. Setup, secrets and goals: `docs/analytics.md`; the database:
+`supabase/README.md`.
+
+Edge Function secrets, by function:
+
+| Function | Secrets |
+|---|---|
+| `ask-docvex` | `ANTHROPIC_API_KEY`, `ASK_SALT` |
+| `stripe-events` | `STRIPE_SECRET_KEY`, `STRIPE_EVENTS_WEBHOOK_SECRET` |
+| `admin` | `PLAUSIBLE_API_KEY`, `PLAUSIBLE_SITE_ID`, `PLAUSIBLE_HOST` (optional), `GITHUB_TOKEN` (optional), `STRIPE_SECRET_KEY` |
+
+`SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` come with
+every function.
 
 ## Accounts and payments
 
@@ -68,6 +89,20 @@ page shows that accounts or online payment are not available yet.
   paid plan on the account, using `client_reference_id`.
 - Fill in the remaining `[DE COMPLETAT]` plan features, and have the
   terms cover subscriptions and the right of withdrawal before selling.
+
+## Ask DocVex (the FAQ's assistant)
+
+The home page's FAQ has a box for questions about the app, answered by Claude
+Haiku 5.5 through the Supabase Edge Function `ask-docvex`
+(`supabase/functions/ask-docvex/`), from a knowledge base written from the app
+and this site (`knowledge.md`; public-safe: no code, keys or internal
+details). Each visitor gets 5 questions a day and the site 1,000, counted on
+the server by a salted hash of the IP and the day (`ask_usage`,
+`supabase/migrations/001_ask_usage.sql`); nothing else is kept.
+
+- Secrets on the function: `ANTHROPIC_API_KEY`, `ASK_SALT`.
+- After editing `knowledge.md`: `node scripts/knowledge.mjs` (writes
+  `knowledge.ts`, which the function bundles), then redeploy the function.
 
 ## Downloads
 

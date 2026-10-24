@@ -2,7 +2,7 @@ export default function Confidentialitate() {
   return (
     <article className="doc">
       <h1>Privacy policy</h1>
-      <p className="updated">Last updated: 24 October 2026</p>
+      <p className="updated">Last updated: 25 October 2026</p>
       <div className="callout">
         This English translation is provided for convenience. The Romanian version is the legally
         binding one.
@@ -32,34 +32,64 @@ export default function Confidentialitate() {
       </p>
       <h2 id="site">2. Visiting this website</h2>
       <p>
-        This website is static: it has no analytics tools, advertising, social media plugins or
-        fonts loaded from third parties. We do not set cookies; in your browser we keep only the
-        language you choose and, if you sign in on the Sign in page, your account session (see the{' '}
-        <a href="cookies.html">Cookie policy</a>).
+        This website is static: it has no advertising, social media plugins or fonts loaded from
+        third parties, and we count visits with a cookieless statistics service (see below). We do
+        not set cookies; in your browser we keep only the language you choose and, if you sign in on
+        the Sign in page, your account session (see the <a href="cookies.html">Cookie policy</a>).
       </p>
+      <h3 id="statistici">Visit statistics</h3>
+      <p>
+        To know how the site is used (how many visitors it has, which pages they read, where they
+        come from and what is downloaded) we use Plausible Analytics, from Plausible Insights OÜ
+        (Estonia), with data hosted in the European Union; Plausible processes the data on our
+        behalf (Article 28 GDPR). It uses no cookies and saves nothing on your device. It receives
+        the page address, the referring site, the browser, the operating system, the device type and
+        the IP address, from which it derives the country, region and city; the IP address is not
+        kept, and unique visitors are counted with a code that changes daily and does not allow you
+        to be identified. We also record the actions listed in the{' '}
+        <a href="cookies.html#statistici">Cookie policy</a>, without data about you. We see only
+        aggregate statistics. The legal basis is our legitimate interest in understanding and
+        improving the site (Article 6(1)(f) GDPR).
+      </p>
+
       <h3 id="cont">Your account and payment on the site</h3>
       <p>
-        On the <a href="autentificare.html">Sign in</a> page you can create your DocVex account or sign
-        in. Your name, email, password (kept only in hashed form) and chosen plan or, if you choose
-        “Continue with Google”, the name, email and photo from your Google account are sent directly
-        to Supabase, the provider of DocVex accounts, and make up the same account you use in the
-        app (see section 3). The legal basis is entering into and performing the contract (Article
-        6(1)(b) GDPR). On the <a href="cont.html">My account</a> page you can see and change this data. If you download the app while signed in, the
-        account keeps the version you downloaded, so that we can show you when a new one is out.
-        Only the Sign in and My account pages and, while you are signed in, the Download page connect
-        to Supabase. Your profile photo, if you have one from Google, loads directly from Google’s
-        servers.
+        On the <a href="autentificare.html">Sign in</a> page you can create your DocVex account or
+        sign in. Your name, email, password (kept only in hashed form) and chosen plan or, if you
+        choose “Continue with Google”, the name, email and photo from your Google account are sent
+        directly to Supabase, the provider of DocVex accounts, and make up the same account you use
+        in the app (see section 3). The legal basis is entering into and performing the contract
+        (Article 6(1)(b) GDPR). On the <a href="cont.html">My account</a> page you can see and
+        change this data. If you download the app while signed in, the account keeps the version you
+        downloaded, so that we can show you when a new one is out. Only the Sign in and My account
+        pages and, while you are signed in, the Download page connect to Supabase. Your profile
+        photo, if you have one from Google, loads directly from Google’s servers.
       </p>
       <p>
         Paid plans are paid on the checkout page hosted by Stripe Payments Europe, Ltd. (Ireland).
-        You enter your card details directly with Stripe; we neither see nor keep them. Stripe
-        sends us the payment confirmation, amount, plan and email, so that we can activate the plan
-        on your account and meet our accounting and tax obligations (Article 6(1)(b) and (c) GDPR).
-        Stripe also processes data as an independent controller, under its{' '}
+        You enter your card details directly with Stripe; we neither see nor keep them. Stripe sends
+        us the payment confirmation, amount, plan and email, so that we can activate the plan on
+        your account and meet our accounting and tax obligations (Article 6(1)(b) and (c) GDPR). We
+        also keep a log of the events Stripe sends us (for example a subscription created, changed
+        or cancelled, a payment succeeded or failed), with the customer and subscription
+        identifiers, plan, status, amounts and periods, linked to your account, as the record of
+        subscriptions; we keep it for as long as you have an account and then as long as accounting
+        and tax obligations require. Stripe also processes data as an independent controller, under
+        its{' '}
         <a href="https://stripe.com/privacy" rel="noopener">
           privacy policy
         </a>
         .
+      </p>
+      <h3 id="asistent">The “Ask about DocVex” assistant</h3>
+      <p>
+        On the home page you can ask an AI assistant questions about the app. Your question (and,
+        for context, the earlier ones in the same conversation) is sent through Supabase to
+        Anthropic, which generates the answer with its Claude model; we do not keep the questions or
+        answers. For the limit of 5 questions a day we keep only a code derived irreversibly from
+        your IP address and the date, with the number of questions, and delete it after a day. The
+        legal basis is our legitimate interest in offering the assistant and preventing abuse
+        (Article 6(1)(f) GDPR). Do not include personal or confidential data in your questions.
       </p>
       <h3 id="github">Hosting on GitHub Pages</h3>
       <p>
@@ -147,10 +177,10 @@ export default function Confidentialitate() {
       </p>
       <h2 id="transferuri">4. Transfers outside the EEA</h2>
       <p>
-        Some providers (GitHub, Anthropic, Supabase, Stripe) are US companies or part of US groups. Transfers take place on the
-        basis of the adequacy decision for the EU-U.S. Data Privacy Framework, where the provider is
-        certified, or of the standard contractual clauses adopted by the European Commission
-        (Articles 45 and 46 GDPR).
+        Some providers (GitHub, Anthropic, Supabase, Stripe) are US companies or part of US groups.
+        Transfers take place on the basis of the adequacy decision for the EU-U.S. Data Privacy
+        Framework, where the provider is certified, or of the standard contractual clauses adopted
+        by the European Commission (Articles 45 and 46 GDPR).
       </p>
       <h2 id="pastrare">5. How long we keep data</h2>
       <ul>

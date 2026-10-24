@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import Layout from '../components/Layout.jsx';
 import { PLAN_IDS, PlanDetails, usePlanText } from '../components/Plans.jsx';
 import { GoogleButton, SignIn, SignUp, useAuthText } from '../components/AuthForms.jsx';
+import { track, trackThen } from '../analytics.js';
 import { authConfigured, authRedirect, checkoutUrl, getSupabase, paymentLink } from '../auth.js';
 import { useLang, useMeta } from '../i18n.jsx';
 
@@ -160,8 +161,17 @@ function AuthPanel({ t, lang, plan, setPlan, mode, setMode, step, setStep }) {
     if (!leaving) return;
     const paid = mode === 'signup' && plan && plan !== 'start';
     const checkout = paid ? checkoutUrl(plan, session.user, lang) : null;
-    window.location.replace(checkout || '/');
+    if (checkout) {
+      trackThen('Checkout Redirect', { plan }).then(() => window.location.replace(checkout));
+    } else {
+      window.location.replace('/');
+    }
   }, [leaving]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Back from Stripe's payment page.
+  useEffect(() => {
+    if (paidBack) track('Payment Return');
+  }, [paidBack]);
 
   if (!authConfigured) return <div className="callout">{t.unavailable}</div>;
   if (session === undefined || leaving) return <div className="auth-card" aria-busy="true" />;
@@ -197,7 +207,11 @@ function AuthPanel({ t, lang, plan, setPlan, mode, setMode, step, setStep }) {
         {planSelect}
         <div className="actions">
           {paid && checkout && (
-            <a className="btn is-gold" href={checkout}>
+            <a
+              className="btn is-gold"
+              href={checkout}
+              onClick={() => track('Checkout Redirect', { plan: chosen })}
+            >
               {t.pay}
             </a>
           )}
@@ -231,6 +245,8 @@ function AuthPanel({ t, lang, plan, setPlan, mode, setMode, step, setStep }) {
       // one goes on to Stripe; from Sign in it does not.
       const redirect = new URL(authRedirect());
       if (mode === 'signup') redirect.searchParams.set('plan', chosen);
+      // Counted when leaving for Google (whether it then succeeds is Google's).
+      await trackThen('Signin', { provider: 'google' });
       const { error: err } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo: redirect.toString() },
@@ -248,8 +264,8 @@ function AuthPanel({ t, lang, plan, setPlan, mode, setMode, step, setStep }) {
       <div className="auth-card">
         <div className="auth-tabs" role="tablist">
           {[
-            ['signup', t.signUp],
             ['signin', t.signIn],
+            ['signup', t.signUp],
           ].map(([m, label]) => (
             <button
               key={m}
