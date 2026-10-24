@@ -3,7 +3,9 @@ name: Deploy site
 on:
   push:
     branches: [main]
-  # The download page lists the releases, so a new release rebuilds the site.
+  # The download page lists the releases, so a new release rebuilds the site:
+  # through a fresh run on main (below), since the github-pages environment
+  # only accepts deployments from main, not from a release's tag.
   release:
     types: [published, edited, deleted]
   workflow_dispatch:
@@ -18,10 +20,22 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # A release: start the deploy again on main (workflow_dispatch runs may be
+  # started with the workflow's own token).
+  redeploy:
+    if: github.event_name == 'release'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - run: gh workflow run deploy.yml --repo "$GITHUB_REPOSITORY" --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
+
   build:
+    if: github.event_name != 'release'
     runs-on: ubuntu-latest
     steps:
-      # Always the current site, also when a release (on its tag) triggers the run.
       - uses: actions/checkout@v5
         with:
           ref: main

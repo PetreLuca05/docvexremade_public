@@ -126,6 +126,6 @@ yearly). Have a lawyer review the legal pages before public launch.
 To serve it: Settings → Pages → Build and deployment → Source: GitHub Actions.
 Every push to `main` then builds the site and publishes `dist/`
 (`.github/workflows/deploy.yml`) at https://docvex.ro (the domain in
-`public/CNAME`). For releases to rebuild it as well, allow the release tags to
-deploy: Settings → Environments → `github-pages` → Deployment branches and
-tags → add a tag rule (e.g. `v*`).
+`public/CNAME`). Publishing, editing or deleting a release starts a fresh deploy from `main`
+(the `redeploy` job): the `github-pages` environment accepts deployments from
+`main` only, so no tag rule is needed.g. `v*`).
