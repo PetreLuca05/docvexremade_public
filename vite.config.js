@@ -1,4 +1,5 @@
-import { resolve } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
@@ -30,22 +31,57 @@ function dmgArch(name) {
   return null;
 }
 
-async function fetchReleases() {
+// "1.10.0" > "1.9.2" > "1.9.2-beta.1".
+function compareVersions(a, b) {
+  const [ma, pa = ''] = a.split('-');
+  const [mb, pb = ''] = b.split('-');
+  const na = ma.split('.').map(Number);
+  const nb = mb.split('.').map(Number);
+  for (let i = 0; i < Math.max(na.length, nb.length); i++) {
+    const d = (na[i] || 0) - (nb[i] || 0);
+    if (d) return d;
+  }
+  if (pa === pb) return 0;
+  return pa ? (pb ? pa.localeCompare(pb) : -1) : 1;
+}
+
+// The last list read from GitHub, kept for local builds: a build without
+// network, or over GitHub's hourly limit for requests without a token, then
+// still lists the versions. (Deploys never use it: they must read GitHub.)
+const RELEASES_CACHE = resolve(import.meta.dirname, 'node_modules/.cache/docvex-releases.json');
+
+async function readReleases() {
   const headers = { Accept: 'application/vnd.github.html+json', 'User-Agent': 'docvex-site' };
   if (process.env.GITHUB_TOKEN) headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
+  const url = `https://api.github.com/repos/${REPO}/releases?per_page=30`;
+  let res = await fetch(url, { headers });
+  // A token GitHub refuses (an expired GITHUB_TOKEN left in a shell, say):
+  // the repository is public, so ask again without it.
+  if (res.status === 401 && headers.Authorization) {
+    console.warn('[releases] GITHUB_TOKEN was refused (401); reading the releases without it.');
+    delete headers.Authorization;
+    res = await fetch(url, { headers });
+  }
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  const list = await res.json();
   try {
-    const res = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=30`, {
-      headers,
-    });
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    const list = await res.json();
-    const file = (a, extra) => ({
-      file: a.name,
-      size: a.size,
-      url: a.browser_download_url,
-      ...extra,
-    });
-    return list
+    mkdirSync(dirname(RELEASES_CACHE), { recursive: true });
+    writeFileSync(RELEASES_CACHE, JSON.stringify(list));
+  } catch {
+    // No cache: nothing lost but the fallback.
+  }
+  return list;
+}
+
+function releasesFrom(list) {
+  const file = (a, extra) => ({
+    file: a.name,
+    size: a.size,
+    url: a.browser_download_url,
+    ...extra,
+  });
+  return (
+    list
       .filter((r) => !r.draft)
       .map((r) => {
         const exe =
@@ -68,10 +104,25 @@ async function fetchReleases() {
           mac: dmgs,
         };
       })
-      .filter(Boolean);
+      .filter(Boolean)
+      // Newest first, by version number (then date): GitHub's own order can
+      // change when an older release is edited.
+      .sort(
+        (a, b) => compareVersions(b.version, a.version) || Date.parse(b.date) - Date.parse(a.date),
+      )
+  );
+}
+
+async function fetchReleases() {
+  try {
+    return releasesFrom(await readReleases());
   } catch (error) {
     // A deploy must not publish a download page with no downloads.
     if (process.env.CI) throw new Error(`Could not read the releases: ${error.message}`);
+    if (existsSync(RELEASES_CACHE)) {
+      console.warn(`[releases] ${error.message}; using the last list read from GitHub.`);
+      return releasesFrom(JSON.parse(readFileSync(RELEASES_CACHE, 'utf8')));
+    }
     console.warn(`[releases] ${error.message}; the download page will list no versions.`);
     return [];
   }

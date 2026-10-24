@@ -8,6 +8,10 @@ on:
   # only accepts deployments from main, not from a release's tag.
   release:
     types: [published, edited, deleted]
+  # And every hour, as a safety net: the release list is read at build time,
+  # so a release the event missed still shows within the hour.
+  schedule:
+    - cron: '17 * * * *'
   workflow_dispatch:
 
 permissions:

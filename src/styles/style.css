@@ -161,7 +161,6 @@ h3,
   z-index: 10;
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
   color: var(--text);
   transition:
@@ -174,7 +173,6 @@ h3,
   background: transparent;
   border-bottom-color: transparent;
   backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 
 .site-head .wrap {
@@ -250,6 +248,9 @@ h3,
   font-size: 13px;
   text-decoration: none;
   transition: border-color 0.2s;
+  /* Readable over the hero photos and the page behind the clear header. */
+  background: color-mix(in srgb, var(--bg) 35%, transparent);
+  backdrop-filter: blur(10px);
 }
 
 .account-pill:hover,
@@ -291,7 +292,6 @@ h3,
   /* Readable over the hero photos and the page behind the clear header. */
   background: color-mix(in srgb, var(--bg) 35%, transparent);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .lang-switch button {
@@ -397,6 +397,26 @@ h3,
 .update-version {
   color: var(--muted);
   letter-spacing: 0.06em;
+}
+
+/* Optical centring in the header: the nav links, buttons and RO / EN are
+   capitals, which sit above the middle of an ordinary text box (it keeps
+   room for descenders). Trimming the box to the capitals centres the letters
+   themselves. Browsers without text-box keep the usual centring. */
+.site-nav a,
+.head-actions .btn,
+.lang-switch button {
+  text-box: trim-both cap alphabetic;
+}
+
+.head-actions .btn {
+  padding-top: 13px;
+  padding-bottom: 13px;
+}
+
+.lang-switch button {
+  padding-top: 7px;
+  padding-bottom: 7px;
 }
 
 /* ---- Buttons --------------------------------------------------------- */
@@ -1657,78 +1677,361 @@ mark.is-caen {
   fill: currentColor;
 }
 
-/* The latest version for the chosen system. */
-.release-hero {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 28px;
-  align-items: start;
-  margin: 0 0 20px;
-  padding: 36px;
-  border: 1px solid var(--line);
-  background:
-    radial-gradient(60% 90% at 90% 0%, rgba(230, 207, 154, 0.22), transparent 70%),
-    linear-gradient(160deg, var(--ink) 0%, var(--night) 100%);
-  color: var(--cream);
-  --text: var(--cream);
-  --muted: rgba(245, 242, 234, 0.66);
-  --line: rgba(245, 242, 234, 0.16);
-  --accent: var(--sand);
+/* The download page uses the page's full width, like the other pages. */
+.doc.install {
+  max-width: none;
+  padding: 0;
 }
 
-.release-hero-icon {
+.section.install-versions {
+  padding: 72px 0 88px;
+}
+
+.install-versions .doc h2:first-child {
+  margin-top: 0;
+}
+
+/* The system switch on the left, the i button (installation steps) on the
+   far right. */
+.install-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+.install-bar .os-switch {
+  margin: 0;
+}
+
+.info-button {
   display: grid;
   place-items: center;
-  width: 72px;
-  height: 72px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border: 1px solid var(--line);
-  border-radius: 18px;
-  background: rgba(245, 242, 234, 0.06);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background 0.2s;
 }
 
-.release-hero-icon svg {
-  width: 34px;
-  height: 34px;
+.info-button:hover {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--text);
+}
+
+.info-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.info-button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+}
+
+/* The steps, in the full-screen dialog. */
+.modal-box.is-steps {
+  position: relative;
+  width: min(560px, 100%);
+  text-align: left;
+}
+
+.modal-box.is-steps h2 {
+  margin: 0 0 22px;
+}
+
+.modal-icon.is-info {
+  border-color: rgba(230, 207, 154, 0.45);
+  background: rgba(230, 207, 154, 0.1);
+}
+
+.modal-icon.is-info svg {
   fill: var(--gold);
+  stroke: none;
 }
 
-.release-hero-body {
+.modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.modal-close:hover {
+  background: rgba(245, 242, 234, 0.08);
+  color: var(--text);
+}
+
+.modal-close:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.modal-close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0 0 28px;
+  padding: 0;
+  list-style: none;
+}
+
+.steps-list li {
+  display: flex;
+  gap: 14px;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.steps-num {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(230, 207, 154, 0.5);
+  border-radius: 50%;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.steps-list code {
+  font-size: 0.9em;
+}
+
+.modal-box.is-steps .btn.is-outline {
+  border-color: rgba(245, 242, 234, 0.4);
+  background: transparent;
+  color: var(--cream);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.modal-box.is-steps .btn.is-outline:hover {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: var(--night);
+}
+
+/* The download page's hero: the home page's (photos, veil, parallax), with
+   the latest version on the left and what's new in it on the right. */
+.download-hero .download-main {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  /* Both columns start at the same height; the pair is centred in the hero. */
+  align-items: start;
+  align-content: center;
+  gap: 48px;
+}
+
+.download-copy {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 12px;
+  gap: 14px;
+  max-width: 640px;
+  /* The panel's own top padding, so the first line is level with "What's new". */
+  padding-top: 35px;
 }
 
-.release-hero .eyebrow {
+/* The i button beside the download button: the same height. */
+.download-copy .actions .info-button {
+  width: 48px;
+  height: 48px;
+  border-color: rgba(245, 242, 234, 0.3);
+  color: var(--cream);
+}
+
+/* The system switch, just above the download button. */
+.download-copy .os-switch {
+  margin: 10px 0 0;
+}
+
+.download-copy .eyebrow {
   margin: 0;
 }
 
-.doc .release-hero h2 {
-  margin: 0;
-  font-size: clamp(32px, 4.4vw, 46px);
-  line-height: 1.05;
-}
-
-.release-hero .note {
+.download-hero h1 {
   margin: 0;
 }
 
-.release-hero .btn {
-  margin-top: 6px;
+.download-version {
+  color: var(--gold);
 }
 
-.release-hero.is-empty {
-  align-items: center;
-}
-
-.release-hero.is-empty p {
-  margin: 0 0 12px;
-}
-
-.release-hero.is-empty .btn {
-  grid-column: 2;
-  justify-self: start;
+.download-summary {
+  max-width: 520px;
   margin: 0;
+  color: var(--muted);
+  font-size: 16px;
+}
+
+.download-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 2px 0 8px;
+  padding: 0;
+  list-style: none;
+}
+
+.download-chips li {
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(245, 242, 234, 0.05);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+
+
+
+.download-file {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.download-file a {
+  color: var(--sand);
+}
+
+.download-hero .btn.is-outline {
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* What's new, in a frosted panel. */
+.download-news {
+  display: flex;
+  flex-direction: column;
+  min-height: min(70vh, 660px);
+  padding: 32px 30px 22px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(13, 20, 36, 0.55);
+  backdrop-filter: blur(10px);
+}
+
+.download-news-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 16px;
+  margin-bottom: 18px;
+}
+
+.download-news-head h2 {
+  margin: 0;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.download-news-head h2 span {
+  color: var(--gold);
+}
+
+.download-news .link-button {
+  color: var(--sand);
+  font-size: 13px;
+}
+
+.download-news ol {
+  flex: 1;
+  max-height: min(76vh, 760px);
+  margin: 0;
+  padding: 0 4px 0 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.download-news li {
+  display: flex;
+  gap: 16px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.download-news-num {
+  flex: none;
+  padding-top: 2px;
+  color: var(--gold);
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+
+.download-news p {
+  margin: 0;
+  color: var(--cream);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* Fills the hero's height, the content centred in it. */
+.download-hero > .download-main {
+  flex: 1 0 auto;
+}
+
+/* On desktop: only the header's height above (not the home page's taller
+   top space) and nothing below, so the content is centred in the space
+   under the header. */
+@media (min-width: 961px) {
+  .site-head.is-overlay + main > .download-hero:first-child {
+    padding-top: 84px;
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 960px) {
+  .download-hero .download-main {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .download-copy {
+    padding-top: 0;
+  }
 }
 
 /* Each release's files: the chosen system's first. */
@@ -1752,60 +2055,123 @@ mark.is-caen {
   text-transform: uppercase;
 }
 
-.release-files .is-secondary a {
-  color: var(--muted);
-}
 
 .release-files .note {
   margin: 0;
 }
 
-.release-list li.is-other-os h3 {
-  color: var(--muted);
-}
 
 @media (max-width: 640px) {
-  .release-hero {
-    grid-template-columns: minmax(0, 1fr);
-    padding: 28px 22px;
-  }
-
-  .release-hero.is-empty .btn {
-    grid-column: 1;
-  }
 }
 
 .doc ol.steps {
   padding-left: 22px;
 }
 
-.release-list {
+.release-list,
+.doc .release-list {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.doc .release-list li {
-  margin: 0;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--line);
+/* Each release a card, closed by default (<details>): the version, date and
+   a chevron; opened, the notes and the files. Only the cards themselves,
+   not the lists inside the notes. */
+.doc .release-list > li.release-card {
+  margin: 0 0 10px;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  transition: border-color 0.2s;
+}
+
+.doc .release-list > li.release-card:hover,
+.release-card:has(details[open]) {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
 }
 
 .release-head {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
   align-items: baseline;
   gap: 4px 12px;
+  padding: 16px 18px;
+  cursor: pointer;
+  list-style: none;
+  border-radius: 9px;
+}
+
+.release-head::-webkit-details-marker {
+  display: none;
+}
+
+.release-head:hover {
+  background: color-mix(in srgb, var(--text) 3%, transparent);
+}
+
+.release-head:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .doc .release-head h3 {
+  flex: 1;
   margin: 0;
 }
 
 .release-head span {
   color: var(--muted);
   font-size: 14px;
+}
+
+.release-chevron {
+  flex: none;
+  align-self: center;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 0.2s ease;
+}
+
+details[open] > .release-head .release-chevron {
+  transform: rotate(180deg);
+}
+
+.release-body {
+  padding: 0 18px 18px;
+  animation: release-open 0.2s ease-out;
+}
+
+@keyframes release-open {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .release-chevron,
+  .release-body {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* The notes' own lists, as plain lists. */
+.release-notes ul,
+.release-notes ol {
+  margin: 8px 0;
+  padding-left: 20px;
+}
+
+.doc .release-notes li {
+  margin: 4px 0;
+  padding: 0;
+  border: 0;
 }
 
 .badge {
@@ -1821,7 +2187,7 @@ mark.is-caen {
 }
 
 .release-notes {
-  color: var(--muted);
+  color: var(--text);
   font-size: 15px;
 }
 
@@ -3157,6 +3523,15 @@ button.progress-name:focus-visible {
   width: 100%;
   height: 6px;
 }
+.usage small {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.usage-blocked {
+  color: var(--danger, #c0392b);
+}
 
 .inline-form {
   display: flex;
@@ -3187,7 +3562,6 @@ button.progress-name:focus-visible {
   border: 1px solid var(--line);
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 20px 44px -20px rgba(13, 20, 36, 0.6);
   opacity: 0;
   transform: translateY(16px);
@@ -3581,7 +3955,6 @@ body.has-modal {
     radial-gradient(60% 60% at 50% 40%, rgba(192, 53, 43, 0.16), transparent 70%),
     rgba(13, 20, 36, 0.82);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   animation: modal-in 0.2s ease-out;
 }
 

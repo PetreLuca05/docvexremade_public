@@ -17,15 +17,9 @@ const META = {
   },
 };
 
-// Everything the app keeps on the account lives in its Supabase user (no
-// tables): the profile and plan in user_metadata, and `ai_usage`, which only
-// the app counts. The app's own settings (`ai_prefs`, `format_prefs`) are
+// The profile and plan live in the Supabase user's user_metadata. AI usage is
+// counted by the app's `ai` function, and read from it here. The app's own settings (`ai_prefs`, `format_prefs`) are
 // left to Settings in the app.
-const AI_LIMITS = {
-  requests: 1000,
-  inputTokens: 500_000,
-  outputTokens: 250_000,
-};
 // Keys this page shows in their own fields; any other metadata is listed as is.
 const KNOWN = new Set([
   'full_name',
@@ -62,11 +56,17 @@ const T = {
     billing: 'Facturare și abonament',
     billingHint: 'Abonamentul, cardul și facturile se gestionează în portalul Stripe.',
     usage: 'Activitate',
-    usageLead: 'Utilizarea AI luna aceasta.',
+    usageLead: 'Utilizarea AI din aplicație, în tokeni.',
     usageHint: 'Numărată de aplicație; nu se poate modifica.',
-    requests: 'Cereri',
-    inputTokens: 'Tokeni trimiși',
-    outputTokens: 'Tokeni generați',
+    session: 'Sesiunea curentă (5 ore)',
+    weekly: 'Săptămâna aceasta',
+    fable: 'Fable, săptămâna aceasta',
+    resets: (when) => `Se resetează ${when}`,
+    requestsWeek: (n) => `${n} cereri săptămâna aceasta`,
+    usageLoading: 'Se încarcă utilizarea…',
+    usageFailed: 'Utilizarea nu a putut fi încărcată.',
+    retry: 'Reîncearcă',
+    blocked: (until) => (until ? `Limita a fost atinsă până ${until}.` : 'Limita a fost atinsă.'),
     save: 'Salvează modificările',
     revert: 'Anulează modificările',
     saving: 'Se salvează…',
@@ -160,11 +160,17 @@ const T = {
     billing: 'Billing and subscription',
     billingHint: 'Your subscription, card and invoices are managed in the Stripe portal.',
     usage: 'Activity',
-    usageLead: 'AI usage this month.',
+    usageLead: 'AI usage in the app, in tokens.',
     usageHint: 'Counted by the app; it cannot be changed.',
-    requests: 'Requests',
-    inputTokens: 'Tokens sent',
-    outputTokens: 'Tokens generated',
+    session: 'Current session (5 hours)',
+    weekly: 'This week',
+    fable: 'Fable, this week',
+    resets: (when) => `Resets ${when}`,
+    requestsWeek: (n) => `${n} requests this week`,
+    usageLoading: 'Loading usage…',
+    usageFailed: 'Usage could not be loaded.',
+    retry: 'Try again',
+    blocked: (until) => (until ? `Limit reached until ${until}.` : 'Limit reached.'),
     save: 'Save changes',
     revert: 'Revert',
     saving: 'Saving…',
@@ -247,11 +253,6 @@ const T = {
   },
 };
 
-const thisMonth = () => {
-  const d = new Date();
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-};
-
 // The editable part of the account, as the form holds it.
 function draftOf(user) {
   const meta = user.user_metadata ?? {};
@@ -279,26 +280,73 @@ function Field({ label, hint, children }) {
   );
 }
 
-function Usage({ t, meta }) {
-  const saved = meta.ai_usage;
-  const usage =
-    saved?.month === thisMonth() ? saved : { requests: 0, inputTokens: 0, outputTokens: 0 };
+// The app's own usage summary: the `ai` function's `usage` action, with the
+// user's token. Nothing is shown until it answers.
+async function fetchUsage() {
+  const supabase = await getSupabase();
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  if (!token) throw new Error('signed out');
+  const res = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      apikey: import.meta.env.VITE_SUPABASE_ANON_KEY,
+    },
+    body: JSON.stringify({ action: 'usage' }),
+  });
+  if (!res.ok) throw new Error(`usage ${res.status}`);
+  return res.json();
+}
+
+function Usage({ t }) {
+  const [usage, setUsage] = useState(null);
+  const [failed, setFailed] = useState(false);
+  const load = () => {
+    setFailed(false);
+    fetchUsage()
+      .then(setUsage)
+      .catch(() => setFailed(true));
+  };
+  useEffect(load, []);
+
+  if (failed) {
+    return (
+      <p className="note">
+        {t.usageFailed}{' '}
+        <button type="button" className="link-button" onClick={load}>
+          {t.retry}
+        </button>
+      </p>
+    );
+  }
+  if (!usage) return <p className="note">{t.usageLoading}</p>;
+
   const n = new Intl.NumberFormat(t.locale);
+  const when = (iso) => (iso ? formatDate(iso, t.locale) : null);
   return (
-    <dl className="usage">
-      {['requests', 'inputTokens', 'outputTokens'].map((k) => {
-        const value = usage[k] ?? 0;
-        return (
-          <div key={k}>
-            <dt>{t[k]}</dt>
-            <dd>
-              {n.format(value)} <span>/ {n.format(AI_LIMITS[k])}</span>
-            </dd>
-            <meter min={0} max={AI_LIMITS[k]} value={value} />
-          </div>
-        );
-      })}
-    </dl>
+    <>
+      {usage.blocked && (
+        <p className="note usage-blocked">{t.blocked(when(usage.blocked.until))}</p>
+      )}
+      <dl className="usage">
+        {['session', 'weekly', 'fable'].map((k) => {
+          const { used = 0, limit = 0, resetsAt } = usage[k] ?? {};
+          return (
+            <div key={k}>
+              <dt>{t[k]}</dt>
+              <dd>
+                {n.format(used)} <span>/ {n.format(limit)}</span>
+              </dd>
+              <meter min={0} max={limit || 1} value={Math.min(used, limit || 1)} />
+              {resetsAt && <small>{t.resets(when(resetsAt))}</small>}
+            </div>
+          );
+        })}
+      </dl>
+      <p className="note">{t.requestsWeek(n.format(usage.requests ?? 0))}</p>
+    </>
   );
 }
 
@@ -1119,7 +1167,7 @@ function Account({ t, user }) {
       <section className="account-section">
         <h2>{t.usage}</h2>
         <p className="note usage-lead">{t.usageLead}</p>
-        <Usage t={t} meta={meta} />
+        <Usage t={t} />
         <p className="note">{t.usageHint}</p>
       </section>
 
