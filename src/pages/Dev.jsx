@@ -4,6 +4,7 @@ import { NotFoundContent } from './NotFound.jsx';
 import { countryName } from '../components/dev/countries.js';
 import { useLang, useMeta } from '../i18n.jsx';
 import { useSession } from '../useSession.js';
+import { validUrl } from '../auth.js';
 
 // The admin dashboard (dev.html): website traffic (Plausible), subscriptions
 // (Stripe, through the stripe-events log), accounts, downloads and health,
@@ -19,7 +20,7 @@ const StackedBars = lazyChart('StackedBars');
 const StackedAreas = lazyChart('StackedAreas');
 const Globe = lazy(() => import('../components/dev/Globe.jsx'));
 
-const ENDPOINT = import.meta.env.VITE_SUPABASE_URL
+const ENDPOINT = validUrl(import.meta.env.VITE_SUPABASE_URL)
   ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin`
   : null;
 const LIVE_EVERY = 60_000;

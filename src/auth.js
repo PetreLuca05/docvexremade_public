@@ -2,16 +2,24 @@
 // loaded only by the pages that need it, so the other pages still make no
 // request to a third party. Without the two variables (see .env.example) the
 // sign-in form says accounts are not available yet.
-const url = import.meta.env.VITE_SUPABASE_URL;
+// A configured address, or null when it is missing or not a web address (a
+// misconfigured build then has no accounts instead of a broken page).
+export function validUrl(value) {
+  try {
+    return /^https?:$/.test(new URL(value).protocol) ? value : null;
+  } catch {
+    return null;
+  }
+}
+
+const url = validUrl(import.meta.env.VITE_SUPABASE_URL);
 const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 export const authConfigured = Boolean(url && key);
 
 // Where supabase-js keeps the session (its default key), and the event fired
 // on this page whenever the session changes.
-const storageKey = authConfigured
-  ? `sb-${new URL(url).hostname.split('.')[0]}-auth-token`
-  : null;
+const storageKey = authConfigured ? `sb-${new URL(url).hostname.split('.')[0]}-auth-token` : null;
 export const AUTH_EVENT = 'docvex-auth';
 
 // The signed-in user as saved by supabase-js, read without loading it, so the
@@ -89,13 +97,13 @@ export function isNewer(a, b) {
 // static site needs no server). The visitor's account id travels as
 // `client_reference_id`, which the Stripe webhook uses to find the account.
 const PAYMENT_LINKS = {
-  pro: import.meta.env.VITE_STRIPE_LINK_PRO,
-  cabinet: import.meta.env.VITE_STRIPE_LINK_CABINET,
+  pro: validUrl(import.meta.env.VITE_STRIPE_LINK_PRO),
+  cabinet: validUrl(import.meta.env.VITE_STRIPE_LINK_CABINET),
 };
 
 // Stripe's customer portal (subscription, card, invoices), signed in to with
 // the account's e-mail; without it, the account page.
-const PORTAL = import.meta.env.VITE_STRIPE_PORTAL;
+const PORTAL = validUrl(import.meta.env.VITE_STRIPE_PORTAL);
 
 export function billingUrl(user) {
   if (!PORTAL) return '/cont.html';

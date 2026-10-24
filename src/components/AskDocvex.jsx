@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { validUrl } from '../auth.js';
 import { useLang } from '../i18n.jsx';
 import { track } from '../analytics.js';
 
@@ -7,7 +8,7 @@ import { track } from '../analytics.js';
 // ask-docvex Supabase function. LIMIT questions a day per visitor, counted
 // on the server; the conversation lives only in this page.
 const LIMIT = 5;
-const ENDPOINT = import.meta.env.VITE_SUPABASE_URL
+const ENDPOINT = validUrl(import.meta.env.VITE_SUPABASE_URL)
   ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ask-docvex`
   : null;
 
