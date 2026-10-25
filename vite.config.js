@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import seo from './seo/plugin.js';
 
 // Each page keeps its own HTML file (and URL), so the site stays a multi-page
 // build: no client-side router and no 404 redirect trick on GitHub Pages.
@@ -113,6 +114,16 @@ function releasesFrom(list) {
   );
 }
 
+// Read once per build, shared by the download page and the metadata.
+let releaseList = null;
+const getReleases = () => (releaseList ??= fetchReleases());
+
+// The newest release with a Windows installer, for the structured data.
+async function latestRelease() {
+  const r = (await getReleases()).find((x) => x.windows);
+  return r ? { version: r.version, date: r.date, windows: r.windows } : null;
+}
+
 async function fetchReleases() {
   try {
     return releasesFrom(await readReleases());
@@ -139,7 +150,7 @@ function releases() {
     resolveId: (source) => (ids.includes(source) ? `\0${source}` : undefined),
     async load(source) {
       if (!ids.some((id) => source === `\0${id}`)) return;
-      data ??= await fetchReleases();
+      data ??= await getReleases();
       if (source === `\0${ids[0]}`) return `export default ${JSON.stringify(data)};`;
       const newest = (os) => {
         const r = data.find((x) => (os === 'mac' ? x.mac.length : x.windows));
@@ -185,7 +196,17 @@ function plausibleScript(mode) {
 export default defineConfig(({ mode }) => ({
   // Served from the root of the custom domain in public/CNAME.
   base: '/',
-  plugins: [react(), releases(), plausibleScript(mode)],
+  plugins: [
+    react(),
+    releases(),
+    plausibleScript(mode),
+    // Titles, descriptions, link previews, icons, structured data, sitemap:
+    // seo/config.js, and SHARING.md.
+    seo({
+      latestRelease,
+      fbAppId: loadEnv(mode, process.cwd(), 'VITE_').VITE_FACEBOOK_APP_ID,
+    }),
+  ],
   build: {
     rollupOptions: {
       input: Object.fromEntries(pages.map((p) => [p, resolve(import.meta.dirname, `${p}.html`)])),

@@ -153,6 +153,11 @@ h3,
    hero). At the very top it is taller and has no background; once the page
    scrolls it shrinks and gets a frosted background. Being fixed, the change
    in height never moves the page. */
+:root {
+  /* The phone and tablet header's height (the bar with the menu button). */
+  --head-h-mobile: 60px;
+}
+
 .site-head {
   --head-h: 64px;
   position: fixed;
@@ -2437,6 +2442,9 @@ details[open] > .release-head .release-chevron {
 main.auth-page {
   display: flex;
   align-items: center;
+  /* Centred while it fits; on a short screen (a phone held sideways) it
+     starts at the top instead of above it. */
+  align-items: safe center;
 }
 
 .get-started.is-page {
@@ -5277,7 +5285,7 @@ body.has-modal {
 
 @media (max-width: 960px) {
   .site-head.is-overlay + main.dev {
-    padding-top: 40px;
+    padding-top: calc(var(--head-h-mobile) + 40px);
   }
 }
 
@@ -5459,11 +5467,16 @@ th {
     gap: 32px;
   }
 
-  /* Phones and tablets: a compact bar (the logo and a menu button) that
-     scrolls away with the page; the links, the account and the language open
+  /* Phones and tablets: a compact bar (the logo and a menu button), fixed
+     to the top of the screen; the links, the account and the language open
      in a panel under it. Over the hero it keeps a solid night background. */
   .site-head {
-    position: static;
+    --head-h: 60px;
+  }
+
+  .site-head.is-open .head-tools {
+    max-height: calc(100dvh - var(--head-h-mobile));
+    overflow-y: auto;
   }
 
   .site-head.is-overlay {
@@ -5518,11 +5531,15 @@ th {
   }
 
   .site-head + main {
+    padding-top: var(--head-h-mobile);
+  }
+
+  .site-head.is-overlay + main {
     padding-top: 0;
   }
 
   .site-head.is-overlay + main > .hero:first-child {
-    padding-top: 96px;
+    padding-top: calc(var(--head-h-mobile) + 56px);
   }
 
   .split,
@@ -5589,8 +5606,11 @@ th {
 }
 
 @media (max-width: 640px) {
+  /* The sides only: sections that are also .wrap keep their own top and
+     bottom spacing. */
   .wrap {
-    padding: 0 16px;
+    padding-right: 16px;
+    padding-left: 16px;
   }
 
   .site-head .wrap {
@@ -5607,7 +5627,7 @@ th {
   }
 
   .site-head.is-overlay + main > .hero:first-child {
-    padding-top: 56px;
+    padding-top: calc(var(--head-h-mobile) + 40px);
   }
 
   .section {

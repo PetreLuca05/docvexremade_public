@@ -36,9 +36,14 @@ vulnerability reporting and the list of applicable acts) and `404.html`.
 npm install
 npm run dev       # http://localhost:5173
 npm run dev:phone # the same, also on the Wi-Fi (http://<this computer's IP>:5173)
+node scripts/icons.mjs # the favicon/app-icon set, after changing the logo
 npm run build     # into dist/
 npm run preview   # serve dist/
 ```
+
+Titles, descriptions, link previews (WhatsApp, Facebook, LinkedIn…), icons,
+structured data and the sitemap all come from `seo/config.js`; see
+[SHARING.md](SHARING.md).
 
 `npm run dev:phone` lets a phone on the same Wi-Fi open the site: use the
 "Network" address Vite prints. Stop `npm run dev` first (both use port 5173).
@@ -67,11 +72,11 @@ only on that page. Setup, secrets and goals: `docs/analytics.md`; the database:
 
 Edge Function secrets, by function:
 
-| Function | Secrets |
-|---|---|
-| `ask-docvex` | `ANTHROPIC_API_KEY`, `ASK_SALT` |
-| `stripe-events` | `STRIPE_SECRET_KEY`, `STRIPE_EVENTS_WEBHOOK_SECRET` |
-| `admin` | `PLAUSIBLE_API_KEY`, `PLAUSIBLE_SITE_ID`, `PLAUSIBLE_HOST` (optional), `GITHUB_TOKEN` (optional), `STRIPE_SECRET_KEY` |
+| Function        | Secrets                                                                                                               |
+| --------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `ask-docvex`    | `ANTHROPIC_API_KEY`, `ASK_SALT`                                                                                       |
+| `stripe-events` | `STRIPE_SECRET_KEY`, `STRIPE_EVENTS_WEBHOOK_SECRET`                                                                   |
+| `admin`         | `PLAUSIBLE_API_KEY`, `PLAUSIBLE_SITE_ID`, `PLAUSIBLE_HOST` (optional), `GITHUB_TOKEN` (optional), `STRIPE_SECRET_KEY` |
 
 `SUPABASE_URL`, `SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY` come with
 every function.

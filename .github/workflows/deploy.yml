@@ -59,6 +59,7 @@ jobs:
           VITE_PLAUSIBLE_DOMAIN: ${{ vars.PLAUSIBLE_DOMAIN }}
           VITE_PLAUSIBLE_HOST: ${{ vars.PLAUSIBLE_HOST }}
           VITE_VAPID_PUBLIC_KEY: ${{ vars.VAPID_PUBLIC_KEY }}
+          VITE_FACEBOOK_APP_ID: ${{ vars.FACEBOOK_APP_ID }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
