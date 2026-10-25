@@ -81,19 +81,18 @@ export default function Confidentialitate() {
         </a>
         .
       </p>
-      <h3 id="demografie">Gender and year of birth (optional)</h3>
+      <h3 id="demografie">Gender and date of birth (optional)</h3>
       <p>
-        When you create your account, on the <a href="cont.html">My account</a> page or in the app
-        you may, if you wish, give your gender (female, male, other) and your year of birth. They
-        are not required: the default is “Prefer not to say”, and your account and the app work the
-        same without them. We use them only for aggregate statistics about who uses DocVex (for
-        example how many users are in each age group and gender, and how many of them have a paid
-        plan), seen only by DocVex’s administrators; we don’t use them for advertising, don’t sell
-        them and make no decisions about you based on them. We ask for the year, not the full date
-        of birth, to process as little data as possible. The legal basis is your consent (Art.
-        6(1)(a) GDPR), which you withdraw at any time by choosing “Prefer not to say” in your
-        account: the values are then deleted. They are kept in your Supabase account, with the date
-        you gave them.
+        When you create your account (the “About you” step), on the{' '}
+        <a href="cont.html">My account</a> page or in the app you may, if you wish, give your gender
+        (female, male, other) and your date of birth. They are not required: the default is “Prefer
+        not to say”, the step can be skipped, and your account and the app work the same without
+        them. We use them only for aggregate statistics about who uses DocVex (for example how many
+        users are in each age group and gender, and how many of them have a paid plan), seen only by
+        DocVex’s administrators; we don’t use them for advertising, don’t sell them and make no
+        decisions about you based on them. The legal basis is your consent (Art. 6(1)(a) GDPR),
+        which you withdraw at any time by choosing “Prefer not to say” in your account: the values
+        are then deleted. They are kept in your Supabase account, with the date you gave them.
       </p>
       <h3 id="asistent">The “Ask about DocVex” assistant</h3>
       <p>
@@ -203,7 +202,7 @@ export default function Confidentialitate() {
           when the account is closed.
         </li>
         <li>
-          Gender and year of birth: until you remove them from your account (by choosing “Prefer not
+          Gender and date of birth: until you remove them from your account (by choosing “Prefer not
           to say”) or the account is closed.
         </li>
         <li>

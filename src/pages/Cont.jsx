@@ -4,7 +4,7 @@ import ContinueButton from '../components/ContinueButton.jsx';
 import Plans, { PLAN_IDS } from '../components/Plans.jsx';
 import { authHref, billingUrl, getSupabase } from '../auth.js';
 import Demographics from '../components/Demographics.jsx';
-import { demographicsData, demographicsOf } from '../demographics.js';
+import { demographicsData, demographicsError, demographicsOf } from '../demographics.js';
 import { useLang, useMeta } from '../i18n.jsx';
 import { useSession } from '../useSession.js';
 
@@ -1085,19 +1085,23 @@ function Account({ t, user }) {
 
   async function save(event) {
     event.preventDefault();
+    // A partly chosen or impossible date of birth: its message is shown.
+    if (demographicsError(draft)) return;
     setSaving(true);
     setMessage(null);
     try {
       const supabase = await getSupabase();
       // user_metadata is merged key by key, so the app's other keys stay.
       const before = JSON.parse(base);
-      const aboutChanged = before.gender !== draft.gender || before.birth_year !== draft.birth_year;
+      const aboutChanged = ['gender', 'birth_day', 'birth_month', 'birth_year'].some(
+        (k) => before[k] !== draft[k],
+      );
       const { error } = await supabase.auth.updateUser({
         data: {
           full_name: draft.full_name.trim(),
           plan: draft.plan,
-          // Gender and birth year only when changed (with when); a cleared
-          // one is removed.
+          // Gender and date of birth only when changed (with when); a
+          // cleared one is removed.
           ...(aboutChanged ? demographicsData(draft) : {}),
         },
       });
@@ -1139,9 +1143,15 @@ function Account({ t, user }) {
                   />
                 </Field>
                 <Demographics
-                  value={{ gender: draft.gender, birth_year: draft.birth_year }}
+                  value={{
+                    gender: draft.gender,
+                    birth_day: draft.birth_day,
+                    birth_month: draft.birth_month,
+                    birth_year: draft.birth_year,
+                  }}
                   onChange={(v) => setDraft((d) => ({ ...d, ...v }))}
                   idPrefix="account"
+                  showErrors
                 />
               </div>
             </div>

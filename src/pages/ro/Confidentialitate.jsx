@@ -75,18 +75,18 @@ export default function Confidentialitate() {
         </a>
         .
       </p>
-      <h3 id="demografie">Genul și anul nașterii (opțional)</h3>
+      <h3 id="demografie">Genul și data nașterii (opțional)</h3>
       <p>
-        La crearea contului, pe pagina <a href="cont.html">Contul meu</a> sau în aplicație poți
-        spune, dacă vrei, genul (feminin, masculin, altul) și anul nașterii. Nu sunt obligatorii:
-        implicit este „Prefer să nu spun”, iar contul și aplicația funcționează la fel fără ele. Le
-        folosim doar pentru statistici agregate despre cine folosește DocVex (de exemplu câți
-        utilizatori sunt pe fiecare grupă de vârstă și gen și câți dintre ei au un plan plătit),
-        văzute doar de administratorii DocVex; nu le folosim pentru reclame, nu le vindem și nu luăm
-        decizii despre tine pe baza lor. Cerem anul, nu data completă a nașterii, ca să prelucrăm
-        cât mai puține date. Temeiul este consimțământul tău (art. 6 alin. (1) lit. a) GDPR), pe
-        care îl retragi oricând alegând „Prefer să nu spun” în cont: valorile se șterg atunci. Sunt
-        păstrate în contul tău de la Supabase, împreună cu data la care le-ai completat.
+        La crearea contului (pasul „Despre tine”), pe pagina <a href="cont.html">Contul meu</a> sau
+        în aplicație poți spune, dacă vrei, genul (feminin, masculin, altul) și data nașterii. Nu
+        sunt obligatorii: implicit este „Prefer să nu spun”, pasul se poate sări, iar contul și
+        aplicația funcționează la fel fără ele. Le folosim doar pentru statistici agregate despre
+        cine folosește DocVex (de exemplu câți utilizatori sunt pe fiecare grupă de vârstă și gen și
+        câți dintre ei au un plan plătit), văzute doar de administratorii DocVex; nu le folosim
+        pentru reclame, nu le vindem și nu luăm decizii despre tine pe baza lor. Temeiul este
+        consimțământul tău (art. 6 alin. (1) lit. a) GDPR), pe care îl retragi oricând alegând
+        „Prefer să nu spun” în cont: valorile se șterg atunci. Sunt păstrate în contul tău de la
+        Supabase, împreună cu data la care le-ai completat.
       </p>
       <h3 id="asistent">Asistentul „Întreabă despre DocVex”</h3>
       <p>
@@ -200,7 +200,7 @@ export default function Confidentialitate() {
           Datele contului: cât timp ai cont, apoi le ștergem la cererea ta sau la închiderea lui.
         </li>
         <li>
-          Genul și anul nașterii: până când le ștergi din cont (alegând „Prefer să nu spun”) sau
+          Genul și data nașterii: până când le ștergi din cont (alegând „Prefer să nu spun”) sau
           până la închiderea contului.
         </li>
         <li>

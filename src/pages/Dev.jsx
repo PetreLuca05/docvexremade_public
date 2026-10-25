@@ -199,7 +199,7 @@ const T = {
       paying: 'Plătesc',
       free: 'Nu plătesc',
       demographicsNote: (given, total) =>
-        `${given} din ${total} conturi și-au completat genul sau anul nașterii (opțional, pe site sau în aplicație).`,
+        `${given} din ${total} conturi și-au completat genul sau data nașterii (opțional, pe site sau în aplicație).`,
       recencyNames: {
         '24h': 'Ultimele 24 h',
         '7d': 'Ultimele 7 zile',
@@ -595,7 +595,7 @@ const T = {
       paying: 'Paying',
       free: 'Not paying',
       demographicsNote: (given, total) =>
-        `${given} of ${total} accounts gave their gender or year of birth (optional, on the site or in the app).`,
+        `${given} of ${total} accounts gave their gender or date of birth (optional, on the site or in the app).`,
       recencyNames: {
         '24h': 'Last 24 h',
         '7d': 'Last 7 days',

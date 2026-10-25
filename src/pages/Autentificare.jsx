@@ -36,6 +36,7 @@ const T = {
         steps: [
           ['Contul', 'Numele și e-mailul tău, sau continuă cu Google, mai jos.'],
           ['Parola', 'O parolă sigură: cel puțin 8 caractere, cu litere și cifre.'],
+          ['Despre tine', 'Genul și data nașterii, dacă vrei: amândouă sunt opționale.'],
           ['Planul', 'Alegi planul; cele plătite se plătesc online, prin Stripe.'],
           ['Verificare', 'Verifici toate datele, accepți termenii și creezi contul.'],
         ],
@@ -82,6 +83,7 @@ const T = {
         steps: [
           ['Account', 'Your name and email, or continue with Google below.'],
           ['Password', 'A secure password: at least 8 characters, with letters and digits.'],
+          ['About you', 'Your gender and date of birth, if you like: both are optional.'],
           ['Plan', 'Choose your plan; paid ones are paid online, through Stripe.'],
           ['Review', 'Check all your details, accept the terms and create the account.'],
         ],
@@ -379,7 +381,7 @@ export default function Autentificare() {
                       )}
                       <span>{text}</span>
                       {/* The plan step: the plan ticked in the form. */}
-                      {i === 2 && step === 2 && (
+                      {i === 3 && step === 3 && (
                         <PlanDetails key={plan ?? 'start'} id={plan ?? 'start'} compact />
                       )}
                     </span>

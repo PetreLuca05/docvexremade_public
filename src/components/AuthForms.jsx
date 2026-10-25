@@ -5,13 +5,18 @@ import BackButton from './BackButton.jsx';
 import ContinueButton from './ContinueButton.jsx';
 import { useLang } from '../i18n.jsx';
 import Demographics from './Demographics.jsx';
-import { demographicsData } from '../demographics.js';
+import { demographicsData, demographicsError, EMPTY_DEMOGRAPHICS } from '../demographics.js';
 import { checkEmail, checkName, checkPassword, generatePassword } from '../validate.js';
 import { FEATURED, PLAN_IDS, usePlanText } from './Plans.jsx';
 
 const T = {
   ro: {
-    steps: ['Contul', 'Parola', 'Planul', 'Verificare'],
+    steps: ['Contul', 'Parola', 'Despre tine', 'Planul', 'Verificare'],
+    aboutLead:
+      'Opțional: genul și data nașterii, pentru statisticile noastre. Poți trece peste acest pas.',
+    aboutLabel: 'Despre tine',
+    aboutNone: 'Nespecificat',
+    genderNames: { female: 'Feminin', male: 'Masculin', other: 'Altul' },
     reviewLead: 'Verifică datele înainte de a crea contul. Poți modifica orice pas.',
     edit: 'Modifică',
     stepOf: (i, n) => `Pasul ${i} din ${n}`,
@@ -118,7 +123,12 @@ const T = {
     },
   },
   en: {
-    steps: ['Account', 'Password', 'Plan', 'Review'],
+    steps: ['Account', 'Password', 'About you', 'Plan', 'Review'],
+    aboutLead:
+      'Optional: your gender and date of birth, for our statistics. You can skip this step.',
+    aboutLabel: 'About you',
+    aboutNone: 'Not given',
+    genderNames: { female: 'Female', male: 'Male', other: 'Other' },
     reviewLead: 'Check your details before creating the account. You can change any step.',
     edit: 'Edit',
     stepOf: (i, n) => `Step ${i} of ${n}`,
@@ -396,8 +406,24 @@ export function GoogleButton({ t, onClick, disabled }) {
 // each checked before the next; the data stays when going back. The page
 // owns the step, so its intro can follow it. After it:
 // a welcome (signed in at once) or "check your e-mail" with a resend.
+// The review's line for the optional step: "Feminin · 3 martie 1988".
+function aboutSummary(about, t, lang) {
+  const parts = [];
+  if (about.gender) parts.push(t.genderNames[about.gender]);
+  const { birth_day: d, birth_month: m, birth_year: y } = about;
+  if (d && m && y) {
+    parts.push(
+      new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'ro-RO', { dateStyle: 'long' }).format(
+        new Date(Number(y), Number(m) - 1, Number(d)),
+      ),
+    );
+  }
+  return parts.length ? parts.join(' · ') : t.aboutNone;
+}
+
 export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
   const t = useAuthText();
+  const { lang } = useLang();
   const pt = usePlanText();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -406,8 +432,8 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
   const [accept, setAccept] = useState(false);
   // Marketing consent: an active opt-in, never ticked in advance (GDPR).
   const [newsletter, setNewsletter] = useState(false);
-  // Gender and year of birth, optional (statistics only).
-  const [about, setAbout] = useState({ gender: '', birth_year: '' });
+  // Gender and date of birth, optional (statistics only).
+  const [about, setAbout] = useState(EMPTY_DEMOGRAPHICS);
   // The suggested password, and whether it reached the clipboard.
   const [suggested, setSuggested] = useState(null);
   const [touched, setTouched] = useState({});
@@ -453,7 +479,11 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
       if (!pw.valid || againError) return focusFirstError(form);
       setStep(2);
     } else if (step === 2) {
+      touch('about');
+      if (demographicsError(about)) return focusFirstError(form);
       setStep(3);
+    } else if (step === 3) {
+      setStep(4);
     } else {
       touch('accept');
       if (!accept) return focusFirstError(form);
@@ -654,6 +684,19 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
       )}
 
       {step === 2 && (
+        <>
+          <p className="note">{t.aboutLead}</p>
+          <Demographics
+            value={about}
+            onChange={setAbout}
+            idPrefix="signup"
+            showErrors={show('about')}
+            firstRef={first}
+          />
+        </>
+      )}
+
+      {step === 3 && (
         <fieldset className="plan-choice">
           <legend>{t.plan}</legend>
           {PLAN_IDS.map((id, i) => (
@@ -691,7 +734,7 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
         </fieldset>
       )}
 
-      {step === 3 && (
+      {step === 4 && (
         <>
           <p className="note">{t.reviewLead}</p>
           <dl className="review">
@@ -704,10 +747,11 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
                 1,
                 <small data-level={pw.score}>{t.strength[pw.score]}</small>,
               ],
+              [t.aboutLabel, aboutSummary(about, t, lang), 2],
               [
                 t.planLabel,
                 `${pt.plans[plan ?? 'start'].name} · ${pt.plans[plan ?? 'start'].price} ${pt.perMonth}`,
-                2,
+                3,
               ],
             ].map(([label, value, to, extra]) => (
               <div key={label}>
@@ -739,7 +783,6 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
             />
             <span>{t.newsletter}</span>
           </label>
-          <Demographics value={about} onChange={setAbout} idPrefix="signup" />
           <label className={`check${show('accept') && !accept ? ' has-error' : ''}`}>
             <input
               type="checkbox"
@@ -772,7 +815,7 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
           <span className="note">{t.stepOf(1, t.steps.length)}</span>
         )}
         <ContinueButton disabled={busy}>
-          {busy ? t.creating : step < 3 ? t.next : t.create}
+          {busy ? t.creating : step < 4 ? t.next : t.create}
         </ContinueButton>
       </div>
     </form>

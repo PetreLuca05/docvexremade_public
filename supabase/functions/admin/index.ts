@@ -363,14 +363,25 @@ async function accounts(db: SupabaseClient, range: Range) {
   let newsletter = 0;
   let mismatch = 0;
   const now = Date.now();
-  // Gender and age group (optional, user_metadata.gender / birth_year), each
-  // with how many of the group pay.
-  const year = new Date().getFullYear();
+  // Gender and age group (optional, user_metadata.gender / birth_date, or
+  // the earlier birth_year), each with how many of the group pay.
+  const today = new Date();
+  const year = today.getFullYear();
   const AGE_GROUPS = ['16-24', '25-34', '35-44', '45-54', '55-64', '65+'];
-  const ageGroup = (y: unknown) => {
-    const n = Number(y);
-    if (!Number.isInteger(n) || n > year - 16 || n < year - 100) return 'unknown';
-    const age = year - n;
+  const ageOf = (meta: Record<string, unknown> | undefined) => {
+    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(meta?.birth_date ?? ''));
+    if (m) {
+      const [y, mo, d] = [Number(m[1]), Number(m[2]), Number(m[3])];
+      let age = year - y;
+      if (today.getMonth() + 1 < mo || (today.getMonth() + 1 === mo && today.getDate() < d)) age--;
+      return age;
+    }
+    const y = Number(meta?.birth_year);
+    return Number.isInteger(y) ? year - y : null;
+  };
+  const ageGroup = (meta: Record<string, unknown> | undefined) => {
+    const age = ageOf(meta);
+    if (age === null || age < 16 || age > 100) return 'unknown';
     return age < 25
       ? '16-24'
       : age < 35
@@ -397,7 +408,7 @@ async function accounts(db: SupabaseClient, range: Range) {
       : 'unknown';
     genders[g].accounts++;
     genders[g].paying += pays;
-    const a = ageGroup(u.user_metadata?.birth_year);
+    const a = ageGroup(u.user_metadata);
     ages[a].accounts++;
     ages[a].paying += pays;
     const list =
@@ -437,8 +448,9 @@ async function accounts(db: SupabaseClient, range: Range) {
     genders,
     ages,
     // Accounts that gave at least one of the two.
-    demographicsGiven: users.filter((u) => u.user_metadata?.gender || u.user_metadata?.birth_year)
-      .length,
+    demographicsGiven: users.filter(
+      (u) => u.user_metadata?.gender || u.user_metadata?.birth_date || u.user_metadata?.birth_year,
+    ).length,
   };
 }
 
