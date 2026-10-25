@@ -54,6 +54,17 @@ the `admin` function's `insights` action and the SQL functions in
 - **Legal sources:** the AI's searches per source, with failures and slow
   calls, failures per day, and failed AI requests by kind.
 
+**Gender and age** are optional, given by the account holder at sign-up
+(the Review step), on the account page or in the app, and kept in the
+Supabase user's `user_metadata`: `gender` (`female` / `male` / `other`),
+`birth_year` (a year, from 100 to 16 years ago) and `demographics_at` (when
+given). "Prefer not to say" stores nothing (or removes what was there). The
+dashboard's Accounts section counts accounts by gender and by age group
+(16-24 … 65+), each split into paying and not paying, and says how many
+accounts gave either. Legal basis: consent (the privacy policy's
+`#demografie`). Shared code: `src/demographics.js`,
+`src/components/Demographics.jsx`.
+
 **Accounts and downloads** are read when needed: from Supabase Auth and from
 GitHub Releases' download counts. Nothing new is collected for them.
 

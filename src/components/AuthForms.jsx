@@ -4,6 +4,8 @@ import { track } from '../analytics.js';
 import BackButton from './BackButton.jsx';
 import ContinueButton from './ContinueButton.jsx';
 import { useLang } from '../i18n.jsx';
+import Demographics from './Demographics.jsx';
+import { demographicsData } from '../demographics.js';
 import { checkEmail, checkName, checkPassword, generatePassword } from '../validate.js';
 import { FEATURED, PLAN_IDS, usePlanText } from './Plans.jsx';
 
@@ -404,6 +406,8 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
   const [accept, setAccept] = useState(false);
   // Marketing consent: an active opt-in, never ticked in advance (GDPR).
   const [newsletter, setNewsletter] = useState(false);
+  // Gender and year of birth, optional (statistics only).
+  const [about, setAbout] = useState({ gender: '', birth_year: '' });
   // The suggested password, and whether it reached the clipboard.
   const [suggested, setSuggested] = useState(null);
   const [touched, setTouched] = useState({});
@@ -490,6 +494,10 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
             // The newsletter consent and when it was given.
             newsletter,
             newsletter_at: newsletter ? new Date().toISOString() : null,
+            // Only what was chosen; nothing when both are "Prefer not to say".
+            ...Object.fromEntries(
+              Object.entries(demographicsData(about)).filter(([, v]) => v !== null),
+            ),
           },
         },
       });
@@ -731,6 +739,7 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
             />
             <span>{t.newsletter}</span>
           </label>
+          <Demographics value={about} onChange={setAbout} idPrefix="signup" />
           <label className={`check${show('accept') && !accept ? ' has-error' : ''}`}>
             <input
               type="checkbox"

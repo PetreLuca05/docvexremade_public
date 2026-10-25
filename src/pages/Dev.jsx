@@ -192,6 +192,14 @@ const T = {
       versions: 'Versiunea descărcată',
       none: 'Niciuna',
       recency: 'Ultima autentificare',
+      gender: 'Gen',
+      age: 'Vârstă',
+      genderNames: { female: 'Feminin', male: 'Masculin', other: 'Altul', unknown: 'Nespecificat' },
+      ageUnknown: 'Nespecificat',
+      paying: 'Plătesc',
+      free: 'Nu plătesc',
+      demographicsNote: (given, total) =>
+        `${given} din ${total} conturi și-au completat genul sau anul nașterii (opțional, pe site sau în aplicație).`,
       recencyNames: {
         '24h': 'Ultimele 24 h',
         '7d': 'Ultimele 7 zile',
@@ -580,6 +588,14 @@ const T = {
       versions: 'Downloaded version',
       none: 'None',
       recency: 'Last sign-in',
+      gender: 'Gender',
+      age: 'Age',
+      genderNames: { female: 'Female', male: 'Male', other: 'Other', unknown: 'Not given' },
+      ageUnknown: 'Not given',
+      paying: 'Paying',
+      free: 'Not paying',
+      demographicsNote: (given, total) =>
+        `${given} of ${total} accounts gave their gender or year of birth (optional, on the site or in the app).`,
       recencyNames: {
         '24h': 'Last 24 h',
         '7d': 'Last 7 days',
@@ -2218,6 +2234,40 @@ function AccountsSection({ t, f, accounts, range }) {
           />
         )}
       </Card>
+      {[
+        ['gender', ta.gender, d?.genders, (k) => ta.genderNames[k] ?? k],
+        ['age', ta.age, d?.ages, (k) => (k === 'unknown' ? ta.ageUnknown : k)],
+      ].map(([key, title, groups, label]) => (
+        <Card key={key} title={title}>
+          {loading ? (
+            <ChartFallback />
+          ) : (
+            <Suspense fallback={<ChartFallback />}>
+              <StackedBars
+                data={Object.entries(groups ?? {}).map(([k, v]) => ({
+                  group: label(k),
+                  paying: v.paying,
+                  free: v.accounts - v.paying,
+                }))}
+                xKey="group"
+                keys={[
+                  { key: 'paying', name: ta.paying, color: C.gold },
+                  { key: 'free', name: ta.free, color: C.blue },
+                ]}
+                format={f.int}
+                height={220}
+              />
+            </Suspense>
+          )}
+        </Card>
+      ))}
+      {!loading && (
+        <Card wide>
+          <p className="dev-note">
+            {ta.demographicsNote(f.int(d.demographicsGiven ?? 0), f.int(d.total))}
+          </p>
+        </Card>
+      )}
     </>
   );
 }

@@ -363,7 +363,43 @@ async function accounts(db: SupabaseClient, range: Range) {
   let newsletter = 0;
   let mismatch = 0;
   const now = Date.now();
+  // Gender and age group (optional, user_metadata.gender / birth_year), each
+  // with how many of the group pay.
+  const year = new Date().getFullYear();
+  const AGE_GROUPS = ['16-24', '25-34', '35-44', '45-54', '55-64', '65+'];
+  const ageGroup = (y: unknown) => {
+    const n = Number(y);
+    if (!Number.isInteger(n) || n > year - 16 || n < year - 100) return 'unknown';
+    const age = year - n;
+    return age < 25
+      ? '16-24'
+      : age < 35
+        ? '25-34'
+        : age < 45
+          ? '35-44'
+          : age < 55
+            ? '45-54'
+            : age < 65
+              ? '55-64'
+              : '65+';
+  };
+  const blank = () => ({ accounts: 0, paying: 0 });
+  const genders: Record<string, { accounts: number; paying: number }> = Object.fromEntries(
+    ['female', 'male', 'other', 'unknown'].map((g) => [g, blank()]),
+  );
+  const ages: Record<string, { accounts: number; paying: number }> = Object.fromEntries(
+    [...AGE_GROUPS, 'unknown'].map((g) => [g, blank()]),
+  );
   for (const u of users) {
+    const pays = paidPlan.has(u.id) ? 1 : 0;
+    const g = ['female', 'male', 'other'].includes(u.user_metadata?.gender)
+      ? u.user_metadata.gender
+      : 'unknown';
+    genders[g].accounts++;
+    genders[g].paying += pays;
+    const a = ageGroup(u.user_metadata?.birth_year);
+    ages[a].accounts++;
+    ages[a].paying += pays;
     const list =
       (u.app_metadata?.providers as string[] | undefined) ??
       [u.app_metadata?.provider].filter(Boolean);
@@ -398,6 +434,11 @@ async function accounts(db: SupabaseClient, range: Range) {
     planMismatch: mismatch,
     versions,
     recency,
+    genders,
+    ages,
+    // Accounts that gave at least one of the two.
+    demographicsGiven: users.filter((u) => u.user_metadata?.gender || u.user_metadata?.birth_year)
+      .length,
   };
 }
 

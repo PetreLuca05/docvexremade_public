@@ -3,6 +3,8 @@ import Layout, { Avatar } from '../components/Layout.jsx';
 import ContinueButton from '../components/ContinueButton.jsx';
 import Plans, { PLAN_IDS } from '../components/Plans.jsx';
 import { authHref, billingUrl, getSupabase } from '../auth.js';
+import Demographics from '../components/Demographics.jsx';
+import { demographicsData, demographicsOf } from '../demographics.js';
 import { useLang, useMeta } from '../i18n.jsx';
 import { useSession } from '../useSession.js';
 
@@ -34,6 +36,9 @@ const KNOWN = new Set([
   'has_password',
   'newsletter',
   'newsletter_at',
+  'gender',
+  'birth_year',
+  'demographics_at',
   'email',
   'email_verified',
   'phone_verified',
@@ -259,6 +264,8 @@ function draftOf(user) {
   return {
     full_name: meta.full_name ?? meta.name ?? '',
     plan: PLAN_IDS.includes(meta.plan) ? meta.plan : 'start',
+    // Optional, for statistics only (src/demographics.js).
+    ...demographicsOf(meta),
   };
 }
 
@@ -1083,8 +1090,16 @@ function Account({ t, user }) {
     try {
       const supabase = await getSupabase();
       // user_metadata is merged key by key, so the app's other keys stay.
+      const before = JSON.parse(base);
+      const aboutChanged = before.gender !== draft.gender || before.birth_year !== draft.birth_year;
       const { error } = await supabase.auth.updateUser({
-        data: { ...draft, full_name: draft.full_name.trim() },
+        data: {
+          full_name: draft.full_name.trim(),
+          plan: draft.plan,
+          // Gender and birth year only when changed (with when); a cleared
+          // one is removed.
+          ...(aboutChanged ? demographicsData(draft) : {}),
+        },
       });
       if (error) throw error;
       setBase(JSON.stringify(draft));
@@ -1123,6 +1138,11 @@ function Account({ t, user }) {
                     onChange={(e) => set('full_name', e.target.value)}
                   />
                 </Field>
+                <Demographics
+                  value={{ gender: draft.gender, birth_year: draft.birth_year }}
+                  onChange={(v) => setDraft((d) => ({ ...d, ...v }))}
+                  idPrefix="account"
+                />
               </div>
             </div>
           </section>
