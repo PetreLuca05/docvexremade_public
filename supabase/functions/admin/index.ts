@@ -6,6 +6,7 @@
 //     billing    subscriptions and Stripe events (public.subscriptions, ...)
 //     accounts   sign-ups, providers, newsletter, plan choices, recency
 //     downloads  GitHub Releases download counts
+//     regions    { country }  visitors by region of one country (the map's zoom)
 //     app        the desktop app's telemetry (the app's app_* and ai_* views)
 //     insights   the path to paying, retention by start week, AI cost per plan,
 //                subscription health, release reliability, the legal sources
@@ -44,9 +45,16 @@ const service = createClient(URL_, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
   auth: { persistSession: false },
 });
 
+// `npm run dev:phone` serves the site on the Wi-Fi as well, so a phone on the
+// same network can open it (http://192.168.x.x:5173). The admin's token is
+// still required; this only lets that page read the answer.
+const LAN_DEV = /^http:\/\/(192\.168|10|172\.(1[6-9]|2\d|3[01]))(\.\d{1,3}){2,3}:5173$/;
+const allowed = (origin: string | null) =>
+  Boolean(origin && (ORIGINS.includes(origin) || LAN_DEV.test(origin)));
+
 function cors(origin: string | null): HeadersInit {
   return {
-    'Access-Control-Allow-Origin': origin && ORIGINS.includes(origin) ? origin : ORIGINS[0],
+    'Access-Control-Allow-Origin': allowed(origin) ? origin! : ORIGINS[0],
     'Access-Control-Allow-Headers': 'authorization, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     Vary: 'Origin',
@@ -205,15 +213,17 @@ async function breakdown(range: Range, dimension: string, limit = 25) {
   return results.map((r) => ({ name: r.dimensions[0], visitors: r.metrics[0] }));
 }
 
-// Visitors in Romania by county: its ISO code ("RO-CJ") and Plausible's name.
-async function romania(range: Range) {
+// Visitors in one country by region (county, state, province): the ISO
+// 3166-2 code ("RO-CJ") and Plausible's name. Romania's come with traffic;
+// any other country's when the map zooms into it (the `regions` action).
+async function regionsOf(range: Range, country: string) {
   const { results } = await plausible({
     metrics: ['visitors'],
     date_range: [range.from, range.to],
     dimensions: ['visit:region', 'visit:region_name'],
-    filters: [['is', 'visit:country', ['RO']]],
+    filters: [['is', 'visit:country', [country]]],
     order_by: [['visitors', 'desc']],
-    pagination: { limit: 60 },
+    pagination: { limit: 200 },
   });
   return results.map((r) => ({
     code: r.dimensions[0],
@@ -277,7 +287,7 @@ async function traffic(range: Range, compare: boolean) {
     previousTotals: prevTotals,
     timeseries: series,
     previousTimeseries: prevSeries,
-    breakdowns: { ...Object.fromEntries(entries), romania: await soft(romania(range)) },
+    breakdowns: { ...Object.fromEntries(entries), romania: await soft(regionsOf(range, 'RO')) },
     goals: goalList,
     notFound,
   };
@@ -1144,6 +1154,15 @@ Deno.serve(async (req) => {
         return json(await cached(key, CACHE_MS, () => accounts(db, range)), 200, origin);
       case 'downloads':
         return json(await cached('downloads', CACHE_MS, downloads), 200, origin);
+      case 'regions': {
+        const country = String(body.country ?? '');
+        if (!/^[A-Z]{2}$/.test(country)) return json({ error: 'bad_country' }, 400, origin);
+        if (!PLAUSIBLE_KEY || !PLAUSIBLE_SITE) return json({ configured: false }, 200, origin);
+        const regions = await cached(`${key}:${country}`, CACHE_MS, () =>
+          regionsOf(range, country),
+        );
+        return json({ configured: true, country, regions }, 200, origin);
+      }
       case 'app':
         return json(await cached(key, CACHE_MS, () => app(db, range)), 200, origin);
       case 'insights':

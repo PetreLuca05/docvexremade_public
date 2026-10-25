@@ -219,6 +219,30 @@ the dashboard still reads the real Plausible stats through the function.
   (`localStorage['docvex:dev-downloads']`).
 - **MRR history.** Rebuilt from each subscription's start and end dates. Every
   price is monthly today; a yearly price would need dividing by 12.
-- **The audience map** covers Romania only, by county (Plausible's
-  `visit:region`, filtered to `RO`). Other countries are in the Countries
-  card. Hovering a county in the list highlights it on the map.
+- **The audience map** is the world by country, drawn with `d3-geo` from
+  [Natural Earth](https://www.naturalearthdata.com) (public domain). Clicking
+  a country, on the map or in the list, zooms into it and shows its
+  first-level regions (counties, states, provinces) with their visitors (the
+  `admin` function's `regions` action: Plausible's `visit:region` for that
+  country). Regions are matched by ISO 3166-2 code, else by name or by the
+  larger region they belong to, for countries where Plausible counts a
+  coarser level (France, Italy, the UK). Esc, "← World" or a click on the sea
+  zooms out. Romania by county is also the "Romania, by county" card.
+
+  The map files are static TopoJSON: `public/geo/world.json` (countries,
+  1:50m) and `public/geo/regions/<code>.json` (regions, 1:10m), fetched only
+  by the dashboard, and a country's file only when it is clicked. To rebuild
+  them from Natural Earth's GeoJSON with
+  [mapshaper](https://github.com/mbloch/mapshaper):
+
+  ```sh
+  mapshaper ne_50m_admin_0_countries.geojson \
+    -filter 'ISO_A2_EH !== "AQ" && ISO_A2_EH !== "-99"' \
+    -each 'id=ISO_A2_EH, name=NAME' -filter-fields id,name -simplify 20% keep-shapes \
+    -o format=topojson id-field=id quantization=20000 public/geo/world.json
+  mapshaper ne_10m_admin_1_states_provinces.geojson \
+    -filter '/^[A-Z]{2}$/.test(iso_a2) && iso_a2 !== "AQ"' \
+    -each 'code=iso_3166_2, name=name || name_en, group=region || ""' \
+    -filter-fields iso_a2,code,name,group -simplify 6% keep-shapes -split iso_a2 \
+    -o format=topojson singles quantization=20000 public/geo/regions/
+  ```

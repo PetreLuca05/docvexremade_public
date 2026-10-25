@@ -322,6 +322,63 @@ h3,
   outline-offset: 2px;
 }
 
+.menu-toggle {
+  display: none;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  margin-right: -12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Three lines that turn into a cross when the menu is open. */
+.menu-toggle span,
+.menu-toggle span::before,
+.menu-toggle span::after {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: currentColor;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.menu-toggle span {
+  position: relative;
+}
+
+.menu-toggle span::before,
+.menu-toggle span::after {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+
+.menu-toggle span::before {
+  top: -7px;
+}
+
+.menu-toggle span::after {
+  top: 7px;
+}
+
+.site-head.is-open .menu-toggle span {
+  background: transparent;
+}
+
+.site-head.is-open .menu-toggle span::before {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.site-head.is-open .menu-toggle span::after {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
 .site-nav {
   display: flex;
   flex-wrap: wrap;
@@ -329,6 +386,9 @@ h3,
 }
 
 .site-nav a {
+  /* The trimmed text box (below) is only as tall as the capitals: the padding
+     gives the link a full-height target without moving the text. */
+  padding: 14px 0;
   color: var(--muted);
   font-size: 11px;
   font-weight: 600;
@@ -4503,7 +4563,8 @@ body.has-modal {
 /* The map of Romania. */
 .dev-globe-wrap {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  /* The world is wide: the map takes two thirds, the list the rest. */
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr);
   gap: 24px;
   align-items: center;
 }
@@ -4519,12 +4580,14 @@ body.has-modal {
   height: auto;
 }
 
-/* Borders in the card's colour: neighbouring counties' edges don't quite
+/* Borders in the card's colour: neighbouring countries' edges don't quite
    coincide, so a light stroke would draw each border twice. */
 .dev-map path {
   fill: rgba(245, 242, 234, 0.07);
   stroke: var(--panel);
   stroke-width: 1.4;
+  /* Widths in screen pixels, whatever the map's own scale. */
+  vector-effect: non-scaling-stroke;
   stroke-linejoin: round;
   transition:
     fill 0.2s ease,
@@ -4534,6 +4597,41 @@ body.has-modal {
 .dev-map path.is-active {
   stroke: var(--gold);
   stroke-width: 1.6;
+}
+
+.dev-map.is-world path {
+  stroke-width: 0.6;
+  cursor: pointer;
+}
+
+.dev-map.is-world path.is-active {
+  stroke-width: 1.4;
+}
+
+.dev-map.is-world path.is-dim {
+  opacity: 0.35;
+}
+
+.dev-map.is-world path.is-region {
+  stroke-width: 0.8;
+  cursor: default;
+}
+
+.dev-map.is-loading {
+  aspect-ratio: 1000 / 520;
+}
+
+.dev-map-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 14px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.dev-rank li.is-selectable {
+  cursor: pointer;
 }
 
 .dev-map-tip {
@@ -5310,20 +5408,60 @@ th {
   color: var(--text);
 }
 
+/* ---- Touch screens ---------------------------------------------------- */
+
+/* Fingers need larger targets than a pointer: the small links and the
+   language buttons get a bigger hit area, the look stays the same. */
+@media (pointer: coarse) {
+  .lang-switch button {
+    position: relative;
+  }
+
+  .lang-switch button::after {
+    content: '';
+    position: absolute;
+    inset: -12px -2px;
+  }
+
+  .site-foot nav a,
+  .link-more {
+    display: inline-block;
+    padding-block: 10px;
+  }
+
+  .auth-tabs button {
+    min-height: 44px;
+  }
+
+  label.check input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+  }
+
+  .link-button {
+    padding-block: 8px;
+  }
+}
+
 /* ---- Small screens --------------------------------------------------- */
 
 @media (max-width: 960px) {
-  .plans,
   .get-started {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Tablets keep the plans side by side, a little tighter. */
+  .plan {
+    padding: 28px 18px;
   }
 
   .get-started {
     gap: 32px;
   }
 
-  /* The links no longer fit in one row: the header stacks and scrolls away
-     with the page. Over the hero it keeps a solid night background. */
+  /* Phones and tablets: a compact bar (the logo and a menu button) that
+     scrolls away with the page; the links, the account and the language open
+     in a panel under it. Over the hero it keeps a solid night background. */
   .site-head {
     position: static;
   }
@@ -5333,17 +5471,49 @@ th {
   }
 
   .site-head .wrap {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-    min-height: 0;
-    padding-top: 14px;
-    padding-bottom: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0;
+    min-height: 60px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .menu-toggle {
+    display: inline-grid;
   }
 
   .head-tools {
+    display: none;
+    flex-basis: 100%;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    gap: 16px;
+    padding: 8px 0 18px;
+  }
+
+  .site-head.is-open .head-tools {
+    display: flex;
+  }
+
+  .head-tools .site-nav {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .head-tools .site-nav a {
+    display: flex;
+    align-items: center;
+    min-height: 48px;
+    border-bottom: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+    text-box: normal;
+  }
+
+  .head-tools .head-actions {
+    flex-wrap: wrap;
+    justify-content: space-between;
     gap: 12px;
   }
 
@@ -5362,6 +5532,33 @@ th {
     gap: 40px;
   }
 
+  /* The sign-up steps above the form: a row of numbered dots with only the
+     current step written out, so the form starts on the first screen. Earlier
+     steps stay reachable with the form's Back button. */
+  .progress {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .doc .progress > li,
+  .progress > li {
+    padding: 0;
+  }
+
+  .progress > li:not(:last-child)::before {
+    display: none;
+  }
+
+  .progress > li:not(.is-current) .progress-body {
+    display: none;
+  }
+
+  .progress > li.is-current {
+    flex: 1 1 200px;
+  }
+
   .module.is-flip .frame {
     order: 0;
   }
@@ -5373,6 +5570,21 @@ th {
 
   .perks {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Tablets: the illustrations span the column, so a wider, shorter frame
+   keeps them from filling a whole screen each. */
+@media (min-width: 641px) and (max-width: 960px) {
+  .frame {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+/* Phones: the plans one under another. */
+@media (max-width: 699px) {
+  .plans {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 

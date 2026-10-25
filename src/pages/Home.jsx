@@ -4,6 +4,10 @@ import { useLang, useMeta } from '../i18n.jsx';
 import { CLIENT_OS, OS_NAMES } from '../os.js';
 import { authHref, storedUser } from '../auth.js';
 import AskDocvex from '../components/AskDocvex.jsx';
+
+// The FAQ's "Ask DocVex" question box, hidden on every device for now. Set
+// to true to show it again.
+const SHOW_ASK = false;
 import ContinueButton from '../components/ContinueButton.jsx';
 
 // The visitor's system, or both when it is neither (Linux, a phone).
@@ -522,8 +526,9 @@ export default function Home() {
             ))}
           </div>
           {/* Under the last question: ask the assistant; as a chat it spans
-              the whole section. */}
-          <AskDocvex />
+              the whole section. Hidden for now (SHOW_ASK); the component,
+              its function and texts stay as they are. */}
+          {SHOW_ASK && <AskDocvex />}
         </div>
       </section>
 

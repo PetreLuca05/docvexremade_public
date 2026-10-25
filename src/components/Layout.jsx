@@ -14,6 +14,8 @@ const T = {
   ro: {
     skip: 'Sari la conținut',
     nav: 'Principal',
+    menu: 'Meniu',
+    closeMenu: 'Închide meniul',
     home: 'Acasă',
     install: 'Descărcare',
     update: 'Actualizare',
@@ -34,6 +36,8 @@ const T = {
   en: {
     skip: 'Skip to content',
     nav: 'Main',
+    menu: 'Menu',
+    closeMenu: 'Close menu',
     home: 'Home',
     install: 'Download',
     update: 'Update',
@@ -188,7 +192,20 @@ function SiteHeader({ page, navPage = page, overlay, t }) {
   const atTop = useAtTop();
   const user = useStoredUser();
   const current = (p) => (navPage === p ? 'page' : undefined);
-  const className = ['site-head', overlay && 'is-overlay', atTop && 'is-top']
+  // Phones and tablets: the links, account and language fold into a menu.
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e) => e.key === 'Escape' && setOpen(false);
+    const onWide = () => window.innerWidth > 960 && setOpen(false);
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('resize', onWide);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('resize', onWide);
+    };
+  }, [open]);
+  const className = ['site-head', overlay && 'is-overlay', atTop && 'is-top', open && 'is-open']
     .filter(Boolean)
     .join(' ');
   return (
@@ -198,7 +215,17 @@ function SiteHeader({ page, navPage = page, overlay, t }) {
           <img src={icon} alt="" />
           docvex
         </a>
-        <div className="head-tools">
+        <button
+          type="button"
+          className="menu-toggle"
+          aria-expanded={open}
+          aria-controls="head-tools"
+          aria-label={open ? t.closeMenu : t.menu}
+          onClick={() => setOpen((o) => !o)}
+        >
+          <span aria-hidden="true" />
+        </button>
+        <div className="head-tools" id="head-tools">
           <nav className="site-nav" aria-label={t.nav}>
             <a href="/" aria-current={current('index')}>
               {t.home}

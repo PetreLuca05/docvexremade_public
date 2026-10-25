@@ -11,7 +11,7 @@ import { authHref, validUrl } from '../auth.js';
 // (Stripe, through the stripe-events log), accounts, downloads and health,
 // all from the admin Edge Function, which answers admins only. Not linked
 // from anywhere and not indexed; anyone who is not an admin sees the 404
-// page. The charts (Recharts) and the map of Romania load only here.
+// page. The charts (Recharts) and the world map load only here.
 
 const lazyChart = (name) =>
   lazy(() => import('../components/dev/Charts.jsx').then((m) => ({ default: m[name] })));
@@ -19,7 +19,7 @@ const TrafficChart = lazyChart('TrafficChart');
 const Donut = lazyChart('Donut');
 const StackedBars = lazyChart('StackedBars');
 const StackedAreas = lazyChart('StackedAreas');
-const RomaniaMap = lazy(() => import('../components/dev/RomaniaMap.jsx'));
+const WorldMap = lazy(() => import('../components/dev/WorldMap.jsx'));
 
 const ENDPOINT = validUrl(import.meta.env.VITE_SUPABASE_URL)
   ? `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/admin`
@@ -113,8 +113,12 @@ const T = {
       goals: 'Evenimente',
     },
     audience: {
-      globe: 'Vizitatori din România, pe județe',
-      counties: 'Județe',
+      globe: 'Vizitatori pe țări',
+      world: 'Lumea',
+      regionsIn: (country) => `${country}, pe regiuni`,
+      noRegions: 'Fără regiuni pe hartă pentru această țară.',
+      mapHint: 'Apasă o țară pentru regiunile ei.',
+      counties: 'România, pe județe',
       countries: 'Țări',
       cities: 'Orașe',
       devices: 'Dispozitive',
@@ -497,8 +501,12 @@ const T = {
       goals: 'Events',
     },
     audience: {
-      globe: 'Visitors in Romania, by county',
-      counties: 'Counties',
+      globe: 'Visitors by country',
+      world: 'World',
+      regionsIn: (country) => `${country}, by region`,
+      noRegions: 'No regions on the map for this country.',
+      mapHint: 'Click a country to see its regions.',
+      counties: 'Romania, by county',
       countries: 'Countries',
       cities: 'Cities',
       devices: 'Devices',
@@ -1054,6 +1062,7 @@ function RankList({
   format,
   limit = 8,
   onHover,
+  onSelect,
 }) {
   if (!rows?.length) return <Empty>—</Empty>;
   const list = rows.slice(0, limit);
@@ -1065,6 +1074,8 @@ function RankList({
           key={`${name(r)}-${i}`}
           onMouseEnter={onHover ? () => onHover(r) : undefined}
           onMouseLeave={onHover ? () => onHover(null) : undefined}
+          onClick={onSelect ? () => onSelect(r) : undefined}
+          className={onSelect ? 'is-selectable' : undefined}
         >
           <span className="dev-rank-bar" style={{ width: `${(value(r) / max) * 100}%` }} />
           <span className="dev-rank-name">{name(r) || '(none)'}</span>
@@ -1772,10 +1783,24 @@ function TrafficSection({ t, f, traffic, compare }) {
   );
 }
 
-function AudienceSection({ t, f, lang, traffic }) {
+function AudienceSection({ t, f, lang, traffic, token, range }) {
   const ta = t.audience;
   const d = traffic.data;
   const [focus, setFocus] = useState(null);
+  // The country the map is zoomed into, and its visitors by region.
+  const [selected, setSelected] = useState(null);
+  const [regions, setRegions] = useState({ country: null, rows: null });
+  useEffect(() => {
+    if (!selected) return;
+    let alive = true;
+    setRegions({ country: selected, rows: null });
+    call(token, 'regions', { range, country: selected })
+      .then((r) => alive && setRegions({ country: selected, rows: r.regions ?? [] }))
+      .catch(() => alive && setRegions({ country: selected, rows: [] }));
+    return () => {
+      alive = false;
+    };
+  }, [selected, token, range.from, range.to]); // eslint-disable-line react-hooks/exhaustive-deps
   if (traffic.error) return null;
   if (d && !d.configured) {
     return (
@@ -1786,36 +1811,59 @@ function AudienceSection({ t, f, lang, traffic }) {
   }
   const loading = traffic.loading && !d;
   const b = d?.breakdowns ?? {};
-  const regions = b.romania ?? [];
+  const countries = (b.country ?? []).map((r) => ({ code: r.name, visitors: r.visitors }));
+  const regionRows = regions.country === selected ? regions.rows : null;
+  const regionName = (code, name) => (code?.startsWith('RO-') ? countyName(code, name) : name);
   return (
     <>
-      <Card title={ta.globe} wide tall>
+      <Card title={ta.globe} wide tall aside={<span className="dev-note">{ta.mapHint}</span>}>
         <div className="dev-globe-wrap">
           {loading ? (
             <Skeleton height={360} />
           ) : (
             <Suspense fallback={<Skeleton height={360} />}>
-              <RomaniaMap regions={regions} focus={focus} label={ta.globe} format={f.int} />
+              <WorldMap
+                countries={countries}
+                selected={selected}
+                onSelect={setSelected}
+                regionVisitors={regionRows}
+                regionName={regionName}
+                focus={focus}
+                label={ta.globe}
+                backLabel={ta.world}
+                noRegions={ta.noRegions}
+                format={f.int}
+                lang={lang}
+              />
             </Suspense>
           )}
           <div className="dev-globe-list">
-            <h4>{ta.counties}</h4>
-            {loading ? (
+            <h4>{selected ? ta.regionsIn(countryName(selected, lang)) : ta.countries}</h4>
+            {loading || (selected && regionRows === null) ? (
               <Skeleton />
+            ) : selected ? (
+              <RankList
+                rows={regionRows}
+                name={(r) => regionName(r.code, r.name)}
+                format={f.int}
+                limit={15}
+                onHover={(r) => setFocus(r?.code ?? null)}
+              />
             ) : (
               <RankList
-                rows={regions}
-                name={(r) => countyName(r.code, r.name)}
+                rows={b.country}
+                name={(r) => countryName(r.name, lang)}
                 format={f.int}
                 limit={12}
-                onHover={(r) => setFocus(r?.code ?? null)}
+                onHover={(r) => setFocus(r?.name ?? null)}
+                onSelect={(r) => setSelected(r.name)}
               />
             )}
           </div>
         </div>
       </Card>
       {[
-        ['country', ta.countries],
+        ['romania', ta.counties],
         ['city', ta.cities],
         ['device', ta.devices],
         ['browser', ta.browsers],
@@ -1827,7 +1875,7 @@ function AudienceSection({ t, f, lang, traffic }) {
           ) : (
             <RankList
               rows={b[key]}
-              name={key === 'country' ? (r) => countryName(r.name, lang) : undefined}
+              name={key === 'romania' ? (r) => countyName(r.code, r.name) : undefined}
               format={f.int}
               limit={6}
             />
@@ -2956,7 +3004,14 @@ function Dashboard({ t, lang, token }) {
             <TrafficSection t={t} f={f} traffic={traffic} compare={compare} />
           </Section>
           <Section id="audience" title={t.sections.audience}>
-            <AudienceSection t={t} f={f} lang={lang} traffic={traffic} />
+            <AudienceSection
+              t={t}
+              f={f}
+              lang={lang}
+              traffic={traffic}
+              token={token}
+              range={range}
+            />
           </Section>
           <Section id="subscriptions" title={t.sections.subscriptions}>
             <SubscriptionsSection

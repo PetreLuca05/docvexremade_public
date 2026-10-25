@@ -35,9 +35,16 @@ vulnerability reporting and the list of applicable acts) and `404.html`.
 ```sh
 npm install
 npm run dev       # http://localhost:5173
+npm run dev:phone # the same, also on the Wi-Fi (http://<this computer's IP>:5173)
 npm run build     # into dist/
 npm run preview   # serve dist/
 ```
+
+`npm run dev:phone` lets a phone on the same Wi-Fi open the site: use the
+"Network" address Vite prints. Stop `npm run dev` first (both use port 5173).
+Signing in with e-mail works there; Google sign-in returns only to the
+addresses allowed in Supabase (docvex.ro and localhost), and push
+notifications need HTTPS, so test those on docvex.ro.
 
 Built with GDPR (Regulation (EU) 2016/679, Law 190/2018) and Law 506/2004 in
 mind: no cookies and system fonts only. The one third-party script is
