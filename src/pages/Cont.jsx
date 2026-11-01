@@ -7,6 +7,7 @@ import Demographics from '../components/Demographics.jsx';
 import { demographicsData, demographicsError, demographicsOf } from '../demographics.js';
 import { useLang, useMeta } from '../i18n.jsx';
 import { useSession } from '../useSession.js';
+import LanguageSelect from '../components/LanguageSelect.jsx';
 
 const META = {
   ro: {
@@ -1212,6 +1213,8 @@ function Account({ t, user }) {
           {t.billingHint} <a href={billingUrl(user)}>{t.billing}</a>
         </p>
       </section>
+
+      <LanguageSelect user={user} />
 
       <section className="account-section">
         <SignOut t={t} />
