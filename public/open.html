@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ro">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <title>Deschide în DocVex / Open in DocVex</title>
+    <link rel="icon" href="/assets/icon.png" />
+    <!--
+      The link in DocVex's case notification emails:
+        https://docvex.ro/open.html?case=1909%2F3%2F2020
+      It hands the case to the app as docvex://case/<numar> (the app's
+      main/deepLink.ts). If the app has not taken over after ~1.5 s, it
+      offers to open it again or to download DocVex. Self-contained (in
+      public/, copied as is): GitHub Pages cannot route /open/case/* to it.
+    -->
+    <style>
+      :root {
+        --ink: #15213a;
+        --sand: #dcc9a3;
+        --cream: #f5f2ea;
+        --cognac: #8b5e3c;
+        --muted: #5b6475;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 24px 16px;
+        background: var(--cream);
+        color: var(--ink);
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+      }
+      main {
+        width: 100%;
+        max-width: 520px;
+        background: #fff;
+        border: 1px solid #e7e1d3;
+        border-radius: 14px;
+        padding: 28px 24px;
+        text-align: center;
+      }
+      img {
+        display: block;
+        margin: 0 auto;
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+      }
+      .case {
+        display: inline-block;
+        margin: 14px 0 4px;
+        padding: 3px 10px;
+        border-radius: 999px;
+        background: var(--cream);
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+      }
+      h1 {
+        font-size: 22px;
+        margin: 10px 0 6px;
+      }
+      p {
+        margin: 0 0 4px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .en {
+        font-size: 14px;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        margin-top: 20px;
+      }
+      .actions[hidden] {
+        display: none;
+      }
+      a.btn {
+        padding: 10px 16px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+      }
+      a.primary {
+        background: var(--ink);
+        color: var(--sand);
+      }
+      a.ghost {
+        border: 1px solid #d8d0bd;
+        color: var(--ink);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/assets/icon.png" alt="DocVex" />
+      <div class="case" id="case" hidden></div>
+      <h1 id="title">Se deschide în DocVex…</h1>
+      <p id="ro">Browserul te poate întreba dacă deschizi aplicația DocVex.</p>
+      <p class="en" id="en">Your browser may ask to open the DocVex app.</p>
+      <div class="actions" id="actions" hidden>
+        <a class="btn primary" id="open" href="docvex://">Deschide DocVex / Open DocVex</a>
+        <a class="btn ghost" href="/instalare.html">Descarcă / Download</a>
+      </div>
+    </main>
+    <script>
+      ;(function () {
+        var WAIT_MS = 1500
+        var $ = function (id) {
+          return document.getElementById(id)
+        }
+        // ?case=<numar> (also /open/case/<numar>, should a host route it here)
+        function caseFrom() {
+          var m = /\/open\/case\/([^?#]+)/.exec(location.pathname)
+          var raw = m ? m[1] : new URLSearchParams(location.search).get('case')
+          if (!raw) return null
+          try {
+            var numar = decodeURIComponent(raw).replace(/\/+$/, '').trim()
+            return numar || null
+          } catch (e) {
+            return null
+          }
+        }
+        var numar = caseFrom()
+        if (!numar) {
+          $('title').textContent = 'Linkul nu are un dosar / No case in this link'
+          $('ro').textContent = 'Deschide dosarul din DocVex: Notifications sau Cases.'
+          $('en').textContent = 'Open the case from DocVex: Notifications or Cases.'
+          $('actions').hidden = false
+          return
+        }
+        var appLink = 'docvex://case/' + encodeURIComponent(numar)
+        $('case').textContent = numar
+        $('case').hidden = false
+        $('open').href = appLink
+        // The app took over when the browser left the page (a dialog, the app's window)
+        var left = false
+        window.addEventListener('blur', function () {
+          left = true
+        })
+        document.addEventListener('visibilitychange', function () {
+          if (document.hidden) left = true
+        })
+        window.location.href = appLink
+        setTimeout(function () {
+          $('actions').hidden = false
+          if (left) {
+            $('title').textContent = 'Deschis în DocVex / Opened in DocVex'
+            $('ro').textContent = 'Poți închide această filă.'
+            $('en').textContent = 'You can close this tab.'
+          } else {
+            $('title').textContent = 'Deschide dosarul în DocVex'
+            $('ro').textContent =
+              'Dacă DocVex nu s-a deschis, deschide-l de aici sau descarcă aplicația dacă nu este instalată.'
+            $('en').textContent =
+              'Open this case in DocVex. If it did not open, open it here, or download it if it is not installed on this computer.'
+          }
+        }, WAIT_MS)
+      })()
+    </script>
+  </body>
+</html>
