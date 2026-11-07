@@ -154,12 +154,12 @@ export function paymentLink(plan) {
   return PAYMENT_LINKS[plan] || null;
 }
 
-export function checkoutUrl(plan, user, lang) {
+export function checkoutUrl(plan, user) {
   const link = paymentLink(plan);
   if (!link) return null;
   const u = new URL(link);
   u.searchParams.set('client_reference_id', user.id);
   if (user.email) u.searchParams.set('prefilled_email', user.email);
-  u.searchParams.set('locale', lang);
+  u.searchParams.set('locale', 'ro');
   return u.toString();
 }

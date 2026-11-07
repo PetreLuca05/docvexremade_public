@@ -2,14 +2,13 @@ export default function Cookies() {
   return (
     <article className="doc">
       <h1>Politica de cookie-uri</h1>
-      <p className="updated">Ultima actualizare: 25 octombrie 2026</p>
+      <p className="updated">Ultima actualizare: 7 noiembrie 2026</p>
       <div className="callout">
         <strong>Acest site nu folosește cookie-uri</strong> și nici pixeli de urmărire. Vizitele le
         numărăm cu Plausible, care nu salvează nimic în browser și nu te identifică (vezi{' '}
-        <a href="#statistici">mai jos</a>). În browserul tău site-ul poate salva doar limba pe care
-        o alegi (română sau engleză), dacă o schimbi, și sesiunea contului, dacă te autentifici pe
-        pagina Autentificare. Amândouă sunt cerute de tine, deci strict necesare, și nu îți cerem
-        consimțământul printr-un banner.
+        <a href="#statistici">mai jos</a>). În browserul tău site-ul poate salva doar sesiunea
+        contului, dacă te autentifici pe pagina Autentificare. Este cerută de tine, deci strict
+        necesară, și nu îți cerem consimțământul printr-un banner.
       </div>
       <h2>Ce sunt cookie-urile</h2>
       <p>
@@ -36,10 +35,6 @@ export default function Cookies() {
             <tr>
               <td>Cookie-uri de preferințe</td>
               <td>Nu</td>
-            </tr>
-            <tr>
-              <td>Stocare locală (local storage) pentru limba aleasă</td>
-              <td>Da, strict necesară</td>
             </tr>
             <tr>
               <td>Stocare locală (local storage) pentru sesiunea contului</td>
@@ -83,18 +78,10 @@ export default function Cookies() {
         varianta și versiunea), începerea și finalizarea creării unui cont (cu planul ales),
         autentificarea (prin e-mail sau Google), cererea de resetare a parolei, trimiterea la plată
         și întoarcerea de la plată, întrebările puse asistentului (doar numărul lor, nu textul),
-        schimbarea limbii, paginile inexistente (adresa lor) și clicurile pe linkuri către alte
+        paginile inexistente (adresa lor) și clicurile pe linkuri către alte
         site-uri. Vedem doar totaluri. Fiindcă nu salvează și nu citește nimic pe dispozitivul tău,
         nu îți cerem consimțământul printr-un banner. Detalii despre prelucrare în{' '}
         <a href="confidentialitate.html#statistici">politica de confidențialitate</a>.
-      </p>
-      <h2 id="limba">Limba aleasă</h2>
-      <p>
-        Când alegi o limbă din meniul site-ului, browserul tău păstrează valoarea{' '}
-        <code>docvex-lang</code> („ro” sau „en”) în local storage, ca paginile să se deschidă în
-        aceeași limbă și la vizita următoare. Valoarea rămâne doar pe dispozitivul tău: nu ne este
-        trimisă și nu te identifică. Nu are dată de expirare; o poți șterge oricând din setările
-        browserului (datele site-ului docvex.ro), iar site-ul revine la limba română.
       </p>
       <h2 id="sesiune">Sesiunea contului</h2>
       <p>

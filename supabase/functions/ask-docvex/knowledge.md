@@ -211,7 +211,7 @@ Open from the sidebar or the account menu ("View all settings"). Choices are sav
 - Text sent to AI is not stored on a DocVex server; the provider keeps it only as its terms allow. Account data is kept while you have an account.
 - Processing follows the GDPR and Law no. 190/2018; processors work under data processing agreements; transfers outside the EEA use the EU-U.S. Data Privacy Framework or standard contractual clauses. No selling of data, no advertising. Connections are encrypted (HTTPS).
 - GDPR rights (access, rectification, erasure, restriction, portability, objection) are exercised via the contact address; complaints can go to ANSPDCP (dataprotection.ro). Not intended for under-16s.
-- **Website**: static, no analytics, ads or **cookies**; it stores only your language choice and, if signed in, your session. Hosted on GitHub.
+- **Website**: static, Romanian only, no ads or **cookies**; it stores only your session, if signed in. Hosted on GitHub.
 
 ## Limitations and status
 
@@ -231,4 +231,4 @@ Open from the sidebar or the account menu ("View all settings"). Choices are sav
 - Contact details (operator name, address, tax ID, email, phone) are **not published on the site yet**; the Legal information page still shows them as to be filled in. Don't invent an address.
 - Once published, that address handles questions, data requests, account deletion, complaints (reply within 30 days) and accessibility issues. Security vulnerabilities go there with the subject "Security" (acknowledged within 5 working days).
 - Consumers can also contact ANPC (anpc.ro) or alternative dispute resolution bodies.
-- The Romanian versions of the policies are legally binding; English is a convenience translation. Romanian law applies.
+- The website and its policies are in Romanian only (there is no English version). Romanian law applies.

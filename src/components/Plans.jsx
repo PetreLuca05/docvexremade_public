@@ -1,4 +1,3 @@
-import { useLang } from '../i18n.jsx';
 import ContinueButton from './ContinueButton.jsx';
 
 // The plans, as the pricing page and the account page both show them.
@@ -6,89 +5,49 @@ export const PLAN_IDS = ['start', 'pro', 'cabinet'];
 export const FEATURED = 'pro';
 
 const T = {
-  ro: {
-    perMonth: '/ lună',
-    featured: 'Recomandat',
-    choose: (name) => `Alege ${name}`,
-    plans: {
-      start: {
-        name: 'Start',
-        price: '0 lei',
-        text: 'Pentru a încerca DocVex.',
-        features: [
-          'Proiecte și previzualizare de fișiere',
-          'Legislație și coduri CAEN',
-          '[DE COMPLETAT: limita de cercetare AI]',
-        ],
-      },
-      pro: {
-        name: 'Solo',
-        price: '199 lei',
-        text: 'Pentru avocatul sau juristul care lucrează zilnic cu dosare.',
-        features: [
-          'Tot ce include Start',
-          'Cercetare juridică cu AI',
-          'Scanare de documente în PDF',
-          '[DE COMPLETAT: alte funcții]',
-        ],
-      },
-      cabinet: {
-        name: 'Cabinet',
-        price: '499 lei',
-        text: 'Pentru cabinete și echipe juridice.',
-        features: [
-          'Tot ce include Solo',
-          '[DE COMPLETAT: numărul de utilizatori]',
-          '[DE COMPLETAT: asistență]',
-        ],
-      },
+  perMonth: '/ lună',
+  featured: 'Recomandat',
+  choose: (name) => `Alege ${name}`,
+  plans: {
+    start: {
+      name: 'Start',
+      price: '0 lei',
+      text: 'Pentru a încerca DocVex.',
+      features: [
+        'Proiecte și previzualizare de fișiere',
+        'Legislație și coduri CAEN',
+        '[DE COMPLETAT: limita de cercetare AI]',
+      ],
     },
-    current: 'Planul tău',
-    keep: 'Planul actual',
-    selected: 'Selectat',
-  },
-  en: {
-    perMonth: '/ month',
-    featured: 'Recommended',
-    choose: (name) => `Choose ${name}`,
-    plans: {
-      start: {
-        name: 'Start',
-        price: '0 lei',
-        text: 'To try DocVex.',
-        features: [
-          'Projects and file previews',
-          'Legislation and CAEN codes',
-          '[TO FILL IN: AI research limit]',
-        ],
-      },
-      pro: {
-        name: 'Solo',
-        price: '199 lei',
-        text: 'For the lawyer or legal professional who works with case files every day.',
-        features: [
-          'Everything in Start',
-          'AI-assisted legal research',
-          'Document scanning to PDF',
-          '[TO FILL IN: other features]',
-        ],
-      },
-      cabinet: {
-        name: 'Firm',
-        price: '499 lei',
-        text: 'For law firms and legal teams.',
-        features: ['Everything in Solo', '[TO FILL IN: number of users]', '[TO FILL IN: support]'],
-      },
+    pro: {
+      name: 'Solo',
+      price: '199 lei',
+      text: 'Pentru avocatul sau juristul care lucrează zilnic cu dosare.',
+      features: [
+        'Tot ce include Start',
+        'Cercetare juridică cu AI',
+        'Scanare de documente în PDF',
+        '[DE COMPLETAT: alte funcții]',
+      ],
     },
-    current: 'Your plan',
-    keep: 'Current plan',
-    selected: 'Selected',
+    cabinet: {
+      name: 'Cabinet',
+      price: '499 lei',
+      text: 'Pentru cabinete și echipe juridice.',
+      features: [
+        'Tot ce include Solo',
+        '[DE COMPLETAT: numărul de utilizatori]',
+        '[DE COMPLETAT: asistență]',
+      ],
+    },
   },
+  current: 'Planul tău',
+  keep: 'Planul actual',
+  selected: 'Selectat',
 };
 
 export function usePlanText() {
-  const { lang } = useLang();
-  return T[lang];
+  return T;
 }
 
 // `href` (a URL, or a function of the plan id) makes each card's button a

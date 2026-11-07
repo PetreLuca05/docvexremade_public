@@ -11,114 +11,58 @@ import {
   nextPage,
   paymentLink,
 } from '../auth.js';
-import { useLang, useMeta } from '../i18n.jsx';
+import { useMeta } from '../i18n.jsx';
 
 const META = {
-  ro: {
-    title: 'Autentificare — DocVex',
-    description: 'Creează-ți contul DocVex sau autentifică-te, cu Google sau cu e-mail și parolă.',
-  },
-  en: {
-    title: 'Sign in — DocVex',
-    description:
-      'Create your DocVex account or sign in, with Google or with an email and password.',
-  },
+  title: 'Autentificare — DocVex',
+  description: 'Creează-ți contul DocVex sau autentifică-te, cu Google sau cu e-mail și parolă.',
 };
 
 const T = {
-  ro: {
-    // The intro beside the form, for each tab.
-    intro: {
-      signup: {
-        eyebrow: 'Începe',
-        title: 'Creează-ți contul DocVex.',
-        // The sign-up's own steps, followed as the form moves on.
-        steps: [
-          ['Contul', 'Numele și e-mailul tău, sau continuă cu Google, mai jos.'],
-          ['Parola', 'O parolă sigură: cel puțin 8 caractere, cu litere și cifre.'],
-          ['Despre tine', 'Genul și data nașterii, dacă vrei: amândouă sunt opționale.'],
-          ['Planul', 'Alegi planul; cele plătite se plătesc online, prin Stripe.'],
-          ['Verificare', 'Verifici toate datele, accepți termenii și creezi contul.'],
-        ],
-        stepOf: (i, n) => `Pasul ${i} din ${n}`,
-        goTo: (name) => `Înapoi la pasul ${name}`,
-      },
-      signin: {
-        eyebrow: 'Bine ai revenit',
-        title: 'Intră în contul tău DocVex.',
-        steps: [
-          'Intră cu Google sau cu e-mailul și parola contului.',
-          'Ai uitat parola? Îți trimitem un link ca să-ți setezi una nouă.',
-          'Același cont te autentifică și în aplicație.',
-        ],
-      },
+  // The intro beside the form, for each tab.
+  intro: {
+    signup: {
+      eyebrow: 'Începe',
+      title: 'Creează-ți contul DocVex.',
+      // The sign-up's own steps, followed as the form moves on.
+      steps: [
+        ['Contul', 'Numele și e-mailul tău, sau continuă cu Google, mai jos.'],
+        ['Parola', 'O parolă sigură: cel puțin 8 caractere, cu litere și cifre.'],
+        ['Despre tine', 'Genul și data nașterii, dacă vrei: amândouă sunt opționale.'],
+        ['Planul', 'Alegi planul; cele plătite se plătesc online, prin Stripe.'],
+        ['Verificare', 'Verifici toate datele, accepți termenii și creezi contul.'],
+      ],
+      stepOf: (i, n) => `Pasul ${i} din ${n}`,
+      goTo: (name) => `Înapoi la pasul ${name}`,
     },
-    plan: 'Planul ales',
-    signUp: 'Cont nou',
-    signIn: 'Autentificare',
-    signedIn: (email) => `Ești autentificat ca ${email}.`,
-    pay: 'Continuă la plată',
-    payLater: 'Plata online pentru acest plan nu este disponibilă încă.',
-    paid: 'Plata a fost primită. Mulțumim!',
-    download: 'Descarcă aplicația',
-    signOut: 'Ieși din cont',
-    unavailable: 'Conturile nu sunt disponibile încă pe site. Revino curând.',
-    errors: {
-      invalid_credentials: 'E-mailul sau parola nu sunt corecte.',
-      user_already_exists: 'Există deja un cont cu acest e-mail. Autentifică-te.',
-      email_exists: 'Există deja un cont cu acest e-mail. Autentifică-te.',
-      weak_password: 'Parola este prea slabă. Alege una mai lungă.',
-      email_not_confirmed: 'Confirmă-ți întâi adresa de e-mail, din linkul primit.',
-      over_email_send_rate_limit: 'Prea multe încercări. Încearcă din nou peste câteva minute.',
-      generic: 'Ceva nu a mers. Încearcă din nou.',
+    signin: {
+      eyebrow: 'Bine ai revenit',
+      title: 'Intră în contul tău DocVex.',
+      steps: [
+        'Intră cu Google sau cu e-mailul și parola contului.',
+        'Ai uitat parola? Îți trimitem un link ca să-ți setezi una nouă.',
+        'Același cont te autentifică și în aplicație.',
+      ],
     },
   },
-  en: {
-    // The intro beside the form, for each tab.
-    intro: {
-      signup: {
-        eyebrow: 'Get started',
-        title: 'Create your DocVex account.',
-        // The sign-up's own steps, followed as the form moves on.
-        steps: [
-          ['Account', 'Your name and email, or continue with Google below.'],
-          ['Password', 'A secure password: at least 8 characters, with letters and digits.'],
-          ['About you', 'Your gender and date of birth, if you like: both are optional.'],
-          ['Plan', 'Choose your plan; paid ones are paid online, through Stripe.'],
-          ['Review', 'Check all your details, accept the terms and create the account.'],
-        ],
-        stepOf: (i, n) => `Step ${i} of ${n}`,
-        goTo: (name) => `Back to the ${name} step`,
-      },
-      signin: {
-        eyebrow: 'Welcome back',
-        title: 'Sign in to your DocVex account.',
-        steps: [
-          'Sign in with Google or with your account’s email and password.',
-          'Forgot your password? We will send you a link to set a new one.',
-          'The same account signs you in to the app too.',
-        ],
-      },
-    },
-    plan: 'Chosen plan',
-    signUp: 'New account',
-    signIn: 'Sign in',
-    signedIn: (email) => `You are signed in as ${email}.`,
-    pay: 'Continue to payment',
-    payLater: 'Online payment for this plan is not available yet.',
-    paid: 'Payment received. Thank you!',
-    download: 'Download the app',
-    signOut: 'Sign out',
-    unavailable: 'Accounts are not available on the site yet. Check back soon.',
-    errors: {
-      invalid_credentials: 'The email or password is incorrect.',
-      user_already_exists: 'An account with this email already exists. Sign in instead.',
-      email_exists: 'An account with this email already exists. Sign in instead.',
-      weak_password: 'The password is too weak. Choose a longer one.',
-      email_not_confirmed: 'Confirm your email address first, from the link you received.',
-      over_email_send_rate_limit: 'Too many attempts. Try again in a few minutes.',
-      generic: 'Something went wrong. Please try again.',
-    },
+  plan: 'Planul ales',
+  signUp: 'Cont nou',
+  signIn: 'Autentificare',
+  signedIn: (email) => `Ești autentificat ca ${email}.`,
+  pay: 'Continuă la plată',
+  payLater: 'Plata online pentru acest plan nu este disponibilă încă.',
+  paid: 'Plata a fost primită. Mulțumim!',
+  download: 'Descarcă aplicația',
+  signOut: 'Ieși din cont',
+  unavailable: 'Conturile nu sunt disponibile încă pe site. Revino curând.',
+  errors: {
+    invalid_credentials: 'E-mailul sau parola nu sunt corecte.',
+    user_already_exists: 'Există deja un cont cu acest e-mail. Autentifică-te.',
+    email_exists: 'Există deja un cont cu acest e-mail. Autentifică-te.',
+    weak_password: 'Parola este prea slabă. Alege una mai lungă.',
+    email_not_confirmed: 'Confirmă-ți întâi adresa de e-mail, din linkul primit.',
+    over_email_send_rate_limit: 'Prea multe încercări. Încearcă din nou peste câteva minute.',
+    generic: 'Ceva nu a mers. Încearcă din nou.',
   },
 };
 
@@ -127,7 +71,7 @@ function modeFromHash() {
   return window.location.hash === '#autentificare' ? 'signin' : 'signup';
 }
 
-function AuthPanel({ t, lang, plan, setPlan, mode, setMode, step, setStep }) {
+function AuthPanel({ t, plan, setPlan, mode, setMode, step, setStep }) {
   const pt = usePlanText();
   const at = useAuthText();
   const [session, setSession] = useState(undefined);
@@ -169,7 +113,7 @@ function AuthPanel({ t, lang, plan, setPlan, mode, setMode, step, setStep }) {
   useEffect(() => {
     if (!leaving) return;
     const paid = mode === 'signup' && plan && plan !== 'start';
-    const checkout = paid ? checkoutUrl(plan, session.user, lang) : null;
+    const checkout = paid ? checkoutUrl(plan, session.user) : null;
     if (checkout) {
       trackThen('Checkout Redirect', { plan }).then(() => window.location.replace(checkout));
     } else {
@@ -202,7 +146,7 @@ function AuthPanel({ t, lang, plan, setPlan, mode, setMode, step, setStep }) {
   if (session) {
     const user = session.user;
     const paid = chosen !== 'start';
-    const checkout = paid ? checkoutUrl(chosen, user, lang) : null;
+    const checkout = paid ? checkoutUrl(chosen, user) : null;
     return (
       <div className="auth-card">
         {paidBack && <div className="callout">{t.paid}</div>}
@@ -318,8 +262,7 @@ function AuthPanel({ t, lang, plan, setPlan, mode, setMode, step, setStep }) {
 }
 
 export default function Autentificare() {
-  const { lang } = useLang();
-  const t = T[lang];
+  const t = T;
   useMeta(META);
   const [plan, setPlan] = useState(() => {
     const p = new URLSearchParams(window.location.search).get('plan');
@@ -399,7 +342,6 @@ export default function Autentificare() {
         </div>
         <AuthPanel
           t={t}
-          lang={lang}
           plan={plan}
           setPlan={setPlan}
           mode={mode}

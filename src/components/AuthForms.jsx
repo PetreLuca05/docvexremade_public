@@ -3,242 +3,126 @@ import { authRedirect, getSupabase } from '../auth.js';
 import { track } from '../analytics.js';
 import BackButton from './BackButton.jsx';
 import ContinueButton from './ContinueButton.jsx';
-import { useLang } from '../i18n.jsx';
 import Demographics from './Demographics.jsx';
 import { demographicsData, demographicsError, EMPTY_DEMOGRAPHICS } from '../demographics.js';
 import { checkEmail, checkName, checkPassword, generatePassword } from '../validate.js';
 import { FEATURED, PLAN_IDS, usePlanText } from './Plans.jsx';
 
 const T = {
-  ro: {
-    steps: ['Contul', 'Parola', 'Despre tine', 'Planul', 'Verificare'],
-    aboutLead:
-      'Opțional: genul și data nașterii, pentru statisticile noastre. Poți trece peste acest pas.',
-    aboutLabel: 'Despre tine',
-    aboutNone: 'Nespecificat',
-    genderNames: { female: 'Feminin', male: 'Masculin', other: 'Altul' },
-    reviewLead: 'Verifică datele înainte de a crea contul. Poți modifica orice pas.',
-    edit: 'Modifică',
-    stepOf: (i, n) => `Pasul ${i} din ${n}`,
-    next: 'Continuă',
-    back: 'Înapoi',
-    google: 'Continuă cu Google',
-    or: 'sau',
-    name: 'Nume și prenume',
-    email: 'E-mail',
-    password: 'Parolă',
-    passwordAgain: 'Repetă parola',
-    show: 'Arată parola',
-    hide: 'Ascunde parola',
-    capsLock: 'Caps Lock este activat.',
-    placeholders: {
-      name: 'ex. Andrei Popescu',
-      email: 'nume@exemplu.ro',
-      newPassword: 'Cel puțin 8 caractere',
-      passwordAgain: 'Scrie parola din nou',
-      password: 'Parola ta',
-    },
-    generate: 'Sugerează o parolă puternică',
-    generated: 'Am completat o parolă puternică și am copiat-o. Salveaz-o în managerul de parole.',
-    generatedNotCopied: 'Am completat o parolă puternică. Salveaz-o în managerul de parole.',
-    newsletter:
-      'Trimite-mi newsletterul DocVex: noutăți despre produs și sfaturi, pe e-mail. Te poți dezabona oricând.',
-    didYouMean: 'Ai vrut să scrii',
-    useIt: 'Folosește-l',
-    nameErrors: {
-      required: 'Scrie-ți numele.',
-      tooShort: 'Numele trebuie să aibă cel puțin 2 caractere.',
-      tooLong: 'Numele poate avea cel mult 80 de caractere.',
-      invalidChars: 'Folosește doar litere, spații, cratime, apostrofuri și puncte.',
-    },
-    emailErrors: {
-      required: 'Scrie-ți adresa de e-mail.',
-      spaces: 'Adresa de e-mail nu poate conține spații.',
-      noAt: 'Adresei îi lipsește „@”, de exemplu nume@exemplu.ro.',
-      noDomain: 'Scrie domeniul după „@”, de exemplu exemplu.ro.',
-      tooLong: 'Adresa de e-mail este prea lungă.',
-      dots: 'Partea dinainte de „@” nu poate începe, se termina sau avea două puncte la rând.',
-      domain: 'Domeniul nu pare corect, de exemplu exemplu.ro.',
-    },
-    rules: {
-      length: 'Cel puțin 8 caractere',
-      letters: 'Cel puțin o literă',
-      digit: 'Cel puțin o cifră',
-      cases: 'Litere mari și mici (recomandat)',
-      symbol: 'Un simbol, de exemplu ! ? # (recomandat)',
-      personal: 'Nu conține numele sau e-mailul tău',
-      common: 'Nu este o parolă des folosită',
-      edges: 'Nu începe și nu se termină cu spațiu',
-    },
-    strength: ['Prea slabă', 'Slabă', 'Acceptabilă', 'Bună', 'Puternică'],
-    strengthLabel: 'Puterea parolei',
-    passwordInvalid: 'Parola nu îndeplinește încă toate cerințele de mai jos.',
-    mismatch: 'Parolele nu coincid.',
-    againRequired: 'Repetă parola, ca să fim siguri că ai scris-o corect.',
-    passwordRequired: 'Scrie-ți parola.',
-    match: 'Parolele coincid.',
-    planLabel: 'Plan',
-    plan: 'Alege planul',
-    planHint: 'Ce include planul ales vezi în stânga. Îl poți schimba oricând din pagina contului.',
-    terms: (
-      <>
-        Am citit și accept <a href="/termeni.html">termenii și condițiile</a> și{' '}
-        <a href="/confidentialitate.html#cont">politica de confidențialitate</a>.
-      </>
-    ),
-    termsRequired: 'Pentru a crea contul trebuie să accepți termenii.',
-    create: 'Creează contul',
-    creating: 'Se creează contul…',
-    welcome: (name) => `Bun venit, ${name}!`,
-    welcomeText: 'Contul tău DocVex este gata.',
-    checkEmail: 'Verifică-ți e-mailul',
-    checkEmailText: (e) =>
-      `Ți-am trimis un link de confirmare la ${e}. Deschide-l ca să-ți activezi contul; poate ajunge și în dosarul Spam.`,
-    resend: 'Retrimite e-mailul',
-    resendIn: (s) => `Poți retrimite în ${s} s`,
-    resent: 'E-mailul a fost retrimis.',
-    wrongEmail: 'Ai greșit adresa?',
-    exists: 'Există deja un cont cu acest e-mail.',
-    signInInstead: 'Autentifică-te cu el',
-    signIn: 'Intră în cont',
-    signingIn: 'Se verifică…',
-    forgot: 'Ai uitat parola?',
-    forgotTitle: 'Resetează parola',
-    forgotText: 'Îți trimitem un link cu care îți setezi o parolă nouă.',
-    sendLink: 'Trimite linkul',
-    sending: 'Se trimite…',
-    linkSent: (e) =>
-      `Dacă există un cont pentru ${e}, ți-am trimis un link de resetare. Verifică și dosarul Spam.`,
-    backToSignIn: 'Înapoi la autentificare',
-    errors: {
-      invalid_credentials: 'E-mailul sau parola nu sunt corecte.',
-      email_not_confirmed: 'Confirmă-ți întâi adresa de e-mail, din linkul primit.',
-      weak_password: 'Supabase a respins parola ca fiind prea slabă. Alege una mai lungă.',
-      over_email_send_rate_limit:
-        'Prea multe e-mailuri trimise. Încearcă din nou peste câteva minute.',
-      over_request_rate_limit: 'Prea multe încercări. Așteaptă puțin și încearcă din nou.',
-      signup_disabled: 'Crearea conturilor noi este oprită momentan.',
-      email_address_invalid: 'Adresa de e-mail nu este acceptată.',
-      generic: 'Ceva nu a mers. Încearcă din nou.',
-    },
+  steps: ['Contul', 'Parola', 'Despre tine', 'Planul', 'Verificare'],
+  aboutLead:
+    'Opțional: genul și data nașterii, pentru statisticile noastre. Poți trece peste acest pas.',
+  aboutLabel: 'Despre tine',
+  aboutNone: 'Nespecificat',
+  genderNames: { female: 'Feminin', male: 'Masculin', other: 'Altul' },
+  reviewLead: 'Verifică datele înainte de a crea contul. Poți modifica orice pas.',
+  edit: 'Modifică',
+  stepOf: (i, n) => `Pasul ${i} din ${n}`,
+  next: 'Continuă',
+  back: 'Înapoi',
+  google: 'Continuă cu Google',
+  or: 'sau',
+  name: 'Nume și prenume',
+  email: 'E-mail',
+  password: 'Parolă',
+  passwordAgain: 'Repetă parola',
+  show: 'Arată parola',
+  hide: 'Ascunde parola',
+  capsLock: 'Caps Lock este activat.',
+  placeholders: {
+    name: 'ex. Andrei Popescu',
+    email: 'nume@exemplu.ro',
+    newPassword: 'Cel puțin 8 caractere',
+    passwordAgain: 'Scrie parola din nou',
+    password: 'Parola ta',
   },
-  en: {
-    steps: ['Account', 'Password', 'About you', 'Plan', 'Review'],
-    aboutLead:
-      'Optional: your gender and date of birth, for our statistics. You can skip this step.',
-    aboutLabel: 'About you',
-    aboutNone: 'Not given',
-    genderNames: { female: 'Female', male: 'Male', other: 'Other' },
-    reviewLead: 'Check your details before creating the account. You can change any step.',
-    edit: 'Edit',
-    stepOf: (i, n) => `Step ${i} of ${n}`,
-    next: 'Continue',
-    back: 'Back',
-    google: 'Continue with Google',
-    or: 'or',
-    name: 'Full name',
-    email: 'Email',
-    password: 'Password',
-    passwordAgain: 'Repeat the password',
-    show: 'Show password',
-    hide: 'Hide password',
-    capsLock: 'Caps Lock is on.',
-    placeholders: {
-      name: 'e.g. Andrei Popescu',
-      email: 'name@example.com',
-      newPassword: 'At least 8 characters',
-      passwordAgain: 'Type the password again',
-      password: 'Your password',
-    },
-    generate: 'Suggest a strong password',
-    generated: 'A strong password is filled in and copied. Save it in your password manager.',
-    generatedNotCopied: 'A strong password is filled in. Save it in your password manager.',
-    newsletter:
-      'Send me the DocVex newsletter: product news and tips, by email. You can unsubscribe at any time.',
-    didYouMean: 'Did you mean',
-    useIt: 'Use it',
-    nameErrors: {
-      required: 'Enter your name.',
-      tooShort: 'Your name must have at least 2 characters.',
-      tooLong: 'Your name can have at most 80 characters.',
-      invalidChars: 'Use only letters, spaces, hyphens, apostrophes and dots.',
-    },
-    emailErrors: {
-      required: 'Enter your email address.',
-      spaces: 'An email address cannot contain spaces.',
-      noAt: 'The address is missing “@”, for example name@example.com.',
-      noDomain: 'Add the domain after “@”, for example example.com.',
-      tooLong: 'The email address is too long.',
-      dots: 'The part before “@” cannot start or end with a dot, or have two in a row.',
-      domain: 'The domain does not look right, for example example.com.',
-    },
-    rules: {
-      length: 'At least 8 characters',
-      letters: 'At least one letter',
-      digit: 'At least one digit',
-      cases: 'Upper- and lower-case letters (recommended)',
-      symbol: 'A symbol, such as ! ? # (recommended)',
-      personal: 'Does not contain your name or email',
-      common: 'Is not a commonly used password',
-      edges: 'Does not start or end with a space',
-    },
-    strength: ['Too weak', 'Weak', 'Fair', 'Good', 'Strong'],
-    strengthLabel: 'Password strength',
-    passwordInvalid: 'The password does not meet all the requirements below yet.',
-    mismatch: 'The passwords do not match.',
-    againRequired: 'Repeat the password, to make sure you typed it right.',
-    passwordRequired: 'Enter your password.',
-    match: 'The passwords match.',
-    planLabel: 'Plan',
-    plan: 'Choose your plan',
-    planHint:
-      'What the chosen plan includes is shown on the left. You can change it at any time from your account page.',
-    terms: (
-      <>
-        I have read and accept the <a href="/termeni.html">terms and conditions</a> and the{' '}
-        <a href="/confidentialitate.html#cont">privacy policy</a>.
-      </>
-    ),
-    termsRequired: 'You need to accept the terms to create an account.',
-    create: 'Create account',
-    creating: 'Creating your account…',
-    welcome: (name) => `Welcome, ${name}!`,
-    welcomeText: 'Your DocVex account is ready.',
-    checkEmail: 'Check your email',
-    checkEmailText: (e) =>
-      `We sent a confirmation link to ${e}. Open it to activate your account; it may land in your Spam folder.`,
-    resend: 'Resend the email',
-    resendIn: (s) => `You can resend in ${s}s`,
-    resent: 'The email has been sent again.',
-    wrongEmail: 'Wrong address?',
-    exists: 'An account with this email already exists.',
-    signInInstead: 'Sign in with it',
-    signIn: 'Sign in',
-    signingIn: 'Checking…',
-    forgot: 'Forgot your password?',
-    forgotTitle: 'Reset your password',
-    forgotText: 'We will send you a link to set a new password.',
-    sendLink: 'Send the link',
-    sending: 'Sending…',
-    linkSent: (e) =>
-      `If there is an account for ${e}, we sent it a reset link. Check your Spam folder too.`,
-    backToSignIn: 'Back to sign in',
-    errors: {
-      invalid_credentials: 'The email or password is incorrect.',
-      email_not_confirmed: 'Confirm your email address first, from the link you received.',
-      weak_password: 'Supabase rejected the password as too weak. Choose a longer one.',
-      over_email_send_rate_limit: 'Too many emails sent. Try again in a few minutes.',
-      over_request_rate_limit: 'Too many attempts. Wait a moment and try again.',
-      signup_disabled: 'Creating new accounts is turned off at the moment.',
-      email_address_invalid: 'This email address is not accepted.',
-      generic: 'Something went wrong. Please try again.',
-    },
+  generate: 'Sugerează o parolă puternică',
+  generated: 'Am completat o parolă puternică și am copiat-o. Salveaz-o în managerul de parole.',
+  generatedNotCopied: 'Am completat o parolă puternică. Salveaz-o în managerul de parole.',
+  newsletter:
+    'Trimite-mi newsletterul DocVex: noutăți despre produs și sfaturi, pe e-mail. Te poți dezabona oricând.',
+  didYouMean: 'Ai vrut să scrii',
+  useIt: 'Folosește-l',
+  nameErrors: {
+    required: 'Scrie-ți numele.',
+    tooShort: 'Numele trebuie să aibă cel puțin 2 caractere.',
+    tooLong: 'Numele poate avea cel mult 80 de caractere.',
+    invalidChars: 'Folosește doar litere, spații, cratime, apostrofuri și puncte.',
+  },
+  emailErrors: {
+    required: 'Scrie-ți adresa de e-mail.',
+    spaces: 'Adresa de e-mail nu poate conține spații.',
+    noAt: 'Adresei îi lipsește „@”, de exemplu nume@exemplu.ro.',
+    noDomain: 'Scrie domeniul după „@”, de exemplu exemplu.ro.',
+    tooLong: 'Adresa de e-mail este prea lungă.',
+    dots: 'Partea dinainte de „@” nu poate începe, se termina sau avea două puncte la rând.',
+    domain: 'Domeniul nu pare corect, de exemplu exemplu.ro.',
+  },
+  rules: {
+    length: 'Cel puțin 8 caractere',
+    letters: 'Cel puțin o literă',
+    digit: 'Cel puțin o cifră',
+    cases: 'Litere mari și mici (recomandat)',
+    symbol: 'Un simbol, de exemplu ! ? # (recomandat)',
+    personal: 'Nu conține numele sau e-mailul tău',
+    common: 'Nu este o parolă des folosită',
+    edges: 'Nu începe și nu se termină cu spațiu',
+  },
+  strength: ['Prea slabă', 'Slabă', 'Acceptabilă', 'Bună', 'Puternică'],
+  strengthLabel: 'Puterea parolei',
+  passwordInvalid: 'Parola nu îndeplinește încă toate cerințele de mai jos.',
+  mismatch: 'Parolele nu coincid.',
+  againRequired: 'Repetă parola, ca să fim siguri că ai scris-o corect.',
+  passwordRequired: 'Scrie-ți parola.',
+  match: 'Parolele coincid.',
+  planLabel: 'Plan',
+  plan: 'Alege planul',
+  planHint: 'Ce include planul ales vezi în stânga. Îl poți schimba oricând din pagina contului.',
+  terms: (
+    <>
+      Am citit și accept <a href="/termeni.html">termenii și condițiile</a> și{' '}
+      <a href="/confidentialitate.html#cont">politica de confidențialitate</a>.
+    </>
+  ),
+  termsRequired: 'Pentru a crea contul trebuie să accepți termenii.',
+  create: 'Creează contul',
+  creating: 'Se creează contul…',
+  welcome: (name) => `Bun venit, ${name}!`,
+  welcomeText: 'Contul tău DocVex este gata.',
+  checkEmail: 'Verifică-ți e-mailul',
+  checkEmailText: (e) =>
+    `Ți-am trimis un link de confirmare la ${e}. Deschide-l ca să-ți activezi contul; poate ajunge și în dosarul Spam.`,
+  resend: 'Retrimite e-mailul',
+  resendIn: (s) => `Poți retrimite în ${s} s`,
+  resent: 'E-mailul a fost retrimis.',
+  wrongEmail: 'Ai greșit adresa?',
+  exists: 'Există deja un cont cu acest e-mail.',
+  signInInstead: 'Autentifică-te cu el',
+  signIn: 'Intră în cont',
+  signingIn: 'Se verifică…',
+  forgot: 'Ai uitat parola?',
+  forgotTitle: 'Resetează parola',
+  forgotText: 'Îți trimitem un link cu care îți setezi o parolă nouă.',
+  sendLink: 'Trimite linkul',
+  sending: 'Se trimite…',
+  linkSent: (e) =>
+    `Dacă există un cont pentru ${e}, ți-am trimis un link de resetare. Verifică și dosarul Spam.`,
+  backToSignIn: 'Înapoi la autentificare',
+  errors: {
+    invalid_credentials: 'E-mailul sau parola nu sunt corecte.',
+    email_not_confirmed: 'Confirmă-ți întâi adresa de e-mail, din linkul primit.',
+    weak_password: 'Supabase a respins parola ca fiind prea slabă. Alege una mai lungă.',
+    over_email_send_rate_limit:
+      'Prea multe e-mailuri trimise. Încearcă din nou peste câteva minute.',
+    over_request_rate_limit: 'Prea multe încercări. Așteaptă puțin și încearcă din nou.',
+    signup_disabled: 'Crearea conturilor noi este oprită momentan.',
+    email_address_invalid: 'Adresa de e-mail nu este acceptată.',
+    generic: 'Ceva nu a mers. Încearcă din nou.',
   },
 };
 
 export function useAuthText() {
-  const { lang } = useLang();
-  return T[lang];
+  return T;
 }
 
 const errorText = (t, err) => t.errors[err?.code] ?? t.errors.generic;
@@ -407,13 +291,13 @@ export function GoogleButton({ t, onClick, disabled }) {
 // owns the step, so its intro can follow it. After it:
 // a welcome (signed in at once) or "check your e-mail" with a resend.
 // The review's line for the optional step: "Feminin · 3 martie 1988".
-function aboutSummary(about, t, lang) {
+function aboutSummary(about, t) {
   const parts = [];
   if (about.gender) parts.push(t.genderNames[about.gender]);
   const { birth_day: d, birth_month: m, birth_year: y } = about;
   if (d && m && y) {
     parts.push(
-      new Intl.DateTimeFormat(lang === 'en' ? 'en-GB' : 'ro-RO', { dateStyle: 'long' }).format(
+      new Intl.DateTimeFormat('ro-RO', { dateStyle: 'long' }).format(
         new Date(Number(y), Number(m) - 1, Number(d)),
       ),
     );
@@ -423,7 +307,6 @@ function aboutSummary(about, t, lang) {
 
 export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
   const t = useAuthText();
-  const { lang } = useLang();
   const pt = usePlanText();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -747,7 +630,7 @@ export function SignUp({ plan, setPlan, step, setStep, onSignIn, onCreated }) {
                 1,
                 <small data-level={pw.score}>{t.strength[pw.score]}</small>,
               ],
-              [t.aboutLabel, aboutSummary(about, t, lang), 2],
+              [t.aboutLabel, aboutSummary(about, t), 2],
               [
                 t.planLabel,
                 `${pt.plans[plan ?? 'start'].name} · ${pt.plans[plan ?? 'start'].price} ${pt.perMonth}`,

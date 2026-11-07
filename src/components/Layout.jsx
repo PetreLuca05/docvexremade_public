@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import newest from 'virtual:latest-release';
 import { AUTH_EVENT, authHref, isNewer, storedUser } from '../auth.js';
-import { LANGS, useLang } from '../i18n.jsx';
-import { track } from '../analytics.js';
 import { CLIENT_OS } from '../os.js';
 import ContinueButton from './ContinueButton.jsx';
 
@@ -11,76 +9,26 @@ const icon = `${import.meta.env.BASE_URL}assets/icon.png`;
 // Links are root-relative so the header and footer also work on 404.html,
 // which GitHub Pages serves at any missing path.
 const T = {
-  ro: {
-    skip: 'Sari la conținut',
-    nav: 'Principal',
-    menu: 'Meniu',
-    closeMenu: 'Închide meniul',
-    home: 'Acasă',
-    install: 'Descărcare',
-    update: 'Actualizare',
-    updateNew: (v) => `Versiune nouă: ${v}`,
-    pricing: 'Prețuri',
-    signIn: 'Autentificare',
-    account: (email) => `Contul tău: ${email}`,
-    start: 'Începe',
-    langs: 'Limba',
-    legalNav: 'Informații legale',
-    legal: [
-      ['/confidentialitate.html', 'Politica de confidențialitate'],
-      ['/cookies.html', 'Politica de cookie-uri'],
-      ['/termeni.html', 'Termeni și condiții'],
-      ['/informatii-legale.html', 'Informații legale'],
-    ],
-  },
-  en: {
-    skip: 'Skip to content',
-    nav: 'Main',
-    menu: 'Menu',
-    closeMenu: 'Close menu',
-    home: 'Home',
-    install: 'Download',
-    update: 'Update',
-    updateNew: (v) => `New version: ${v}`,
-    pricing: 'Pricing',
-    signIn: 'Sign in',
-    account: (email) => `Your account: ${email}`,
-    start: 'Get started',
-    langs: 'Language',
-    legalNav: 'Legal information',
-    legal: [
-      ['/confidentialitate.html', 'Privacy policy'],
-      ['/cookies.html', 'Cookie policy'],
-      ['/termeni.html', 'Terms and conditions'],
-      ['/informatii-legale.html', 'Legal information'],
-    ],
-  },
+  skip: 'Sari la conținut',
+  nav: 'Principal',
+  menu: 'Meniu',
+  closeMenu: 'Închide meniul',
+  home: 'Acasă',
+  install: 'Descărcare',
+  update: 'Actualizare',
+  updateNew: (v) => `Versiune nouă: ${v}`,
+  pricing: 'Prețuri',
+  signIn: 'Autentificare',
+  account: (email) => `Contul tău: ${email}`,
+  start: 'Începe',
+  legalNav: 'Informații legale',
+  legal: [
+    ['/confidentialitate.html', 'Politica de confidențialitate'],
+    ['/cookies.html', 'Politica de cookie-uri'],
+    ['/termeni.html', 'Termeni și condiții'],
+    ['/informatii-legale.html', 'Informații legale'],
+  ],
 };
-
-const LANG_NAMES = { ro: 'Română', en: 'English' };
-
-function LanguageSwitcher({ label }) {
-  const { lang, setLang } = useLang();
-  return (
-    <div className="lang-switch" role="group" aria-label={label}>
-      {LANGS.map((l) => (
-        <button
-          key={l}
-          type="button"
-          lang={l}
-          aria-pressed={l === lang}
-          aria-label={LANG_NAMES[l]}
-          onClick={() => {
-            if (l !== lang) track('Language Switch', { to: l });
-            setLang(l);
-          }}
-        >
-          {l.toUpperCase()}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 // True while the page is scrolled to the very top: the header is then taller
 // and has no background.
@@ -255,7 +203,6 @@ function SiteHeader({ page, navPage = page, overlay, t }) {
                 {t.start}
               </ContinueButton>
             )}
-            <LanguageSwitcher label={t.langs} />
           </div>
         </div>
       </div>
@@ -285,8 +232,7 @@ function SiteFooter({ t }) {
 
 // The shared frame of every page: header, main and footer.
 export default function Layout({ page, navPage, overlay = false, mainClassName, children }) {
-  const { lang } = useLang();
-  const t = T[lang];
+  const t = T;
   return (
     <>
       <a className="skip" href="#continut">

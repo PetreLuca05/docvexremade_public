@@ -1,7 +1,7 @@
-// A country's name in the dashboard's language ("RO" -> "România").
-export function countryName(code, lang) {
+// A country's name in Romanian ("RO" -> "România").
+export function countryName(code) {
   try {
-    return new Intl.DisplayNames([lang], { type: 'region' }).of(code) ?? code;
+    return new Intl.DisplayNames(['ro'], { type: 'region' }).of(code) ?? code;
   } catch {
     return code;
   }

@@ -12,8 +12,6 @@ export const SITE = {
   url: 'https://docvex.ro',
   lang: 'ro',
   locale: 'ro_RO',
-  // The same pages switch to English in the browser (same URLs).
-  alternateLocales: ['en_US'],
   description:
     'DocVex: aplicație desktop pentru avocați și juriști din România. Proiecte, documente, legislație, CAEN și cercetare juridică asistată de AI.',
   // Brand colours: the header and dark sections, and the light page.
@@ -97,7 +95,7 @@ export const PAGES = {
   cookies: {
     title: 'Politica de cookie-uri — DocVex',
     description:
-      'Site-ul DocVex nu folosește cookie-uri: numără vizitele fără cookie-uri (Plausible) și reține doar limba aleasă și, dacă te autentifici, sesiunea contului (Legea nr. 506/2004).',
+      'Site-ul DocVex nu folosește cookie-uri: numără vizitele fără cookie-uri (Plausible) și reține doar sesiunea contului, dacă te autentifici (Legea nr. 506/2004).',
     heading: 'Politica de cookie-uri',
     kicker: 'Fără cookie-uri',
     crumb: 'Politica de cookie-uri',

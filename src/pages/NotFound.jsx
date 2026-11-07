@@ -1,24 +1,17 @@
 import BackButton from '../components/BackButton.jsx';
 import Layout from '../components/Layout.jsx';
 import { useEffect } from 'react';
-import { useLang, useMeta } from '../i18n.jsx';
+import { useMeta } from '../i18n.jsx';
 import { track } from '../analytics.js';
 
-const META = {
-  ro: { title: 'Pagina nu există — DocVex', description: '' },
-  en: { title: 'Page not found — DocVex', description: '' },
-};
+const META = { title: 'Pagina nu există — DocVex', description: '' };
 
-const T = {
-  ro: { title: 'Pagina nu există', code: 'Eroare 404', back: 'Înapoi la pagina principală' },
-  en: { title: 'Page not found', code: 'Error 404', back: 'Back to the home page' },
-};
+const T = { title: 'Pagina nu există', code: 'Eroare 404', back: 'Înapoi la pagina principală' };
 
 // The page's content, also shown by the admin dashboard to anyone who is not
 // an admin (so it does not advertise what it is).
 export function NotFoundContent() {
-  const { lang } = useLang();
-  const t = T[lang];
+  const t = T;
   return (
     <article className="doc">
       <h1>{t.title}</h1>

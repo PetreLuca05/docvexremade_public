@@ -2,7 +2,7 @@ export default function Confidentialitate() {
   return (
     <article className="doc">
       <h1>Politica de confidențialitate</h1>
-      <p className="updated">Ultima actualizare: 25 octombrie 2026</p>
+      <p className="updated">Ultima actualizare: 7 noiembrie 2026</p>
       <p>
         Această politică explică ce date cu caracter personal sunt prelucrate atunci când vizitezi
         acest site și când folosești aplicația DocVex, în ce scop, pe ce temei și ce drepturi ai,
@@ -29,8 +29,8 @@ export default function Confidentialitate() {
       <p>
         Site-ul este static: nu are reclame, pluginuri de social media sau fonturi încărcate de la
         terți, iar vizitele le numărăm cu un serviciu de statistici fără cookie-uri (vezi mai jos).
-        Nu plasăm cookie-uri; în browserul tău păstrăm doar limba pe care o alegi și, dacă te
-        autentifici pe pagina Autentificare, sesiunea contului (vezi{' '}
+        Nu plasăm cookie-uri; în browserul tău păstrăm doar sesiunea contului, dacă te
+        autentifici pe pagina Autentificare (vezi{' '}
         <a href="cookies.html">Politica de cookie-uri</a>).
       </p>
       <h3 id="statistici">Statistici de vizitare</h3>

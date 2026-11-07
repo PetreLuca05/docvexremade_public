@@ -5,137 +5,71 @@ import HeroCarousel from '../components/HeroCarousel.jsx';
 import ContinueButton from '../components/ContinueButton.jsx';
 import { recordDownload, storedUser } from '../auth.js';
 import { track } from '../analytics.js';
-import { useLang, useMeta } from '../i18n.jsx';
+import { useMeta } from '../i18n.jsx';
 import { OSES, OS_NAMES, useOS } from '../os.js';
 
 const META = {
-  ro: {
-    title: 'Descarcă DocVex pentru Windows și macOS — DocVex',
-    description:
-      'Descarcă DocVex pentru Windows sau macOS, vezi pașii de instalare și notele fiecărei versiuni.',
-  },
-  en: {
-    title: 'Download DocVex for Windows and macOS — DocVex',
-    description:
-      'Download DocVex for Windows or macOS, see the installation steps and the notes for each version.',
-  },
+  title: 'Descarcă DocVex pentru Windows și macOS — DocVex',
+  description:
+    'Descarcă DocVex pentru Windows sau macOS, vezi pașii de instalare și notele fiecărei versiuni.',
 };
 
 const T = {
-  ro: {
-    locale: 'ro-RO',
-    title: 'Descarcă DocVex',
-    updateTitle: 'Actualizează DocVex',
-    system: 'Sistemul de operare',
-    latest: (os) => `Ultima versiune pentru ${OS_NAMES[os]}`,
-    prerelease: 'Versiune de test',
-    download: (v, os) => `Descarcă DocVex ${v} pentru ${OS_NAMES[os]}`,
-    published: 'Publicată',
-    arch: { universal: 'Universal', arm64: 'Apple silicon (M1 și mai noi)', x64: 'Intel' },
-    otherArch: 'Alte variante:',
-    whatsNew: 'Ce aduce',
-    seeNotes: 'Toate noutățile',
-    size: 'Dimensiune',
-    soon: (os) => `DocVex pentru ${OS_NAMES[os]} vine în curând.`,
-    none: (os) => `Nicio versiune pentru ${OS_NAMES[os]} nu este publicată încă. Revino curând.`,
-    noneOther: (os) => `Vezi versiunea pentru ${OS_NAMES[os]}`,
-    stepsTitle: (os) => `Instalare pe ${OS_NAMES[os]}`,
-    howTo: (os) => `Cum instalezi pe ${OS_NAMES[os]}`,
-    close: 'Închide',
-    steps: {
-      windows: [
-        <>
-          Descarcă fișierul <code>docvex-…-setup.exe</code> cu butonul de mai sus.
-        </>,
-        'Deschide fișierul descărcat și urmează pașii instalatorului.',
-        <>
-          Dacă Windows afișează „Windows a protejat computerul”, alege <b>Mai multe informații</b>,
-          apoi <b>Executați oricum</b>.
-        </>,
-        'Pornește DocVex din meniul Start. Versiunile noi apar în fila Actualizări din aplicație.',
-      ],
-      mac: [
-        <>
-          Descarcă fișierul <code>docvex-….dmg</code> cu butonul de mai sus.
-        </>,
-        <>
-          Deschide fișierul și trage <b>Docvex</b> în dosarul <b>Aplicații</b>.
-        </>,
-        <>
-          La prima pornire, dacă macOS spune că aplicația nu poate fi verificată, deschide{' '}
-          <b>Setări sistem → Confidențialitate și securitate</b> și alege <b>Deschide oricum</b>.
-        </>,
-        'Pornește DocVex din Launchpad sau din Aplicații. Versiunile noi apar în fila Actualizări din aplicație.',
-      ],
-    },
-    historyTitle: (os) => `Toate versiunile pentru ${OS_NAMES[os]}`,
-    forOs: (os) => `Pentru ${OS_NAMES[os]}`,
-    noVersions: (os) => `Nicio versiune pentru ${OS_NAMES[os]} încă.`,
-    latestOnly: 'Se poate descărca doar ultima versiune.',
-    privacy: (
+  locale: 'ro-RO',
+  title: 'Descarcă DocVex',
+  updateTitle: 'Actualizează DocVex',
+  system: 'Sistemul de operare',
+  latest: (os) => `Ultima versiune pentru ${OS_NAMES[os]}`,
+  prerelease: 'Versiune de test',
+  download: (v, os) => `Descarcă DocVex ${v} pentru ${OS_NAMES[os]}`,
+  published: 'Publicată',
+  arch: { universal: 'Universal', arm64: 'Apple silicon (M1 și mai noi)', x64: 'Intel' },
+  otherArch: 'Alte variante:',
+  whatsNew: 'Ce aduce',
+  seeNotes: 'Toate noutățile',
+  size: 'Dimensiune',
+  soon: (os) => `DocVex pentru ${OS_NAMES[os]} vine în curând.`,
+  none: (os) => `Nicio versiune pentru ${OS_NAMES[os]} nu este publicată încă. Revino curând.`,
+  noneOther: (os) => `Vezi versiunea pentru ${OS_NAMES[os]}`,
+  stepsTitle: (os) => `Instalare pe ${OS_NAMES[os]}`,
+  howTo: (os) => `Cum instalezi pe ${OS_NAMES[os]}`,
+  close: 'Închide',
+  steps: {
+    windows: [
       <>
-        Fișierul se descarcă direct de pe serverele GitHub, unde sunt publicate versiunile
-        aplicației; vezi <a href="/confidentialitate.html#github">politica de confidențialitate</a>.
-      </>
-    ),
-  },
-  en: {
-    locale: 'en-GB',
-    title: 'Download DocVex',
-    updateTitle: 'Update DocVex',
-    system: 'Operating system',
-    latest: (os) => `Latest version for ${OS_NAMES[os]}`,
-    prerelease: 'Pre-release',
-    download: (v, os) => `Download DocVex ${v} for ${OS_NAMES[os]}`,
-    published: 'Published',
-    arch: { universal: 'Universal', arm64: 'Apple silicon (M1 and later)', x64: 'Intel' },
-    otherArch: 'Other builds:',
-    whatsNew: 'What’s new',
-    seeNotes: 'All release notes',
-    size: 'Size',
-    soon: (os) => `DocVex for ${OS_NAMES[os]} is coming soon.`,
-    none: (os) => `No version for ${OS_NAMES[os]} has been published yet. Check back soon.`,
-    noneOther: (os) => `See the version for ${OS_NAMES[os]}`,
-    stepsTitle: (os) => `Installing on ${OS_NAMES[os]}`,
-    howTo: (os) => `How to install on ${OS_NAMES[os]}`,
-    close: 'Close',
-    steps: {
-      windows: [
-        <>
-          Download the <code>docvex-…-setup.exe</code> file with the button above.
-        </>,
-        'Open the downloaded file and follow the installer’s steps.',
-        <>
-          If Windows shows “Windows protected your PC”, choose <b>More info</b>, then{' '}
-          <b>Run anyway</b>.
-        </>,
-        'Start DocVex from the Start menu. New versions show up in the app’s Updates tab.',
-      ],
-      mac: [
-        <>
-          Download the <code>docvex-….dmg</code> file with the button above.
-        </>,
-        <>
-          Open it and drag <b>Docvex</b> into the <b>Applications</b> folder.
-        </>,
-        <>
-          On first launch, if macOS says the app cannot be verified, open{' '}
-          <b>System Settings → Privacy &amp; Security</b> and choose <b>Open Anyway</b>.
-        </>,
-        'Start DocVex from Launchpad or Applications. New versions show up in the app’s Updates tab.',
-      ],
-    },
-    historyTitle: (os) => `All versions for ${OS_NAMES[os]}`,
-    forOs: (os) => `For ${OS_NAMES[os]}`,
-    noVersions: (os) => `No versions for ${OS_NAMES[os]} yet.`,
-    latestOnly: 'Only the latest version can be downloaded.',
-    privacy: (
+        Descarcă fișierul <code>docvex-…-setup.exe</code> cu butonul de mai sus.
+      </>,
+      'Deschide fișierul descărcat și urmează pașii instalatorului.',
       <>
-        The file downloads directly from GitHub’s servers, where the app’s versions are published;
-        see the <a href="/confidentialitate.html#github">privacy policy</a>.
-      </>
-    ),
+        Dacă Windows afișează „Windows a protejat computerul”, alege <b>Mai multe informații</b>,
+        apoi <b>Executați oricum</b>.
+      </>,
+      'Pornește DocVex din meniul Start. Versiunile noi apar în fila Actualizări din aplicație.',
+    ],
+    mac: [
+      <>
+        Descarcă fișierul <code>docvex-….dmg</code> cu butonul de mai sus.
+      </>,
+      <>
+        Deschide fișierul și trage <b>Docvex</b> în dosarul <b>Aplicații</b>.
+      </>,
+      <>
+        La prima pornire, dacă macOS spune că aplicația nu poate fi verificată, deschide{' '}
+        <b>Setări sistem → Confidențialitate și securitate</b> și alege <b>Deschide oricum</b>.
+      </>,
+      'Pornește DocVex din Launchpad sau din Aplicații. Versiunile noi apar în fila Actualizări din aplicație.',
+    ],
   },
+  historyTitle: (os) => `Toate versiunile pentru ${OS_NAMES[os]}`,
+  forOs: (os) => `Pentru ${OS_NAMES[os]}`,
+  noVersions: (os) => `Nicio versiune pentru ${OS_NAMES[os]} încă.`,
+  latestOnly: 'Se poate descărca doar ultima versiune.',
+  privacy: (
+    <>
+      Fișierul se descarcă direct de pe serverele GitHub, unde sunt publicate versiunile
+      aplicației; vezi <a href="/confidentialitate.html#github">politica de confidențialitate</a>.
+    </>
+  ),
 };
 
 // A download: remembered on a signed-in account (the header's Update badge)
@@ -397,8 +331,7 @@ function FileLinks({ files, version, t }) {
 }
 
 export default function Instalare() {
-  const { lang } = useLang();
-  const t = T[lang];
+  const t = T;
   useMeta(META);
   const [os, setOs] = useOS();
   const [steps, setSteps] = useState(false);

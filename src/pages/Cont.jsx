@@ -5,19 +5,12 @@ import Plans, { PLAN_IDS } from '../components/Plans.jsx';
 import { authHref, billingUrl, getSupabase } from '../auth.js';
 import Demographics from '../components/Demographics.jsx';
 import { demographicsData, demographicsError, demographicsOf } from '../demographics.js';
-import { useLang, useMeta } from '../i18n.jsx';
+import { useMeta } from '../i18n.jsx';
 import { useSession } from '../useSession.js';
-import LanguageSelect from '../components/LanguageSelect.jsx';
 
 const META = {
-  ro: {
-    title: 'Contul meu — DocVex',
-    description: 'Datele contului tău DocVex.',
-  },
-  en: {
-    title: 'My account — DocVex',
-    description: 'Your DocVex account data.',
-  },
+  title: 'Contul meu — DocVex',
+  description: 'Datele contului tău DocVex.',
 };
 
 // The profile and plan live in the Supabase user's user_metadata. AI usage is
@@ -49,277 +42,140 @@ const KNOWN = new Set([
 ]);
 
 const T = {
-  ro: {
-    locale: 'ro-RO',
-    title: 'Contul meu',
-    lead: 'Toate datele contului tău DocVex, așa cum sunt păstrate în Supabase.',
-    loading: 'Se încarcă…',
-    signedOut: 'Nu ești autentificat.',
-    signIn: 'Autentifică-te',
-    profile: 'Detaliile contului',
-    name: 'Nume',
-    plan: 'Plan',
-    billing: 'Facturare și abonament',
-    billingHint: 'Abonamentul, cardul și facturile se gestionează în portalul Stripe.',
-    support: 'Asistență',
-    supportNote: (
-      <>
-        Rapoartele mele: ce ne-ai trimis și răspunsurile noastre. Rapoartele se trimit din aplicația
-        DocVex: <kbd>Ctrl+Shift+R</kbd> (<kbd>Cmd+Shift+R</kbd> pe Mac) deschide unul de oriunde din
-        ea.
-      </>
-    ),
-    reportCols: {
-      id: 'Raport',
-      title: 'Titlu',
-      category: 'Categorie',
-      sent: 'Trimis',
-      status: 'Stare',
-    },
-    reportCategories: {
-      bug: 'Eroare',
-      ai_answer: 'Răspuns AI',
-      document: 'Document',
-      billing: 'Facturare',
-      feature: 'Idee',
-      other: 'Altceva',
-    },
-    reportStatuses: { new: 'Primit', seen: 'Citit', replied: 'Răspuns', closed: 'Închis' },
-    reportReply: (when) => `Răspunsul nostru, ${when}`,
-    reportClosed: 'Închis fără un răspuns scris.',
-    reportWaiting: 'Încă niciun răspuns: citim fiecare raport și îți răspundem aici și pe e-mail.',
-    reportsLoading: 'Se citește…',
-    reportsFailed: 'Rapoartele nu au putut fi încărcate.',
-    reportsEmptyTitle: 'Niciun raport încă',
-    reportsEmpty:
-      'Când ceva nu merge în aplicația DocVex, raportează-l acolo: răspunsul nostru apare în această listă și pe e-mail.',
-    usage: 'Activitate',
-    usageLead: 'Utilizarea AI din aplicație, în tokeni.',
-    usageHint: 'Numărată de aplicație; nu se poate modifica.',
-    session: 'Sesiunea curentă (5 ore)',
-    weekly: 'Săptămâna aceasta',
-    fable: 'Fable, săptămâna aceasta',
-    resets: (when) => `Se resetează ${when}`,
-    requestsWeek: (n) => `${n} cereri săptămâna aceasta`,
-    usageLoading: 'Se încarcă utilizarea…',
-    usageFailed: 'Utilizarea nu a putut fi încărcată.',
-    retry: 'Reîncearcă',
-    blocked: (until) => (until ? `Limita a fost atinsă până ${until}.` : 'Limita a fost atinsă.'),
-    save: 'Salvează modificările',
-    revert: 'Anulează modificările',
-    saving: 'Se salvează…',
-    saved: 'Modificările au fost salvate.',
-    unsaved: 'Ai modificări nesalvate.',
-    email: 'E-mail',
-    changeEmail: 'Schimbă e-mailul',
-    emailSent: (e) =>
-      `Ți-am trimis un link de confirmare la ${e}. E-mailul se schimbă după ce îl deschizi.`,
-    password: 'Parolă nouă',
-    passwordAgain: 'Repetă parola nouă',
-    passwordHint: 'Cel puțin 8 caractere.',
-    noPassword: 'Contul tău folosește Google. Poți seta și o parolă, ca să intri cu e-mailul.',
-    changePassword: 'Schimbă parola',
-    setPassword: 'Setează parola',
-    passwordSaved: 'Parola a fost schimbată.',
-    mismatch: 'Parolele nu coincid.',
-    nonce: 'Cod de confirmare',
-    nonceSent: (e) => `Pentru siguranță, ți-am trimis un cod la ${e}. Introdu-l mai jos.`,
-    confirm: 'Confirmă',
-    errors: {
-      same_password: 'Parola nouă trebuie să fie diferită de cea actuală.',
-      weak_password: 'Parola este prea slabă. Alege una mai lungă.',
-      email_exists: 'Există deja un cont cu acest e-mail.',
-      email_address_invalid: 'Adresa de e-mail nu este validă.',
-      over_email_send_rate_limit: 'Prea multe încercări. Încearcă din nou peste câteva minute.',
-      reauthentication_not_valid: 'Codul nu este corect sau a expirat.',
-      manual_linking_disabled: 'Conectarea altor metode nu este activată încă.',
-      identity_already_exists: 'Acest cont Google este deja folosit de alt cont DocVex.',
-      single_identity_not_deletable: 'Nu poți elimina singura metodă de autentificare.',
-      email_conflict_identity_not_deletable:
-        'Metoda nu poate fi eliminată: e-mailul contului ar rămâne fără o metodă care să-l folosească.',
-    },
-    details: 'Autentificare',
-    providerNames: { email: 'E-mail și parolă' },
-    methods: 'Metode de autentificare',
-    methodsLead:
-      'Poți avea mai multe moduri de a intra în același cont DocVex, pe site și în aplicație: de exemplu cu Google și cu e-mail și parolă. Adaugă unul nou cu + sau elimină-l pe cel de care nu mai ai nevoie.',
-    connected: (d) => `Conectată ${d}`,
-    lastUsed: (d) => `folosită ultima dată ${d}`,
-    change: 'Schimbă',
-    changeGoogle: 'Schimbă contul Google',
-    remove: 'Elimină',
-    onlyMethod: 'Este singura metodă; adaugă întâi alta ca s-o poți elimina.',
-    passwordOnly: 'Parola setată pe un cont Google nu poate fi eliminată de aici.',
-    add: 'Adaugă o metodă',
-    addGoogle: 'Conectează Google',
-    addPassword: 'Adaugă e-mail și parolă',
-    removeTitle: (name) => `Elimini ${name}?`,
-    removeText: (name) => `Nu vei mai putea intra în cont cu ${name}. Celelalte metode rămân.`,
-    removing: 'Se elimină…',
-    linked: 'Contul Google a fost conectat.',
-    replaced: 'Contul Google a fost schimbat.',
-    removed: 'Metoda a fost eliminată.',
-    resetNotice: 'Setează-ți mai jos parola nouă.',
-    created: 'Creat',
-    lastSignIn: 'Ultima autentificare',
-    confirmed: 'E-mail confirmat',
-    newsletter: 'Newsletter',
-    newsletterLabel: 'Primesc newsletterul DocVex pe e-mail',
-    newsletterSince: (d) => `Abonat din ${d}.`,
-    newsletterSaved: (on) =>
-      on ? 'Te-ai abonat la newsletter.' : 'Te-ai dezabonat de la newsletter.',
-    providers: 'Metode de autentificare',
-    yes: 'Da',
-    no: 'Nu',
-    other: 'Alte date',
-    signOut: 'Ieși din cont',
-    signOutTitle: 'Ieși din cont?',
-    signOutText: 'Te vei deconecta de pe acest site. Aplicația DocVex rămâne autentificată.',
-    signingOut: 'Se deconectează…',
-    cancel: 'Anulează',
-    deleteNote: (
-      <>
-        Pentru a șterge contul și toate datele lui, scrie-ne la{' '}
-        <a href="/informatii-legale.html#identificare">adresa de contact</a>.
-      </>
-    ),
-    error: 'Ceva nu a mers. Încearcă din nou.',
+  locale: 'ro-RO',
+  title: 'Contul meu',
+  lead: 'Toate datele contului tău DocVex, așa cum sunt păstrate în Supabase.',
+  loading: 'Se încarcă…',
+  signedOut: 'Nu ești autentificat.',
+  signIn: 'Autentifică-te',
+  profile: 'Detaliile contului',
+  name: 'Nume',
+  plan: 'Plan',
+  billing: 'Facturare și abonament',
+  billingHint: 'Abonamentul, cardul și facturile se gestionează în portalul Stripe.',
+  support: 'Asistență',
+  supportNote: (
+    <>
+      Rapoartele mele: ce ne-ai trimis și răspunsurile noastre. Rapoartele se trimit din aplicația
+      DocVex: <kbd>Ctrl+Shift+R</kbd> (<kbd>Cmd+Shift+R</kbd> pe Mac) deschide unul de oriunde din
+      ea.
+    </>
+  ),
+  reportCols: {
+    id: 'Raport',
+    title: 'Titlu',
+    category: 'Categorie',
+    sent: 'Trimis',
+    status: 'Stare',
   },
-  en: {
-    locale: 'en-GB',
-    title: 'My account',
-    lead: 'All the data of your DocVex account, as kept in Supabase.',
-    loading: 'Loading…',
-    signedOut: 'You are not signed in.',
-    signIn: 'Sign in',
-    profile: 'Account details',
-    name: 'Name',
-    plan: 'Plan',
-    billing: 'Billing and subscription',
-    billingHint: 'Your subscription, card and invoices are managed in the Stripe portal.',
-    support: 'Support',
-    supportNote: (
-      <>
-        My reports: what you sent us and our replies. Reports are sent from the DocVex app:{' '}
-        <kbd>Ctrl+Shift+R</kbd> (<kbd>Cmd+Shift+R</kbd> on a Mac) opens one from anywhere in it.
-      </>
-    ),
-    reportCols: {
-      id: 'Report',
-      title: 'Title',
-      category: 'Category',
-      sent: 'Sent',
-      status: 'Status',
-    },
-    reportCategories: {
-      bug: 'Bug',
-      ai_answer: 'AI answer',
-      document: 'Document',
-      billing: 'Billing',
-      feature: 'Idea',
-      other: 'Other',
-    },
-    reportStatuses: { new: 'Received', seen: 'Read', replied: 'Replied', closed: 'Closed' },
-    reportReply: (when) => `Our reply, ${when}`,
-    reportClosed: 'Closed without a written reply.',
-    reportWaiting: 'No reply yet: we read every report and will answer here and by email.',
-    reportsLoading: 'Reading…',
-    reportsFailed: 'Your reports could not be loaded.',
-    reportsEmptyTitle: 'No reports yet',
-    reportsEmpty:
-      "When something doesn't work in the DocVex app, report it there: our reply appears in this list, and by email.",
-    usage: 'Activity',
-    usageLead: 'AI usage in the app, in tokens.',
-    usageHint: 'Counted by the app; it cannot be changed.',
-    session: 'Current session (5 hours)',
-    weekly: 'This week',
-    fable: 'Fable, this week',
-    resets: (when) => `Resets ${when}`,
-    requestsWeek: (n) => `${n} requests this week`,
-    usageLoading: 'Loading usage…',
-    usageFailed: 'Usage could not be loaded.',
-    retry: 'Try again',
-    blocked: (until) => (until ? `Limit reached until ${until}.` : 'Limit reached.'),
-    save: 'Save changes',
-    revert: 'Revert',
-    saving: 'Saving…',
-    saved: 'Your changes have been saved.',
-    unsaved: 'You have unsaved changes.',
-    email: 'Email',
-    changeEmail: 'Change email',
-    emailSent: (e) => `We sent a confirmation link to ${e}. Your email changes once you open it.`,
-    password: 'New password',
-    passwordAgain: 'Repeat the new password',
-    passwordHint: 'At least 8 characters.',
-    noPassword: 'Your account uses Google. You can also set a password to sign in with your email.',
-    changePassword: 'Change password',
-    setPassword: 'Set password',
-    passwordSaved: 'Your password has been changed.',
-    mismatch: 'The passwords do not match.',
-    nonce: 'Confirmation code',
-    nonceSent: (e) => `For your security, we sent a code to ${e}. Enter it below.`,
-    confirm: 'Confirm',
-    errors: {
-      same_password: 'The new password must differ from the current one.',
-      weak_password: 'The password is too weak. Choose a longer one.',
-      email_exists: 'An account with this email already exists.',
-      email_address_invalid: 'The email address is not valid.',
-      over_email_send_rate_limit: 'Too many attempts. Try again in a few minutes.',
-      reauthentication_not_valid: 'The code is incorrect or has expired.',
-      manual_linking_disabled: 'Connecting other methods is not enabled yet.',
-      identity_already_exists: 'This Google account is already used by another DocVex account.',
-      single_identity_not_deletable: 'You cannot remove your only sign-in method.',
-      email_conflict_identity_not_deletable:
-        'This method cannot be removed: the account’s email would be left without a method using it.',
-    },
-    details: 'Sign-in',
-    providerNames: { email: 'Email and password' },
-    methods: 'Sign-in methods',
-    methodsLead:
-      'You can have several ways to sign in to the same DocVex account, on the site and in the app: for example with Google and with an email and password. Add one with + or remove one you no longer need.',
-    connected: (d) => `Connected ${d}`,
-    lastUsed: (d) => `last used ${d}`,
-    change: 'Change',
-    changeGoogle: 'Change Google account',
-    remove: 'Remove',
-    onlyMethod: 'This is your only method; add another before removing it.',
-    passwordOnly: 'A password set on a Google account cannot be removed here.',
-    add: 'Add a method',
-    addGoogle: 'Connect Google',
-    addPassword: 'Add email and password',
-    removeTitle: (name) => `Remove ${name}?`,
-    removeText: (name) =>
-      `You will no longer be able to sign in with ${name}. Your other methods stay.`,
-    removing: 'Removing…',
-    linked: 'Your Google account has been connected.',
-    replaced: 'Your Google account has been changed.',
-    removed: 'The method has been removed.',
-    resetNotice: 'Set your new password below.',
-    created: 'Created',
-    lastSignIn: 'Last sign-in',
-    confirmed: 'Email confirmed',
-    newsletter: 'Newsletter',
-    newsletterLabel: 'I receive the DocVex newsletter by email',
-    newsletterSince: (d) => `Subscribed since ${d}.`,
-    newsletterSaved: (on) =>
-      on ? 'You are subscribed to the newsletter.' : 'You are unsubscribed from the newsletter.',
-    providers: 'Sign-in methods',
-    yes: 'Yes',
-    no: 'No',
-    other: 'Other data',
-    signOut: 'Sign out',
-    signOutTitle: 'Sign out?',
-    signOutText: 'You will be signed out of this site. The DocVex app stays signed in.',
-    signingOut: 'Signing out…',
-    cancel: 'Cancel',
-    deleteNote: (
-      <>
-        To delete your account and all its data, write to us at the{' '}
-        <a href="/informatii-legale.html#identificare">contact address</a>.
-      </>
-    ),
-    error: 'Something went wrong. Please try again.',
+  reportCategories: {
+    bug: 'Eroare',
+    ai_answer: 'Răspuns AI',
+    document: 'Document',
+    billing: 'Facturare',
+    feature: 'Idee',
+    other: 'Altceva',
   },
+  reportStatuses: { new: 'Primit', seen: 'Citit', replied: 'Răspuns', closed: 'Închis' },
+  reportReply: (when) => `Răspunsul nostru, ${when}`,
+  reportClosed: 'Închis fără un răspuns scris.',
+  reportWaiting: 'Încă niciun răspuns: citim fiecare raport și îți răspundem aici și pe e-mail.',
+  reportsLoading: 'Se citește…',
+  reportsFailed: 'Rapoartele nu au putut fi încărcate.',
+  reportsEmptyTitle: 'Niciun raport încă',
+  reportsEmpty:
+    'Când ceva nu merge în aplicația DocVex, raportează-l acolo: răspunsul nostru apare în această listă și pe e-mail.',
+  usage: 'Activitate',
+  usageLead: 'Utilizarea AI din aplicație, în tokeni.',
+  usageHint: 'Numărată de aplicație; nu se poate modifica.',
+  session: 'Sesiunea curentă (5 ore)',
+  weekly: 'Săptămâna aceasta',
+  fable: 'Fable, săptămâna aceasta',
+  resets: (when) => `Se resetează ${when}`,
+  requestsWeek: (n) => `${n} cereri săptămâna aceasta`,
+  usageLoading: 'Se încarcă utilizarea…',
+  usageFailed: 'Utilizarea nu a putut fi încărcată.',
+  retry: 'Reîncearcă',
+  blocked: (until) => (until ? `Limita a fost atinsă până ${until}.` : 'Limita a fost atinsă.'),
+  save: 'Salvează modificările',
+  revert: 'Anulează modificările',
+  saving: 'Se salvează…',
+  saved: 'Modificările au fost salvate.',
+  unsaved: 'Ai modificări nesalvate.',
+  email: 'E-mail',
+  changeEmail: 'Schimbă e-mailul',
+  emailSent: (e) =>
+    `Ți-am trimis un link de confirmare la ${e}. E-mailul se schimbă după ce îl deschizi.`,
+  password: 'Parolă nouă',
+  passwordAgain: 'Repetă parola nouă',
+  passwordHint: 'Cel puțin 8 caractere.',
+  noPassword: 'Contul tău folosește Google. Poți seta și o parolă, ca să intri cu e-mailul.',
+  changePassword: 'Schimbă parola',
+  setPassword: 'Setează parola',
+  passwordSaved: 'Parola a fost schimbată.',
+  mismatch: 'Parolele nu coincid.',
+  nonce: 'Cod de confirmare',
+  nonceSent: (e) => `Pentru siguranță, ți-am trimis un cod la ${e}. Introdu-l mai jos.`,
+  confirm: 'Confirmă',
+  errors: {
+    same_password: 'Parola nouă trebuie să fie diferită de cea actuală.',
+    weak_password: 'Parola este prea slabă. Alege una mai lungă.',
+    email_exists: 'Există deja un cont cu acest e-mail.',
+    email_address_invalid: 'Adresa de e-mail nu este validă.',
+    over_email_send_rate_limit: 'Prea multe încercări. Încearcă din nou peste câteva minute.',
+    reauthentication_not_valid: 'Codul nu este corect sau a expirat.',
+    manual_linking_disabled: 'Conectarea altor metode nu este activată încă.',
+    identity_already_exists: 'Acest cont Google este deja folosit de alt cont DocVex.',
+    single_identity_not_deletable: 'Nu poți elimina singura metodă de autentificare.',
+    email_conflict_identity_not_deletable:
+      'Metoda nu poate fi eliminată: e-mailul contului ar rămâne fără o metodă care să-l folosească.',
+  },
+  details: 'Autentificare',
+  providerNames: { email: 'E-mail și parolă' },
+  methods: 'Metode de autentificare',
+  methodsLead:
+    'Poți avea mai multe moduri de a intra în același cont DocVex, pe site și în aplicație: de exemplu cu Google și cu e-mail și parolă. Adaugă unul nou cu + sau elimină-l pe cel de care nu mai ai nevoie.',
+  connected: (d) => `Conectată ${d}`,
+  lastUsed: (d) => `folosită ultima dată ${d}`,
+  change: 'Schimbă',
+  changeGoogle: 'Schimbă contul Google',
+  remove: 'Elimină',
+  onlyMethod: 'Este singura metodă; adaugă întâi alta ca s-o poți elimina.',
+  passwordOnly: 'Parola setată pe un cont Google nu poate fi eliminată de aici.',
+  add: 'Adaugă o metodă',
+  addGoogle: 'Conectează Google',
+  addPassword: 'Adaugă e-mail și parolă',
+  removeTitle: (name) => `Elimini ${name}?`,
+  removeText: (name) => `Nu vei mai putea intra în cont cu ${name}. Celelalte metode rămân.`,
+  removing: 'Se elimină…',
+  linked: 'Contul Google a fost conectat.',
+  replaced: 'Contul Google a fost schimbat.',
+  removed: 'Metoda a fost eliminată.',
+  resetNotice: 'Setează-ți mai jos parola nouă.',
+  created: 'Creat',
+  lastSignIn: 'Ultima autentificare',
+  confirmed: 'E-mail confirmat',
+  newsletter: 'Newsletter',
+  newsletterLabel: 'Primesc newsletterul DocVex pe e-mail',
+  newsletterSince: (d) => `Abonat din ${d}.`,
+  newsletterSaved: (on) =>
+    on ? 'Te-ai abonat la newsletter.' : 'Te-ai dezabonat de la newsletter.',
+  providers: 'Metode de autentificare',
+  yes: 'Da',
+  no: 'Nu',
+  other: 'Alte date',
+  signOut: 'Ieși din cont',
+  signOutTitle: 'Ieși din cont?',
+  signOutText: 'Te vei deconecta de pe acest site. Aplicația DocVex rămâne autentificată.',
+  signingOut: 'Se deconectează…',
+  cancel: 'Anulează',
+  deleteNote: (
+    <>
+      Pentru a șterge contul și toate datele lui, scrie-ne la{' '}
+      <a href="/informatii-legale.html#identificare">adresa de contact</a>.
+    </>
+  ),
+  error: 'Ceva nu a mers. Încearcă din nou.',
 };
 
 // The editable part of the account, as the form holds it.
@@ -1414,8 +1270,6 @@ function Account({ t, user }) {
         </p>
       </section>
 
-      <LanguageSelect user={user} />
-
       <section className="account-section">
         <SignOut t={t} />
         <p className="note">{t.deleteNote}</p>
@@ -1519,8 +1373,7 @@ function SignOut({ t }) {
 }
 
 export default function Cont() {
-  const { lang } = useLang();
-  const t = T[lang];
+  const t = T;
   useMeta(META);
   const session = useSession();
 

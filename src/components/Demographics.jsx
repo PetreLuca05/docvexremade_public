@@ -1,77 +1,39 @@
-import { useLang } from '../i18n.jsx';
 import { birthYears, daysIn, demographicsError, GENDERS } from '../demographics.js';
 
 const T = {
-  ro: {
-    gender: 'Gen',
-    genders: { female: 'Feminin', male: 'Masculin', other: 'Altul' },
-    birthDate: 'Data nașterii',
-    day: 'Ziua',
-    month: 'Luna',
-    year: 'Anul',
-    months: [
-      'ianuarie',
-      'februarie',
-      'martie',
-      'aprilie',
-      'mai',
-      'iunie',
-      'iulie',
-      'august',
-      'septembrie',
-      'octombrie',
-      'noiembrie',
-      'decembrie',
-    ],
-    none: 'Prefer să nu spun',
-    errors: {
-      partial: 'Alege ziua, luna și anul, sau lasă-le pe toate necompletate.',
-      invalid: 'Luna aleasă nu are această zi.',
-      age: 'Trebuie să ai cel puțin 16 ani.',
-    },
-    note: (
-      <>
-        Amândouă sunt opționale. Le folosim doar în statistici agregate (câți utilizatori pe gen și
-        grupă de vârstă), niciodată pentru reclame. Le poți șterge oricând din cont.{' '}
-        <a href="/confidentialitate.html#demografie">Detalii</a>
-      </>
-    ),
+  gender: 'Gen',
+  genders: { female: 'Feminin', male: 'Masculin', other: 'Altul' },
+  birthDate: 'Data nașterii',
+  day: 'Ziua',
+  month: 'Luna',
+  year: 'Anul',
+  months: [
+    'ianuarie',
+    'februarie',
+    'martie',
+    'aprilie',
+    'mai',
+    'iunie',
+    'iulie',
+    'august',
+    'septembrie',
+    'octombrie',
+    'noiembrie',
+    'decembrie',
+  ],
+  none: 'Prefer să nu spun',
+  errors: {
+    partial: 'Alege ziua, luna și anul, sau lasă-le pe toate necompletate.',
+    invalid: 'Luna aleasă nu are această zi.',
+    age: 'Trebuie să ai cel puțin 16 ani.',
   },
-  en: {
-    gender: 'Gender',
-    genders: { female: 'Female', male: 'Male', other: 'Other' },
-    birthDate: 'Date of birth',
-    day: 'Day',
-    month: 'Month',
-    year: 'Year',
-    months: [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ],
-    none: 'Prefer not to say',
-    errors: {
-      partial: 'Choose the day, month and year, or leave all three empty.',
-      invalid: 'That month has no such day.',
-      age: 'You must be at least 16.',
-    },
-    note: (
-      <>
-        Both are optional. Used only in aggregate statistics (how many users by gender and age
-        group), never for advertising. You can remove them from your account at any time.{' '}
-        <a href="/confidentialitate.html#demografie">Details</a>
-      </>
-    ),
-  },
+  note: (
+    <>
+      Amândouă sunt opționale. Le folosim doar în statistici agregate (câți utilizatori pe gen și
+      grupă de vârstă), niciodată pentru reclame. Le poți șterge oricând din cont.{' '}
+      <a href="/confidentialitate.html#demografie">Detalii</a>
+    </>
+  ),
 };
 
 // Gender and date of birth, both optional ("Prefer not to say" by default).
@@ -80,8 +42,7 @@ const T = {
 // error (a partial or impossible date). `firstRef` goes on the first field.
 // Used by the sign-up's "About you" step and the account page.
 export default function Demographics({ value, onChange, idPrefix = 'demo', showErrors, firstRef }) {
-  const { lang } = useLang();
-  const t = T[lang];
+  const t = T;
   const set = (key, v) => onChange({ ...value, [key]: v });
   const error = showErrors ? demographicsError(value) : null;
   const days = daysIn(value.birth_year, value.birth_month);

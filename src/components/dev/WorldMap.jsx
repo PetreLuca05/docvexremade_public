@@ -142,7 +142,6 @@ export default function WorldMap({
   backLabel,
   noRegions,
   format,
-  lang,
 }) {
   const box = useRef(null);
   const [world, setWorld] = useState(null);
@@ -208,7 +207,7 @@ export default function WorldMap({
           <button type="button" className="link-button" onClick={() => onSelect(null)}>
             ← {backLabel}
           </button>
-          <b>{countryName(selected, lang)}</b>
+          <b>{countryName(selected)}</b>
           {regions && !regions.length && <span className="dev-note">{noRegions}</span>}
         </div>
       )}
@@ -238,7 +237,7 @@ export default function WorldMap({
                 onMouseMove={(e) =>
                   move(e, {
                     code: c.code,
-                    name: countryName(c.code, lang),
+                    name: countryName(c.code),
                     value: counts[c.code] ?? 0,
                   })
                 }

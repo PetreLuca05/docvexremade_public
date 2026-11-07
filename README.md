@@ -18,15 +18,19 @@ identification, ANPC-SAL, AI Act transparency, accessibility statement,
 vulnerability reporting and the list of applicable acts) and `404.html`.
 
 - `*.html`: each page's `<head>` (title, description) and its entry script.
-- `src/pages/`: each page. The home and download pages hold their Romanian and
-  English text side by side; the legal pages have one file per language in
-  `src/pages/ro/` and `src/pages/en/` (the Romanian text is the binding one).
-- `src/components/Layout.jsx`: the shared header (links, sign-in, Get started
-  and the RO / EN switcher; taller and without a background while the page is
+- `src/pages/`: each page, in Romanian; the legal pages' text is in
+  `src/pages/ro/`. The site is Romanian only, but the emails are not yet:
+  the app's Settings → Language still sets `user_metadata.lang` (mirrored to
+  `notify_prefs.lang`), and the server still sends Romanian or English emails
+  by it; `public/open.html`, the emails' link, stays bilingual for the same
+  reason. Keep the email language on the server until the app goes Romanian
+  only (a separate job: `docs/ROMANIAN_UI.md` in the app repo).
+- `src/components/Layout.jsx`: the shared header (links, sign-in and Get
+  started; taller and without a background while the page is
   at the top) and footer, used by every page;
 - `src/auth.js`: the Supabase client (loaded only by the pricing and account
   pages, and by the download page for a signed-in visitor, to record the
-  downloaded version behind the header's Update badge) and the Stripe links; `src/i18n.jsx`: the current language; `src/styles/style.css`:
+  downloaded version behind the header's Update badge) and the Stripe links; `src/i18n.jsx`: the page title and description; `src/styles/style.css`:
   the stylesheet.
 - `src/assets/hero/`: the hero photos (JPEG, 1280 and 1920 px wide).
 - `public/`: copied as is: `CNAME`, `.nojekyll`, `.well-known/security.txt`
@@ -55,8 +59,7 @@ Built with GDPR (Regulation (EU) 2016/679, Law 190/2018) and Law 506/2004 in
 mind: no cookies and system fonts only. The one third-party script is
 Plausible's cookieless, EU-hosted statistics (injected into every page but
 `dev.html` by a plugin in `vite.config.js`; events in `src/analytics.js`). The
-browser stores only the language the visitor picks (`docvex-lang` in
-localStorage) and, after signing in, the Supabase session; both are strictly
+browser stores only the Supabase session, after signing in; it is strictly
 necessary and described in the cookie policy, so no consent banner is needed.
 The sign-in, account and (signed in) download pages talk to Supabase. Adding
 anything else means updating the cookie policy and asking for consent first.

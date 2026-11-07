@@ -187,7 +187,6 @@ export function headTags(key, ctx) {
       prop('og:description', page.description),
       prop('og:url', url),
       prop('og:locale', SITE.locale),
-      ...SITE.alternateLocales.map((l) => prop('og:locale:alternate', l)),
     );
     if (img) {
       for (const [variant, file] of [

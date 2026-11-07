@@ -1,27 +1,18 @@
 import Layout from '../components/Layout.jsx';
-import { useLang, useMeta } from '../i18n.jsx';
-import En from './en/Cookies.jsx';
-import Ro from './ro/Cookies.jsx';
+import { useMeta } from '../i18n.jsx';
+import Content from './ro/Cookies.jsx';
 
 const META = {
-  ro: {
-    title: 'Politica de cookie-uri — DocVex',
-    description:
-      'Site-ul DocVex nu folosește cookie-uri: numără vizitele fără cookie-uri (Plausible) și reține doar limba aleasă și, dacă te autentifici, sesiunea contului (Legea nr. 506/2004).',
-  },
-  en: {
-    title: 'Cookie policy — DocVex',
-    description:
-      'The DocVex site uses no cookies: it counts visits without cookies (Plausible) and only remembers your chosen language and, if you sign in, your account session (Law no. 506/2004).',
-  },
+  title: 'Politica de cookie-uri — DocVex',
+  description:
+    'Site-ul DocVex nu folosește cookie-uri: numără vizitele fără cookie-uri (Plausible) și reține doar sesiunea contului, dacă te autentifici (Legea nr. 506/2004).',
 };
 
 export default function Cookies() {
-  const { lang } = useLang();
   useMeta(META);
   return (
     <Layout page="cookies" mainClassName="wrap">
-      {lang === 'en' ? <En /> : <Ro />}
+      <Content />
     </Layout>
   );
 }

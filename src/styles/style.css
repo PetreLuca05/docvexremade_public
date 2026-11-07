@@ -291,42 +291,6 @@ h3,
   white-space: nowrap;
 }
 
-.lang-switch {
-  display: flex;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  /* Readable over the hero photos and the page behind the clear header. */
-  background: color-mix(in srgb, var(--bg) 35%, transparent);
-  backdrop-filter: blur(10px);
-}
-
-.lang-switch button {
-  padding: 4px 10px;
-  border: 0;
-  border-radius: 999px;
-  background: none;
-  color: var(--muted);
-  font: inherit;
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.14em;
-  cursor: pointer;
-}
-
-.lang-switch button:hover {
-  color: var(--text);
-}
-
-.lang-switch button[aria-pressed='true'] {
-  background: var(--accent);
-  color: var(--bg);
-}
-
-.lang-switch button:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
 .menu-toggle {
   display: none;
   place-items: center;
@@ -465,24 +429,18 @@ h3,
   letter-spacing: 0.06em;
 }
 
-/* Optical centring in the header: the nav links, buttons and RO / EN are
+/* Optical centring in the header: the nav links and buttons are
    capitals, which sit above the middle of an ordinary text box (it keeps
    room for descenders). Trimming the box to the capitals centres the letters
    themselves. Browsers without text-box keep the usual centring. */
 .site-nav a,
-.head-actions .btn,
-.lang-switch button {
+.head-actions .btn {
   text-box: trim-both cap alphabetic;
 }
 
 .head-actions .btn {
   padding-top: 13px;
   padding-bottom: 13px;
-}
-
-.lang-switch button {
-  padding-top: 7px;
-  padding-bottom: 7px;
 }
 
 /* ---- Buttons --------------------------------------------------------- */
@@ -5576,19 +5534,9 @@ th {
 
 /* ---- Touch screens ---------------------------------------------------- */
 
-/* Fingers need larger targets than a pointer: the small links and the
-   language buttons get a bigger hit area, the look stays the same. */
+/* Fingers need larger targets than a pointer: the small links get a bigger
+   hit area, the look stays the same. */
 @media (pointer: coarse) {
-  .lang-switch button {
-    position: relative;
-  }
-
-  .lang-switch button::after {
-    content: '';
-    position: absolute;
-    inset: -12px -2px;
-  }
-
   .site-foot nav a,
   .link-more {
     display: inline-block;
@@ -5626,7 +5574,7 @@ th {
   }
 
   /* Phones and tablets: a compact bar (the logo and a menu button), fixed
-     to the top of the screen; the links, the account and the language open
+     to the top of the screen; the links and the account open
      in a panel under it. Over the hero it keeps a solid night background. */
   .site-head {
     --head-h: 60px;

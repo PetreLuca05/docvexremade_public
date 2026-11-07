@@ -3,7 +3,7 @@ import Layout from '../components/Layout.jsx';
 import { NotFoundContent } from './NotFound.jsx';
 import { countryName } from '../components/dev/countries.js';
 import { countyName } from '../components/dev/counties.js';
-import { useLang, useMeta } from '../i18n.jsx';
+import { useMeta } from '../i18n.jsx';
 import { useSession } from '../useSession.js';
 import { authHref, validUrl } from '../auth.js';
 
@@ -38,800 +38,403 @@ const C = {
   violet: '#b9a3e8',
 };
 
-const META = {
-  ro: { title: 'Panou — DocVex', description: '' },
-  en: { title: 'Dashboard — DocVex', description: '' },
-};
+const META = { title: 'Panou — DocVex', description: '' };
 
 const T = {
-  ro: {
-    locale: 'ro-RO',
-    eyebrow: 'Panou intern',
-    title: 'DocVex, în timp real.',
-    signedOut: 'Autentifică-te cu un cont de administrator.',
-    signIn: 'Autentificare',
-    loading: 'Se încarcă…',
-    unavailable: 'Panoul nu este configurat (lipsește VITE_SUPABASE_URL).',
-    failed: 'Nu am putut încărca datele.',
-    retry: 'Reîncearcă',
-    ranges: {
-      today: 'Azi',
-      '7d': '7 zile',
-      '30d': '30 de zile',
-      '90d': '90 de zile',
-      custom: 'Interval',
+  locale: 'ro-RO',
+  eyebrow: 'Panou intern',
+  title: 'DocVex, în timp real.',
+  signedOut: 'Autentifică-te cu un cont de administrator.',
+  signIn: 'Autentificare',
+  loading: 'Se încarcă…',
+  unavailable: 'Panoul nu este configurat (lipsește VITE_SUPABASE_URL).',
+  failed: 'Nu am putut încărca datele.',
+  retry: 'Reîncearcă',
+  ranges: {
+    today: 'Azi',
+    '7d': '7 zile',
+    '30d': '30 de zile',
+    '90d': '90 de zile',
+    custom: 'Interval',
+  },
+  from: 'De la',
+  to: 'Până la',
+  compare: 'Compară cu perioada anterioară',
+  autoRefresh: 'Actualizare automată la 60 s',
+  updated: (time) => `Actualizat la ${time}`,
+  refresh: 'Actualizează',
+  live: {
+    title: 'Acum',
+    visitors: 'Vizitatori acum',
+    subs: 'Abonamente active',
+    mrr: 'MRR',
+    signups: 'Conturi noi azi',
+    downloads: 'Descărcări azi',
+    app: 'Utilizatori ai aplicației azi',
+  },
+  sections: {
+    insights: 'Esențial',
+    traffic: 'Trafic',
+    audience: 'Public',
+    subscriptions: 'Abonamente',
+    accounts: 'Conturi',
+    app: 'Aplicația',
+    downloads: 'Descărcări',
+    health: 'Stare',
+  },
+  traffic: {
+    notConfigured:
+      'Plausible nu este configurat: setează PLAUSIBLE_API_KEY și PLAUSIBLE_SITE_ID ca secrete ale funcției admin.',
+    visitors: 'Vizitatori unici',
+    visits: 'Vizite',
+    pageviews: 'Afișări de pagini',
+    views_per_visit: 'Pagini / vizită',
+    visit_duration: 'Durata vizitei',
+    bounce_rate: 'Rată de respingere',
+    vsPrevious: 'față de perioada anterioară',
+    chart: 'Vizitatori și afișări',
+    current: 'Perioada aleasă',
+    previous: 'Perioada anterioară',
+    channels: 'Canale',
+    referrers: 'Site-uri care trimit vizitatori',
+    utm: 'Campanii (UTM)',
+    utmSource: 'Sursă',
+    utmMedium: 'Mediu',
+    utmCampaign: 'Campanie',
+    pages: 'Pagini',
+    top: 'Cele mai vizitate',
+    entry: 'De intrare',
+    exit: 'De ieșire',
+    notFound: 'Pagini inexistente (404)',
+    goals: 'Evenimente',
+  },
+  audience: {
+    globe: 'Vizitatori pe țări',
+    world: 'Lumea',
+    regionsIn: (country) => `${country}, pe regiuni`,
+    noRegions: 'Fără regiuni pe hartă pentru această țară.',
+    mapHint: 'Apasă o țară pentru regiunile ei.',
+    counties: 'România, pe județe',
+    countries: 'Țări',
+    cities: 'Orașe',
+    devices: 'Dispozitive',
+    browsers: 'Browsere',
+    os: 'Sisteme de operare',
+    returning:
+      'Vizitatori noi și reveniți: Plausible nu îi deosebește, fiindcă nu folosește cookie-uri.',
+  },
+  subs: {
+    mrrByPlan: 'MRR pe plan',
+    lifecycle: 'Ciclul abonamentelor',
+    funnel: 'De la plată la abonament',
+    funnelSteps: ['Trimiși la plată', 'Întorși de la plată', 'Abonamente create'],
+    changes: 'Schimbări de plan',
+    from: 'Din',
+    toPlan: 'În',
+    current: 'Abonamente',
+    events: 'Ultimele evenimente Stripe',
+    all: 'Toate',
+    search: 'Caută după e-mail',
+    cols: {
+      email: 'E-mail',
+      plan: 'Plan',
+      status: 'Stare',
+      periodEnd: 'Sfârșitul perioadei',
+      cancel: 'Se anulează',
+      amount: 'Sumă',
     },
-    from: 'De la',
-    to: 'Până la',
-    compare: 'Compară cu perioada anterioară',
-    autoRefresh: 'Actualizare automată la 60 s',
-    updated: (time) => `Actualizat la ${time}`,
-    refresh: 'Actualizează',
-    live: {
-      title: 'Acum',
-      visitors: 'Vizitatori acum',
-      subs: 'Abonamente active',
-      mrr: 'MRR',
-      signups: 'Conturi noi azi',
-      downloads: 'Descărcări azi',
-      app: 'Utilizatori ai aplicației azi',
+    lifecycleKeys: {
+      created: 'Create',
+      upgraded: 'Trecute pe un plan mai mare',
+      downgraded: 'Trecute pe un plan mai mic',
+      cancel_requested: 'Anulare cerută',
+      canceled: 'Anulate',
+      reactivated: 'Reactivate',
+      payment_failed: 'Plăți eșuate',
     },
-    sections: {
-      insights: 'Esențial',
-      traffic: 'Trafic',
-      audience: 'Public',
-      subscriptions: 'Abonamente',
-      accounts: 'Conturi',
-      app: 'Aplicația',
-      downloads: 'Descărcări',
-      health: 'Stare',
-    },
-    traffic: {
-      notConfigured:
-        'Plausible nu este configurat: setează PLAUSIBLE_API_KEY și PLAUSIBLE_SITE_ID ca secrete ale funcției admin.',
-      visitors: 'Vizitatori unici',
-      visits: 'Vizite',
-      pageviews: 'Afișări de pagini',
-      views_per_visit: 'Pagini / vizită',
-      visit_duration: 'Durata vizitei',
-      bounce_rate: 'Rată de respingere',
-      vsPrevious: 'față de perioada anterioară',
-      chart: 'Vizitatori și afișări',
-      current: 'Perioada aleasă',
-      previous: 'Perioada anterioară',
-      channels: 'Canale',
-      referrers: 'Site-uri care trimit vizitatori',
-      utm: 'Campanii (UTM)',
-      utmSource: 'Sursă',
-      utmMedium: 'Mediu',
-      utmCampaign: 'Campanie',
-      pages: 'Pagini',
-      top: 'Cele mai vizitate',
-      entry: 'De intrare',
-      exit: 'De ieșire',
-      notFound: 'Pagini inexistente (404)',
-      goals: 'Evenimente',
-    },
-    audience: {
-      globe: 'Vizitatori pe țări',
-      world: 'Lumea',
-      regionsIn: (country) => `${country}, pe regiuni`,
-      noRegions: 'Fără regiuni pe hartă pentru această țară.',
-      mapHint: 'Apasă o țară pentru regiunile ei.',
-      counties: 'România, pe județe',
-      countries: 'Țări',
-      cities: 'Orașe',
-      devices: 'Dispozitive',
-      browsers: 'Browsere',
-      os: 'Sisteme de operare',
-      returning:
-        'Vizitatori noi și reveniți: Plausible nu îi deosebește, fiindcă nu folosește cookie-uri.',
-    },
-    subs: {
-      mrrByPlan: 'MRR pe plan',
-      lifecycle: 'Ciclul abonamentelor',
-      funnel: 'De la plată la abonament',
-      funnelSteps: ['Trimiși la plată', 'Întorși de la plată', 'Abonamente create'],
-      changes: 'Schimbări de plan',
-      from: 'Din',
-      toPlan: 'În',
-      current: 'Abonamente',
-      events: 'Ultimele evenimente Stripe',
-      all: 'Toate',
-      search: 'Caută după e-mail',
-      cols: {
-        email: 'E-mail',
-        plan: 'Plan',
-        status: 'Stare',
-        periodEnd: 'Sfârșitul perioadei',
-        cancel: 'Se anulează',
-        amount: 'Sumă',
-      },
-      lifecycleKeys: {
-        created: 'Create',
-        upgraded: 'Trecute pe un plan mai mare',
-        downgraded: 'Trecute pe un plan mai mic',
-        cancel_requested: 'Anulare cerută',
-        canceled: 'Anulate',
-        reactivated: 'Reactivate',
-        payment_failed: 'Plăți eșuate',
-      },
-      empty:
-        'Niciun abonament încă. Când Stripe trimite primele evenimente către stripe-events, apar aici.',
-    },
-    events: {
-      'checkout.session.completed': (e) => `Plată finalizată${e.who}`,
-      'customer.subscription.created': (e) => `Abonament ${e.plan} creat${e.who}`,
-      'customer.subscription.updated': (e) =>
-        e.lifecycle === 'cancel_requested'
-          ? `Anulare cerută${e.who}, se încheie la ${e.end}`
-          : e.lifecycle === 'reactivated'
-            ? `Abonament reactivat${e.who}`
-            : e.lifecycle === 'upgraded'
+    empty:
+      'Niciun abonament încă. Când Stripe trimite primele evenimente către stripe-events, apar aici.',
+  },
+  events: {
+    'checkout.session.completed': (e) => `Plată finalizată${e.who}`,
+    'customer.subscription.created': (e) => `Abonament ${e.plan} creat${e.who}`,
+    'customer.subscription.updated': (e) =>
+      e.lifecycle === 'cancel_requested'
+        ? `Anulare cerută${e.who}, se încheie la ${e.end}`
+        : e.lifecycle === 'reactivated'
+          ? `Abonament reactivat${e.who}`
+          : e.lifecycle === 'upgraded'
+            ? `Trecere la ${e.plan}${e.who}`
+            : e.lifecycle === 'downgraded'
               ? `Trecere la ${e.plan}${e.who}`
-              : e.lifecycle === 'downgraded'
-                ? `Trecere la ${e.plan}${e.who}`
-                : `Abonament actualizat${e.who}`,
-      'customer.subscription.deleted': (e) => `Abonament ${e.plan} încheiat${e.who}`,
-      'customer.subscription.trial_will_end': (e) => `Perioada de probă se încheie${e.who}`,
-      'invoice.paid': (e) => `Factură plătită${e.who}: ${e.amount}`,
-      'invoice.payment_failed': (e) => `Plată eșuată${e.who}`,
-      'invoice.payment_action_required': (e) => `Plata cere confirmare${e.who}`,
-      'customer.created': (e) => `Client nou${e.who}`,
-      'customer.deleted': (e) => `Client șters${e.who}`,
+              : `Abonament actualizat${e.who}`,
+    'customer.subscription.deleted': (e) => `Abonament ${e.plan} încheiat${e.who}`,
+    'customer.subscription.trial_will_end': (e) => `Perioada de probă se încheie${e.who}`,
+    'invoice.paid': (e) => `Factură plătită${e.who}: ${e.amount}`,
+    'invoice.payment_failed': (e) => `Plată eșuată${e.who}`,
+    'invoice.payment_action_required': (e) => `Plata cere confirmare${e.who}`,
+    'customer.created': (e) => `Client nou${e.who}`,
+    'customer.deleted': (e) => `Client șters${e.who}`,
+  },
+  accounts: {
+    total: 'Conturi',
+    signups: 'Conturi noi pe zi',
+    providers: 'Metode de autentificare',
+    providerNames: { email: 'E-mail', google: 'Google', both: 'Amândouă', other: 'Altele' },
+    newsletter: 'Abonați la newsletter',
+    plans: 'Planul ales pe site',
+    planNames: { start: 'Start', pro: 'Solo', cabinet: 'Firm', none: 'Neales' },
+    mismatch: 'Planul ales diferă de cel plătit',
+    versions: 'Versiunea descărcată',
+    none: 'Niciuna',
+    recency: 'Ultima autentificare',
+    gender: 'Gen',
+    age: 'Vârstă',
+    genderNames: { female: 'Feminin', male: 'Masculin', other: 'Altul', unknown: 'Nespecificat' },
+    ageUnknown: 'Nespecificat',
+    paying: 'Plătesc',
+    free: 'Nu plătesc',
+    demographicsNote: (given, total) =>
+      `${given} din ${total} conturi și-au completat genul sau data nașterii (opțional, pe site sau în aplicație).`,
+    recencyNames: {
+      '24h': 'Ultimele 24 h',
+      '7d': 'Ultimele 7 zile',
+      '30d': 'Ultimele 30 de zile',
+      older: 'Mai demult',
+      never: 'Niciodată',
     },
-    accounts: {
-      total: 'Conturi',
-      signups: 'Conturi noi pe zi',
-      providers: 'Metode de autentificare',
-      providerNames: { email: 'E-mail', google: 'Google', both: 'Amândouă', other: 'Altele' },
-      newsletter: 'Abonați la newsletter',
-      plans: 'Planul ales pe site',
-      planNames: { start: 'Start', pro: 'Solo', cabinet: 'Firm', none: 'Neales' },
-      mismatch: 'Planul ales diferă de cel plătit',
-      versions: 'Versiunea descărcată',
-      none: 'Niciuna',
-      recency: 'Ultima autentificare',
-      gender: 'Gen',
-      age: 'Vârstă',
-      genderNames: { female: 'Feminin', male: 'Masculin', other: 'Altul', unknown: 'Nespecificat' },
-      ageUnknown: 'Nespecificat',
-      paying: 'Plătesc',
-      free: 'Nu plătesc',
-      demographicsNote: (given, total) =>
-        `${given} din ${total} conturi și-au completat genul sau data nașterii (opțional, pe site sau în aplicație).`,
-      recencyNames: {
-        '24h': 'Ultimele 24 h',
-        '7d': 'Ultimele 7 zile',
-        '30d': 'Ultimele 30 de zile',
-        older: 'Mai demult',
-        never: 'Niciodată',
-      },
+  },
+  views: { dashboard: 'Panou', reports: 'Rapoarte', settings: 'Setări' },
+  reports: {
+    title: 'Rapoarte',
+    soon: 'Rapoartele trimise din aplicație vor apărea aici, după ce aplicația începe să le trimită.',
+    report: (id) => `Raportul ${id}`,
+  },
+  settingsTitle: 'Setări',
+  notif: {
+    title: 'Notificări pe acest dispozitiv',
+    unsupported: 'Acest browser nu poate primi notificări push.',
+    ios: 'Pe iPhone, adaugă mai întâi panoul pe ecranul principal: Safari › Partajează › Adaugă pe ecranul principal, apoi deschide-l din pictogramă și revino aici.',
+    notConfigured: 'Notificările nu sunt configurate (lipsește VITE_VAPID_PUBLIC_KEY).',
+    denied:
+      'Notificările sunt blocate pentru acest site. Permite-le din setările browserului, apoi reîncarcă.',
+    on: 'Activate pe acest dispozitiv.',
+    off: 'Nu sunt activate pe acest dispozitiv.',
+    label: 'Numele dispozitivului',
+    enable: 'Activează pe acest dispozitiv',
+    disable: 'Dezactivează aici',
+    test: 'Trimite o notificare de test',
+    tested: (n) =>
+      n
+        ? `Trimisă către ${n} ${n === 1 ? 'dispozitiv' : 'dispozitive'}.`
+        : 'Niciun dispozitiv activat.',
+    failed: 'Nu a mers:',
+    devices: 'Dispozitive',
+    none: 'Niciun dispozitiv încă.',
+    thisDevice: 'acesta',
+    remove: 'Elimină',
+    lastUsed: 'ultima notificare',
+    never: 'niciuna încă',
+    failures: (n) => `${n} eșecuri`,
+  },
+  assistant: {
+    title: 'Întreabă despre cifre',
+    placeholder: 'De exemplu: de ce au scăzut abonamentele luna asta?',
+    send: 'Trimite',
+    thinking: 'Analizez datele…',
+    failed: 'Nu am putut obține un răspuns.',
+    refused: 'Asistentul nu poate răspunde la această întrebare.',
+    truncated: 'Răspunsul a fost tăiat (prea lung).',
+    clear: 'Conversație nouă',
+    note: 'Răspunde Claude (Anthropic) din cifrele intervalului ales, citite chiar acum. Adresele de e-mail nu îi sunt trimise.',
+    suggestions: [
+      'Cum stăm cu abonamentele și ce ar trebui să urmăresc?',
+      'Unde pierdem cei mai mulți oameni pe drumul spre abonament?',
+      'Este AI-ul profitabil pe fiecare plan?',
+    ],
+  },
+  insights: {
+    funnel: 'Drumul până la abonament',
+    funnelNote:
+      'Primele trei sunt totaluri pe interval. Următoarele urmăresc conturile create în interval: câte au deschis aplicația, au întrebat AI-ul și s-au abonat (până azi).',
+    steps: {
+      visitors: 'Vizitatori pe site',
+      downloadClicks: 'Au apăsat Descarcă',
+      installs: 'Instalări noi',
+      accounts: 'Conturi create',
+      inApp: 'Au intrat în aplicație',
+      askedAi: 'Au întrebat AI-ul',
+      paid: 'S-au abonat',
     },
-    views: { dashboard: 'Panou', reports: 'Rapoarte', settings: 'Setări' },
-    reports: {
-      title: 'Rapoarte',
-      soon: 'Rapoartele trimise din aplicație vor apărea aici, după ce aplicația începe să le trimită.',
-      report: (id) => `Raportul ${id}`,
+    ofPrevious: 'din pasul anterior',
+    daysToAi: 'Zile până la prima întrebare AI (mediană)',
+    daysToPaid: 'Zile până la abonament (mediană)',
+    retention: 'Retenție pe săptămâna de început',
+    retentionNote:
+      'Instalări grupate după săptămâna în care au apărut; fiecare coloană arată ce parte a folosit aplicația în săptămâna respectivă. Ultimele 8 săptămâni, indiferent de interval.',
+    cohort: 'Săptămâna',
+    size: 'Instalări',
+    week: (n) => `S${n}`,
+    noRetention: 'Încă nicio instalare cu statistici.',
+    cost: 'Costul AI pe plan',
+    costNote: (rate, date) =>
+      `Prețuri de listă Claude, fără reducerile de cache, deci o estimare maximă. Venitul este MRR-ul abonamentelor active, proporțional cu intervalul.${rate ? ` 1 USD = ${rate} lei (BNR, ${date}).` : ''}`,
+    plan: 'Plan',
+    planNames: { trial: 'Probă', standard: 'Solo', pro: 'Firm' },
+    aiUsers: 'Folosesc AI',
+    tokens: 'Tokeni',
+    costUsd: 'Cost AI (USD)',
+    costLei: 'Cost AI (lei)',
+    subscribers: 'Abonați',
+    revenue: 'Venit (lei)',
+    margin: 'Marjă (lei)',
+    perUser: 'Cost / utilizator',
+    top: 'Cele mai costisitoare conturi',
+    account: 'Cont',
+    requests: 'Cereri',
+    unknown: 'Necunoscut',
+    noCost: 'Nicio utilizare AI în interval.',
+    unpriced: (list) => `Modele fără preț cunoscut (necalculate): ${list}.`,
+    subs: 'Sănătatea abonamentelor',
+    paying: 'Abonați plătitori',
+    mrr: 'MRR',
+    arpu: 'Venit mediu / abonat',
+    churn: 'Rată lunară de renunțare',
+    ltv: 'Valoare pe viață (estimată)',
+    joined: 'Abonamente noi',
+    left: 'Abonamente încheiate',
+    atStart: (n) => `${n} active la începutul intervalului`,
+    reasons: 'De ce renunță',
+    reasonNames: {
+      too_expensive: 'Prea scump',
+      missing_features: 'Lipsesc funcții',
+      switched_service: 'A trecut la alt serviciu',
+      unused: 'Nu îl folosește',
+      customer_service: 'Asistența',
+      too_complex: 'Prea complicat',
+      low_quality: 'Calitate slabă',
+      other: 'Altceva',
     },
-    settingsTitle: 'Setări',
-    notif: {
-      title: 'Notificări pe acest dispozitiv',
-      unsupported: 'Acest browser nu poate primi notificări push.',
-      ios: 'Pe iPhone, adaugă mai întâi panoul pe ecranul principal: Safari › Partajează › Adaugă pe ecranul principal, apoi deschide-l din pictogramă și revino aici.',
-      notConfigured: 'Notificările nu sunt configurate (lipsește VITE_VAPID_PUBLIC_KEY).',
-      denied:
-        'Notificările sunt blocate pentru acest site. Permite-le din setările browserului, apoi reîncarcă.',
-      on: 'Activate pe acest dispozitiv.',
-      off: 'Nu sunt activate pe acest dispozitiv.',
-      label: 'Numele dispozitivului',
-      enable: 'Activează pe acest dispozitiv',
-      disable: 'Dezactivează aici',
-      test: 'Trimite o notificare de test',
-      tested: (n) =>
-        n
-          ? `Trimisă către ${n} ${n === 1 ? 'dispozitiv' : 'dispozitive'}.`
-          : 'Niciun dispozitiv activat.',
-      failed: 'Nu a mers:',
-      devices: 'Dispozitive',
-      none: 'Niciun dispozitiv încă.',
-      thisDevice: 'acesta',
-      remove: 'Elimină',
-      lastUsed: 'ultima notificare',
-      never: 'niciuna încă',
-      failures: (n) => `${n} eșecuri`,
+    noReasons:
+      'Niciun motiv înregistrat. Stripe le colectează doar dacă e activat în portalul clienților (Settings › Billing › Customer portal › Cancellations › „Collect cancellation reasons”).',
+    subsNote:
+      'Rata de renunțare: abonamente încheiate în interval față de cele active la început, adusă la 30 de zile. Valoarea pe viață = venit mediu / rata lunară.',
+    releases: 'Fiabilitate pe versiuni',
+    version: 'Versiune',
+    firstSeen: 'Apărută',
+    sessions: 'Sesiuni',
+    clean: 'Fără erori',
+    crashes: 'Ferestre căzute',
+    noReleases: 'Încă nicio sesiune cu statistici în interval.',
+    law: 'Sursele juridice',
+    tool: 'Sursă',
+    toolNames: {
+      search_legislation: 'Legislație',
+      search_eu_law: 'Dreptul UE',
+      search_court_cases: 'Jurisprudență',
+      lookup_company: 'Firme',
+      search_lawyers: 'Avocați',
     },
-    assistant: {
-      title: 'Întreabă despre cifre',
-      placeholder: 'De exemplu: de ce au scăzut abonamentele luna asta?',
-      send: 'Trimite',
-      thinking: 'Analizez datele…',
-      failed: 'Nu am putut obține un răspuns.',
-      refused: 'Asistentul nu poate răspunde la această întrebare.',
-      truncated: 'Răspunsul a fost tăiat (prea lung).',
-      clear: 'Conversație nouă',
-      note: 'Răspunde Claude (Anthropic) din cifrele intervalului ales, citite chiar acum. Adresele de e-mail nu îi sunt trimise.',
-      suggestions: [
-        'Cum stăm cu abonamentele și ce ar trebui să urmăresc?',
-        'Unde pierdem cei mai mulți oameni pe drumul spre abonament?',
-        'Este AI-ul profitabil pe fiecare plan?',
-      ],
+    calls: 'Căutări',
+    failed: 'Eșuate',
+    slow: 'Peste 30 s',
+    failuresDaily: 'Căutări eșuate pe zi',
+    lawErrors: 'Cereri AI eșuate, pe tip',
+    noLaw: 'Nicio căutare în sursele juridice în interval.',
+  },
+  app: {
+    empty:
+      'Încă nicio statistică de la aplicație. Apar după ce cineva folosește versiunea 1.2.0 sau mai nouă, cu statisticile anonime pornite.',
+    dau: 'Utilizatori azi',
+    wau: 'Utilizatori în 7 zile',
+    mau: 'Utilizatori în 30 de zile',
+    sessions: 'Sesiuni în interval',
+    allSessions: 'Sesiuni',
+    median: 'Sesiune mediană (min)',
+    active: 'Utilizatori activi pe zi',
+    features: 'Funcții folosite',
+    featureNames: {
+      project: 'Proiecte',
+      file: 'Fișiere',
+      viewer: 'Vizualizator',
+      convert: 'Conversii',
+      scan: 'Scanări',
+      print: 'Tipărire',
+      trash: 'Coș de gunoi',
+      portal: 'Import de pe telefon',
+      law: 'Cercetare juridică (AI)',
+      update: 'Actualizări',
+      error: 'Erori',
     },
-    insights: {
-      funnel: 'Drumul până la abonament',
-      funnelNote:
-        'Primele trei sunt totaluri pe interval. Următoarele urmăresc conturile create în interval: câte au deschis aplicația, au întrebat AI-ul și s-au abonat (până azi).',
-      steps: {
-        visitors: 'Vizitatori pe site',
-        downloadClicks: 'Au apăsat Descarcă',
-        installs: 'Instalări noi',
-        accounts: 'Conturi create',
-        inApp: 'Au intrat în aplicație',
-        askedAi: 'Au întrebat AI-ul',
-        paid: 'S-au abonat',
-      },
-      ofPrevious: 'din pasul anterior',
-      daysToAi: 'Zile până la prima întrebare AI (mediană)',
-      daysToPaid: 'Zile până la abonament (mediană)',
-      retention: 'Retenție pe săptămâna de început',
-      retentionNote:
-        'Instalări grupate după săptămâna în care au apărut; fiecare coloană arată ce parte a folosit aplicația în săptămâna respectivă. Ultimele 8 săptămâni, indiferent de interval.',
-      cohort: 'Săptămâna',
-      size: 'Instalări',
-      week: (n) => `S${n}`,
-      noRetention: 'Încă nicio instalare cu statistici.',
-      cost: 'Costul AI pe plan',
-      costNote: (rate, date) =>
-        `Prețuri de listă Claude, fără reducerile de cache, deci o estimare maximă. Venitul este MRR-ul abonamentelor active, proporțional cu intervalul.${rate ? ` 1 USD = ${rate} lei (BNR, ${date}).` : ''}`,
-      plan: 'Plan',
-      planNames: { trial: 'Probă', standard: 'Solo', pro: 'Firm' },
-      aiUsers: 'Folosesc AI',
-      tokens: 'Tokeni',
-      costUsd: 'Cost AI (USD)',
-      costLei: 'Cost AI (lei)',
-      subscribers: 'Abonați',
-      revenue: 'Venit (lei)',
-      margin: 'Marjă (lei)',
-      perUser: 'Cost / utilizator',
-      top: 'Cele mai costisitoare conturi',
-      account: 'Cont',
-      requests: 'Cereri',
-      unknown: 'Necunoscut',
-      noCost: 'Nicio utilizare AI în interval.',
-      unpriced: (list) => `Modele fără preț cunoscut (necalculate): ${list}.`,
-      subs: 'Sănătatea abonamentelor',
-      paying: 'Abonați plătitori',
-      mrr: 'MRR',
-      arpu: 'Venit mediu / abonat',
-      churn: 'Rată lunară de renunțare',
-      ltv: 'Valoare pe viață (estimată)',
-      joined: 'Abonamente noi',
-      left: 'Abonamente încheiate',
-      atStart: (n) => `${n} active la începutul intervalului`,
-      reasons: 'De ce renunță',
-      reasonNames: {
-        too_expensive: 'Prea scump',
-        missing_features: 'Lipsesc funcții',
-        switched_service: 'A trecut la alt serviciu',
-        unused: 'Nu îl folosește',
-        customer_service: 'Asistența',
-        too_complex: 'Prea complicat',
-        low_quality: 'Calitate slabă',
-        other: 'Altceva',
-      },
-      noReasons:
-        'Niciun motiv înregistrat. Stripe le colectează doar dacă e activat în portalul clienților (Settings › Billing › Customer portal › Cancellations › „Collect cancellation reasons”).',
-      subsNote:
-        'Rata de renunțare: abonamente încheiate în interval față de cele active la început, adusă la 30 de zile. Valoarea pe viață = venit mediu / rata lunară.',
-      releases: 'Fiabilitate pe versiuni',
-      version: 'Versiune',
-      firstSeen: 'Apărută',
-      sessions: 'Sesiuni',
-      clean: 'Fără erori',
-      crashes: 'Ferestre căzute',
-      noReleases: 'Încă nicio sesiune cu statistici în interval.',
-      law: 'Sursele juridice',
-      tool: 'Sursă',
-      toolNames: {
-        search_legislation: 'Legislație',
-        search_eu_law: 'Dreptul UE',
-        search_court_cases: 'Jurisprudență',
-        lookup_company: 'Firme',
-        search_lawyers: 'Avocați',
-      },
-      calls: 'Căutări',
+    ai: 'Tokeni AI pe zi, pe model',
+    aiRequests: 'Cereri AI',
+    aiTokens: 'Tokeni AI',
+    atLimit: 'Limite atinse',
+    limitNames: {
+      session: 'Sesiune (5 h)',
+      weekly: 'Săptămânal',
+      fable: 'Fable',
+      trial: 'Perioadă de probă',
+    },
+    versions: 'Versiuni instalate (30 de zile)',
+    updates: 'Actualizări în interval',
+    updateNames: {
+      available: 'Găsite',
+      downloaded: 'Descărcate',
+      install_started: 'Instalare pornită',
+      installed: 'Instalate',
       failed: 'Eșuate',
-      slow: 'Peste 30 s',
-      failuresDaily: 'Căutări eșuate pe zi',
-      lawErrors: 'Cereri AI eșuate, pe tip',
-      noLaw: 'Nicio căutare în sursele juridice în interval.',
     },
-    app: {
-      empty:
-        'Încă nicio statistică de la aplicație. Apar după ce cineva folosește versiunea 1.2.0 sau mai nouă, cu statisticile anonime pornite.',
-      dau: 'Utilizatori azi',
-      wau: 'Utilizatori în 7 zile',
-      mau: 'Utilizatori în 30 de zile',
-      sessions: 'Sesiuni în interval',
-      allSessions: 'Sesiuni',
-      median: 'Sesiune mediană (min)',
-      active: 'Utilizatori activi pe zi',
-      features: 'Funcții folosite',
-      featureNames: {
-        project: 'Proiecte',
-        file: 'Fișiere',
-        viewer: 'Vizualizator',
-        convert: 'Conversii',
-        scan: 'Scanări',
-        print: 'Tipărire',
-        trash: 'Coș de gunoi',
-        portal: 'Import de pe telefon',
-        law: 'Cercetare juridică (AI)',
-        update: 'Actualizări',
-        error: 'Erori',
-      },
-      ai: 'Tokeni AI pe zi, pe model',
-      aiRequests: 'Cereri AI',
-      aiTokens: 'Tokeni AI',
-      atLimit: 'Limite atinse',
-      limitNames: {
-        session: 'Sesiune (5 h)',
-        weekly: 'Săptămânal',
-        fable: 'Fable',
-        trial: 'Perioadă de probă',
-      },
-      versions: 'Versiuni instalate (30 de zile)',
-      updates: 'Actualizări în interval',
-      updateNames: {
-        available: 'Găsite',
-        downloaded: 'Descărcate',
-        install_started: 'Instalare pornită',
-        installed: 'Instalate',
-        failed: 'Eșuate',
-      },
-      events: 'Evenimente',
-      errors: 'Erori recente',
-      noErrors: 'Nicio eroare.',
-      error: 'Eroare',
-      where: 'Unde',
-      count: 'De câte ori',
-      users: 'Utilizatori',
-      lastSeen: 'Ultima dată',
-      accounts: 'Conturi în aplicație',
-      email: 'Cont',
-      plan: 'Plan',
-      version: 'Versiune',
-      aiRounds: 'Cereri AI',
-      anonymous: 'Necunoscut',
-    },
-    downloads: {
-      title: 'Descărcări pe versiuni',
-      release: 'Versiune',
-      date: 'Data',
-      windows: 'Windows',
-      mac: 'macOS',
-      total: 'Total',
-      empty: 'Nicio versiune publicată încă.',
-    },
-    health: {
-      alerts: 'Alerte pe telefon',
-      alertsOff: 'Alertele nu sunt configurate (NTFY_TOPIC).',
-      alertsHow:
-        'Instalează aplicația ntfy (Android sau iOS), apasă + și abonează-te la subiectul:',
-      alertsOpen: 'Deschide în ntfy',
-      testAlert: 'Trimite o alertă de test',
-      testSent: 'Trimisă. Ar trebui să apară pe telefon în câteva secunde.',
-      testFailed: 'Alerta de test nu a putut fi trimisă.',
-      recentAlerts: 'Ultimele alerte',
-      noAlerts: 'Nicio alertă încă. Verificarea rulează la fiecare 10 minute.',
-      stripe: 'Stripe',
-      test: 'Mod de test',
-      live: 'Mod real',
-      unknown: 'Necunoscut',
-      functions: 'Funcții',
-      lastEvent: 'Ultimul eveniment Stripe',
-      never: 'Niciunul încă',
-      usageDebug:
-        'USAGE_DEBUG este activat pe funcția ai: oprește-l în producție (supabase secrets unset USAGE_DEBUG).',
-      plausible: 'Plausible',
-      github: 'Token GitHub',
-      yes: 'Configurat',
-      no: 'Lipsește',
-    },
-    empty: 'Nimic de arătat pentru această perioadă.',
+    events: 'Evenimente',
+    errors: 'Erori recente',
+    noErrors: 'Nicio eroare.',
+    error: 'Eroare',
+    where: 'Unde',
+    count: 'De câte ori',
+    users: 'Utilizatori',
+    lastSeen: 'Ultima dată',
+    accounts: 'Conturi în aplicație',
+    email: 'Cont',
+    plan: 'Plan',
+    version: 'Versiune',
+    aiRounds: 'Cereri AI',
+    anonymous: 'Necunoscut',
   },
-  en: {
-    locale: 'en-GB',
-    eyebrow: 'Internal dashboard',
-    title: 'DocVex, live.',
-    signedOut: 'Sign in with an admin account.',
-    signIn: 'Sign in',
-    loading: 'Loading…',
-    unavailable: 'The dashboard is not configured (VITE_SUPABASE_URL is missing).',
-    failed: 'Could not load the data.',
-    retry: 'Try again',
-    ranges: {
-      today: 'Today',
-      '7d': '7 days',
-      '30d': '30 days',
-      '90d': '90 days',
-      custom: 'Custom',
-    },
-    from: 'From',
-    to: 'To',
-    compare: 'Compare with the previous period',
-    autoRefresh: 'Auto-refresh every 60 s',
-    updated: (time) => `Updated at ${time}`,
-    refresh: 'Refresh',
-    live: {
-      title: 'Now',
-      visitors: 'Visitors now',
-      subs: 'Active subscriptions',
-      mrr: 'MRR',
-      signups: 'Sign-ups today',
-      downloads: 'Downloads today',
-      app: 'App users today',
-    },
-    sections: {
-      insights: 'Key metrics',
-      traffic: 'Traffic',
-      audience: 'Audience',
-      subscriptions: 'Subscriptions',
-      accounts: 'Accounts',
-      app: 'App',
-      downloads: 'Downloads',
-      health: 'Health',
-    },
-    traffic: {
-      notConfigured:
-        'Plausible is not configured: set PLAUSIBLE_API_KEY and PLAUSIBLE_SITE_ID as secrets of the admin function.',
-      visitors: 'Unique visitors',
-      visits: 'Visits',
-      pageviews: 'Page views',
-      views_per_visit: 'Views per visit',
-      visit_duration: 'Visit duration',
-      bounce_rate: 'Bounce rate',
-      vsPrevious: 'vs previous period',
-      chart: 'Visitors and page views',
-      current: 'Selected period',
-      previous: 'Previous period',
-      channels: 'Channels',
-      referrers: 'Top referrers',
-      utm: 'Campaigns (UTM)',
-      utmSource: 'Source',
-      utmMedium: 'Medium',
-      utmCampaign: 'Campaign',
-      pages: 'Pages',
-      top: 'Top',
-      entry: 'Entry',
-      exit: 'Exit',
-      notFound: 'Missing pages (404)',
-      goals: 'Events',
-    },
-    audience: {
-      globe: 'Visitors by country',
-      world: 'World',
-      regionsIn: (country) => `${country}, by region`,
-      noRegions: 'No regions on the map for this country.',
-      mapHint: 'Click a country to see its regions.',
-      counties: 'Romania, by county',
-      countries: 'Countries',
-      cities: 'Cities',
-      devices: 'Devices',
-      browsers: 'Browsers',
-      os: 'Operating systems',
-      returning:
-        'New vs returning visitors: Plausible can’t tell them apart, as it uses no cookies.',
-    },
-    subs: {
-      mrrByPlan: 'MRR by plan',
-      lifecycle: 'Subscription lifecycle',
-      funnel: 'From checkout to subscription',
-      funnelSteps: ['Sent to checkout', 'Back from checkout', 'Subscriptions created'],
-      changes: 'Plan changes',
-      from: 'From',
-      toPlan: 'To',
-      current: 'Subscriptions',
-      events: 'Latest Stripe events',
-      all: 'All',
-      search: 'Search by email',
-      cols: {
-        email: 'Email',
-        plan: 'Plan',
-        status: 'Status',
-        periodEnd: 'Period ends',
-        cancel: 'Cancelling',
-        amount: 'Amount',
-      },
-      lifecycleKeys: {
-        created: 'Created',
-        upgraded: 'Upgraded',
-        downgraded: 'Downgraded',
-        cancel_requested: 'Cancel requested',
-        canceled: 'Canceled',
-        reactivated: 'Reactivated',
-        payment_failed: 'Payment failed',
-      },
-      empty:
-        'No subscriptions yet. They show up here once Stripe sends its first events to stripe-events.',
-    },
-    events: {
-      'checkout.session.completed': (e) => `Checkout completed${e.who}`,
-      'customer.subscription.created': (e) => `${e.plan} subscription created${e.who}`,
-      'customer.subscription.updated': (e) =>
-        e.lifecycle === 'cancel_requested'
-          ? `Cancel requested${e.who}, ends ${e.end}`
-          : e.lifecycle === 'reactivated'
-            ? `Subscription reactivated${e.who}`
-            : e.lifecycle === 'upgraded'
-              ? `Upgraded to ${e.plan}${e.who}`
-              : e.lifecycle === 'downgraded'
-                ? `Downgraded to ${e.plan}${e.who}`
-                : `Subscription updated${e.who}`,
-      'customer.subscription.deleted': (e) => `${e.plan} subscription ended${e.who}`,
-      'customer.subscription.trial_will_end': (e) => `Trial ending soon${e.who}`,
-      'invoice.paid': (e) => `Invoice paid${e.who}: ${e.amount}`,
-      'invoice.payment_failed': (e) => `Payment failed${e.who}`,
-      'invoice.payment_action_required': (e) => `Payment needs confirmation${e.who}`,
-      'customer.created': (e) => `New customer${e.who}`,
-      'customer.deleted': (e) => `Customer deleted${e.who}`,
-    },
-    accounts: {
-      total: 'Accounts',
-      signups: 'Sign-ups per day',
-      providers: 'Sign-in methods',
-      providerNames: { email: 'Email', google: 'Google', both: 'Both', other: 'Other' },
-      newsletter: 'Newsletter opt-ins',
-      plans: 'Plan chosen on the site',
-      planNames: { start: 'Start', pro: 'Solo', cabinet: 'Firm', none: 'Not chosen' },
-      mismatch: 'Chosen plan differs from the paid one',
-      versions: 'Downloaded version',
-      none: 'None',
-      recency: 'Last sign-in',
-      gender: 'Gender',
-      age: 'Age',
-      genderNames: { female: 'Female', male: 'Male', other: 'Other', unknown: 'Not given' },
-      ageUnknown: 'Not given',
-      paying: 'Paying',
-      free: 'Not paying',
-      demographicsNote: (given, total) =>
-        `${given} of ${total} accounts gave their gender or date of birth (optional, on the site or in the app).`,
-      recencyNames: {
-        '24h': 'Last 24 h',
-        '7d': 'Last 7 days',
-        '30d': 'Last 30 days',
-        older: 'Older',
-        never: 'Never',
-      },
-    },
-    views: { dashboard: 'Dashboard', reports: 'Reports', settings: 'Settings' },
-    reports: {
-      title: 'Reports',
-      soon: 'Reports sent from the app will appear here once the app starts sending them.',
-      report: (id) => `Report ${id}`,
-    },
-    settingsTitle: 'Settings',
-    notif: {
-      title: 'Notifications on this device',
-      unsupported: "This browser can't receive push notifications.",
-      ios: 'On iPhone, first add the dashboard to the Home Screen: Safari › Share › Add to Home Screen, then open it from the icon and come back here.',
-      notConfigured: 'Notifications are not configured (VITE_VAPID_PUBLIC_KEY is missing).',
-      denied:
-        "Notifications are blocked for this site. Allow them in the browser's settings, then reload.",
-      on: 'On for this device.',
-      off: 'Not on for this device.',
-      label: 'Device name',
-      enable: 'Enable on this device',
-      disable: 'Turn off here',
-      test: 'Send a test notification',
-      tested: (n) => (n ? `Sent to ${n} device${n === 1 ? '' : 's'}.` : 'No device enabled.'),
-      failed: "Didn't work:",
-      devices: 'Devices',
-      none: 'No devices yet.',
-      thisDevice: 'this one',
-      remove: 'Remove',
-      lastUsed: 'last notification',
-      never: 'none yet',
-      failures: (n) => `${n} failures`,
-    },
-    assistant: {
-      title: 'Ask about the metrics',
-      placeholder: 'For example: why did subscriptions drop this month?',
-      send: 'Send',
-      thinking: 'Analysing the data…',
-      failed: 'Could not get an answer.',
-      refused: "The assistant can't answer this question.",
-      truncated: 'The answer was cut off (too long).',
-      clear: 'New conversation',
-      note: "Answered by Claude (Anthropic) from the selected range's numbers, read just now. Email addresses are not sent to it.",
-      suggestions: [
-        'How are subscriptions doing, and what should I watch?',
-        'Where do we lose the most people on the way to paying?',
-        'Is the AI profitable on each plan?',
-      ],
-    },
-    insights: {
-      funnel: 'The path to paying',
-      funnelNote:
-        'The first three are totals for the range. The rest follow the accounts created in the range: how many opened the app, asked the AI and subscribed (up to today).',
-      steps: {
-        visitors: 'Website visitors',
-        downloadClicks: 'Clicked Download',
-        installs: 'New installs',
-        accounts: 'Accounts created',
-        inApp: 'Opened the app',
-        askedAi: 'Asked the AI',
-        paid: 'Subscribed',
-      },
-      ofPrevious: 'of the step before',
-      daysToAi: 'Days to first AI question (median)',
-      daysToPaid: 'Days to subscribing (median)',
-      retention: 'Retention by start week',
-      retentionNote:
-        'Installs grouped by the week they first appeared; each column shows the share that used the app in that week. The last 8 weeks, whatever the range.',
-      cohort: 'Week of',
-      size: 'Installs',
-      week: (n) => `W${n}`,
-      noRetention: 'No installs with statistics yet.',
-      cost: 'AI cost per plan',
-      costNote: (rate, date) =>
-        `Claude list prices, before prompt-cache discounts, so an upper estimate. Revenue is the active subscriptions' MRR, prorated to the range.${rate ? ` 1 USD = ${rate} lei (BNR, ${date}).` : ''}`,
-      plan: 'Plan',
-      planNames: { trial: 'Trial', standard: 'Solo', pro: 'Firm' },
-      aiUsers: 'Use AI',
-      tokens: 'Tokens',
-      costUsd: 'AI cost (USD)',
-      costLei: 'AI cost (lei)',
-      subscribers: 'Subscribers',
-      revenue: 'Revenue (lei)',
-      margin: 'Margin (lei)',
-      perUser: 'Cost / user',
-      top: 'Costliest accounts',
-      account: 'Account',
-      requests: 'Requests',
-      unknown: 'Unknown',
-      noCost: 'No AI usage in the range.',
-      unpriced: (list) => `Models with no known price (not counted): ${list}.`,
-      subs: 'Subscription health',
-      paying: 'Paying subscribers',
-      mrr: 'MRR',
-      arpu: 'Revenue per subscriber',
-      churn: 'Monthly churn',
-      ltv: 'Lifetime value (estimate)',
-      joined: 'New subscriptions',
-      left: 'Ended subscriptions',
-      atStart: (n) => `${n} active when the range began`,
-      reasons: 'Why people cancel',
-      reasonNames: {
-        too_expensive: 'Too expensive',
-        missing_features: 'Missing features',
-        switched_service: 'Switched to another service',
-        unused: "Doesn't use it",
-        customer_service: 'Customer service',
-        too_complex: 'Too complex',
-        low_quality: 'Low quality',
-        other: 'Other',
-      },
-      noReasons:
-        'No reasons recorded. Stripe collects them only when the customer portal asks (Settings › Billing › Customer portal › Cancellations › "Collect cancellation reasons").',
-      subsNote:
-        'Churn: subscriptions ended in the range against those active when it began, scaled to 30 days. Lifetime value = revenue per subscriber / monthly churn.',
-      releases: 'Reliability per release',
-      version: 'Version',
-      firstSeen: 'First seen',
-      sessions: 'Sessions',
-      clean: 'Error-free',
-      crashes: 'Window crashes',
-      noReleases: 'No sessions with statistics in the range yet.',
-      law: 'Legal sources',
-      tool: 'Source',
-      toolNames: {
-        search_legislation: 'Legislation',
-        search_eu_law: 'EU law',
-        search_court_cases: 'Court cases',
-        lookup_company: 'Companies',
-        search_lawyers: 'Lawyers',
-      },
-      calls: 'Searches',
-      failed: 'Failed',
-      slow: 'Over 30 s',
-      failuresDaily: 'Failed searches per day',
-      lawErrors: 'Failed AI requests, by kind',
-      noLaw: 'No searches of the legal sources in the range.',
-    },
-    app: {
-      empty:
-        'No statistics from the app yet. They appear once someone uses version 1.2.0 or later with anonymous statistics on.',
-      dau: 'Users today',
-      wau: 'Users, 7 days',
-      mau: 'Users, 30 days',
-      sessions: 'Sessions in range',
-      allSessions: 'Sessions',
-      median: 'Median session (min)',
-      active: 'Active users per day',
-      features: 'Features used',
-      featureNames: {
-        project: 'Projects',
-        file: 'Files',
-        viewer: 'Viewer',
-        convert: 'Conversions',
-        scan: 'Scans',
-        print: 'Printing',
-        trash: 'Recycle Bin',
-        portal: 'Phone import',
-        law: 'Law research (AI)',
-        update: 'Updates',
-        error: 'Errors',
-      },
-      ai: 'AI tokens per day, by model',
-      aiRequests: 'AI requests',
-      aiTokens: 'AI tokens',
-      atLimit: 'Limits reached',
-      limitNames: {
-        session: 'Session (5 h)',
-        weekly: 'Weekly',
-        fable: 'Fable',
-        trial: 'Trial',
-      },
-      versions: 'Installed versions (30 days)',
-      updates: 'Updates in range',
-      updateNames: {
-        available: 'Found',
-        downloaded: 'Downloaded',
-        install_started: 'Install started',
-        installed: 'Installed',
-        failed: 'Failed',
-      },
-      events: 'Events',
-      errors: 'Recent errors',
-      noErrors: 'No errors.',
-      error: 'Error',
-      where: 'Where',
-      count: 'Times',
-      users: 'Users',
-      lastSeen: 'Last seen',
-      accounts: 'Accounts in the app',
-      email: 'Account',
-      plan: 'Plan',
-      version: 'Version',
-      aiRounds: 'AI requests',
-      anonymous: 'Unknown',
-    },
-    downloads: {
-      title: 'Downloads by release',
-      release: 'Release',
-      date: 'Date',
-      windows: 'Windows',
-      mac: 'macOS',
-      total: 'Total',
-      empty: 'No release published yet.',
-    },
-    health: {
-      alerts: 'Phone alerts',
-      alertsOff: 'Alerts are not configured (NTFY_TOPIC).',
-      alertsHow: 'Install the ntfy app (Android or iOS), tap + and subscribe to the topic:',
-      alertsOpen: 'Open in ntfy',
-      testAlert: 'Send a test alert',
-      testSent: 'Sent. It should appear on your phone within seconds.',
-      testFailed: 'The test alert could not be sent.',
-      recentAlerts: 'Recent alerts',
-      noAlerts: 'No alerts yet. The check runs every 10 minutes.',
-      stripe: 'Stripe',
-      test: 'Test mode',
-      live: 'Live mode',
-      unknown: 'Unknown',
-      functions: 'Functions',
-      lastEvent: 'Last Stripe event',
-      never: 'None yet',
-      usageDebug:
-        'USAGE_DEBUG is on for the ai function: turn it off in production (supabase secrets unset USAGE_DEBUG).',
-      plausible: 'Plausible',
-      github: 'GitHub token',
-      yes: 'Set',
-      no: 'Missing',
-    },
-    empty: 'Nothing to show for this period.',
+  downloads: {
+    title: 'Descărcări pe versiuni',
+    release: 'Versiune',
+    date: 'Data',
+    windows: 'Windows',
+    mac: 'macOS',
+    total: 'Total',
+    empty: 'Nicio versiune publicată încă.',
   },
+  health: {
+    alerts: 'Alerte pe telefon',
+    alertsOff: 'Alertele nu sunt configurate (NTFY_TOPIC).',
+    alertsHow:
+      'Instalează aplicația ntfy (Android sau iOS), apasă + și abonează-te la subiectul:',
+    alertsOpen: 'Deschide în ntfy',
+    testAlert: 'Trimite o alertă de test',
+    testSent: 'Trimisă. Ar trebui să apară pe telefon în câteva secunde.',
+    testFailed: 'Alerta de test nu a putut fi trimisă.',
+    recentAlerts: 'Ultimele alerte',
+    noAlerts: 'Nicio alertă încă. Verificarea rulează la fiecare 10 minute.',
+    stripe: 'Stripe',
+    test: 'Mod de test',
+    live: 'Mod real',
+    unknown: 'Necunoscut',
+    functions: 'Funcții',
+    lastEvent: 'Ultimul eveniment Stripe',
+    never: 'Niciunul încă',
+    usageDebug:
+      'USAGE_DEBUG este activat pe funcția ai: oprește-l în producție (supabase secrets unset USAGE_DEBUG).',
+    plausible: 'Plausible',
+    github: 'Token GitHub',
+    yes: 'Configurat',
+    no: 'Lipsește',
+  },
+  empty: 'Nimic de arătat pentru această perioadă.',
 };
 
 const PLAN_NAMES = { solo: 'Solo', firm: 'Firm', unknown: '—' };
@@ -1204,7 +807,7 @@ function Rich({ text }) {
 
 // Questions about the metrics, answered by Claude from a fresh snapshot of
 // the selected range (the admin function's `ask` action).
-function Assistant({ t, token, range, lang }) {
+function Assistant({ t, token, range }) {
   const ta = t.assistant;
   const [turns, setTurns] = useState([]);
   const [question, setQuestion] = useState('');
@@ -1225,7 +828,7 @@ function Assistant({ t, token, range, lang }) {
     setTurns([...history, { role: 'user', content: q }]);
     setBusy(true);
     try {
-      const r = await call(token, 'ask', { range, question: q, history, lang });
+      const r = await call(token, 'ask', { range, question: q, history, lang: 'ro' });
       if (r.refused) setError(ta.refused);
       else if (!r.answer) setError(ta.failed);
       else
@@ -1799,7 +1402,7 @@ function TrafficSection({ t, f, traffic, compare }) {
   );
 }
 
-function AudienceSection({ t, f, lang, traffic, token, range }) {
+function AudienceSection({ t, f, traffic, token, range }) {
   const ta = t.audience;
   const d = traffic.data;
   const [focus, setFocus] = useState(null);
@@ -1849,12 +1452,12 @@ function AudienceSection({ t, f, lang, traffic, token, range }) {
                 backLabel={ta.world}
                 noRegions={ta.noRegions}
                 format={f.int}
-                lang={lang}
+               
               />
             </Suspense>
           )}
           <div className="dev-globe-list">
-            <h4>{selected ? ta.regionsIn(countryName(selected, lang)) : ta.countries}</h4>
+            <h4>{selected ? ta.regionsIn(countryName(selected)) : ta.countries}</h4>
             {loading || (selected && regionRows === null) ? (
               <Skeleton />
             ) : selected ? (
@@ -1868,7 +1471,7 @@ function AudienceSection({ t, f, lang, traffic, token, range }) {
             ) : (
               <RankList
                 rows={b.country}
-                name={(r) => countryName(r.name, lang)}
+                name={(r) => countryName(r.name)}
                 format={f.int}
                 limit={12}
                 onHover={(r) => setFocus(r?.name ?? null)}
@@ -1922,7 +1525,7 @@ function mrrSeries(subs, range) {
   });
 }
 
-function SubscriptionsSection({ t, f, lang, billing, traffic, range }) {
+function SubscriptionsSection({ t, f, billing, traffic, range }) {
   const ts = t.subs;
   const d = billing.data;
   const [status, setStatus] = useState('all');
@@ -1958,7 +1561,7 @@ function SubscriptionsSection({ t, f, lang, billing, traffic, range }) {
 
   const label = (e) => {
     const make = t.events[e.type];
-    const who = e.email ? (lang === 'ro' ? ` pentru ${e.email}` : ` for ${e.email}`) : '';
+    const who = e.email ? ` pentru ${e.email}` : '';
     if (!make) return e.type;
     return make({
       who,
@@ -2605,7 +2208,7 @@ function AlertsCard({ t, f, d, token }) {
   );
 }
 
-function HealthSection({ t, f, health, token, lang }) {
+function HealthSection({ t, f, health, token }) {
   const th = t.health;
   const d = health.data;
   if (health.error) return <Failed t={t} error={health.error} onRetry={health.reload} />;
@@ -2642,7 +2245,7 @@ function HealthSection({ t, f, health, token, lang }) {
           </div>
         </dl>
       </Card>
-      <NotificationsCard t={t} f={f} token={token} lang={lang} />
+      <NotificationsCard t={t} f={f} token={token} />
       <AlertsCard t={t} f={f} d={d} token={token} />
       <Card title={th.functions}>
         <ul className="dev-fns">
@@ -2764,7 +2367,7 @@ function deviceName() {
   return browser ? `${os} · ${browser}` : os;
 }
 
-function NotificationsCard({ t, f, token, lang }) {
+function NotificationsCard({ t, f, token }) {
   const tn = t.notif;
   const [devices, setDevices] = useState(null);
   const [mine, setMine] = useState(null);
@@ -2838,7 +2441,7 @@ function NotificationsCard({ t, f, token, lang }) {
 
   const test = () =>
     run(async () => {
-      const r = await call(token, 'push.test', { lang });
+      const r = await call(token, 'push.test', { lang: 'ro' });
       if (r.error) throw new Error(r.error);
       setMessage({ text: tn.tested(r.sent ?? 0) });
       await load();
@@ -2915,16 +2518,16 @@ function NotificationsCard({ t, f, token, lang }) {
   );
 }
 
-function SettingsView({ t, f, token, lang, health }) {
+function SettingsView({ t, f, token, health }) {
   return (
     <Section id="settings" title={t.settingsTitle}>
-      <NotificationsCard t={t} f={f} token={token} lang={lang} />
+      <NotificationsCard t={t} f={f} token={token} />
       {health.data && <AlertsCard t={t} f={f} d={health.data} token={token} />}
     </Section>
   );
 }
 
-function Dashboard({ t, lang, token }) {
+function Dashboard({ t, token }) {
   const f = useFormat(t.locale);
   const [preset, setPreset] = useState('30d');
   const [custom, setCustom] = useState(() => presetRange('30d'));
@@ -3031,13 +2634,13 @@ function Dashboard({ t, lang, token }) {
       <ViewTabs t={t} route={route} />
       {route.startsWith('/reports') && <ReportsView t={t} route={route} />}
       {route.startsWith('/settings') && (
-        <SettingsView t={t} f={f} token={token} lang={lang} health={health} />
+        <SettingsView t={t} f={f} token={token} health={health} />
       )}
       {!route && (
         <>
           <LiveStrip t={t} f={f} live={live} lastUpdated={lastUpdated} />
 
-          <Assistant t={t} token={token} range={range} lang={lang} />
+          <Assistant t={t} token={token} range={range} />
 
           <nav className="dev-jump" aria-label="Sections">
             {Object.entries(t.sections).map(([key, label]) => (
@@ -3057,7 +2660,7 @@ function Dashboard({ t, lang, token }) {
             <AudienceSection
               t={t}
               f={f}
-              lang={lang}
+             
               traffic={traffic}
               token={token}
               range={range}
@@ -3067,7 +2670,7 @@ function Dashboard({ t, lang, token }) {
             <SubscriptionsSection
               t={t}
               f={f}
-              lang={lang}
+             
               billing={billing}
               traffic={traffic}
               range={range}
@@ -3083,7 +2686,7 @@ function Dashboard({ t, lang, token }) {
             <DownloadsSection t={t} f={f} downloads={downloads} />
           </Section>
           <Section id="health" title={t.sections.health}>
-            <HealthSection t={t} f={f} health={health} token={token} lang={lang} />
+            <HealthSection t={t} f={f} health={health} token={token} />
           </Section>
         </>
       )}
@@ -3094,8 +2697,7 @@ function Dashboard({ t, lang, token }) {
 // Signed out: a short note. Signed in: the dashboard if the admin function
 // answers, the 404 page if it does not (not an admin).
 export default function Dev() {
-  const { lang } = useLang();
-  const t = T[lang];
+  const t = T;
   useMeta(META);
   const session = useSession();
   const token = session?.access_token ?? null;
@@ -3138,7 +2740,7 @@ export default function Dev() {
       </Layout>
     );
   } else {
-    content = <Dashboard t={t} lang={lang} token={token} />;
+    content = <Dashboard t={t} token={token} />;
   }
 
   return (
