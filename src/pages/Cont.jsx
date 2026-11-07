@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import Layout, { Avatar } from '../components/Layout.jsx';
 import ContinueButton from '../components/ContinueButton.jsx';
 import Plans, { PLAN_IDS } from '../components/Plans.jsx';
@@ -61,6 +61,38 @@ const T = {
     plan: 'Plan',
     billing: 'Facturare și abonament',
     billingHint: 'Abonamentul, cardul și facturile se gestionează în portalul Stripe.',
+    support: 'Asistență',
+    supportNote: (
+      <>
+        Rapoartele mele: ce ne-ai trimis și răspunsurile noastre. Rapoartele se trimit din aplicația
+        DocVex: <kbd>Ctrl+Shift+R</kbd> (<kbd>Cmd+Shift+R</kbd> pe Mac) deschide unul de oriunde din
+        ea.
+      </>
+    ),
+    reportCols: {
+      id: 'Raport',
+      title: 'Titlu',
+      category: 'Categorie',
+      sent: 'Trimis',
+      status: 'Stare',
+    },
+    reportCategories: {
+      bug: 'Eroare',
+      ai_answer: 'Răspuns AI',
+      document: 'Document',
+      billing: 'Facturare',
+      feature: 'Idee',
+      other: 'Altceva',
+    },
+    reportStatuses: { new: 'Primit', seen: 'Citit', replied: 'Răspuns', closed: 'Închis' },
+    reportReply: (when) => `Răspunsul nostru, ${when}`,
+    reportClosed: 'Închis fără un răspuns scris.',
+    reportWaiting: 'Încă niciun răspuns: citim fiecare raport și îți răspundem aici și pe e-mail.',
+    reportsLoading: 'Se citește…',
+    reportsFailed: 'Rapoartele nu au putut fi încărcate.',
+    reportsEmptyTitle: 'Niciun raport încă',
+    reportsEmpty:
+      'Când ceva nu merge în aplicația DocVex, raportează-l acolo: răspunsul nostru apare în această listă și pe e-mail.',
     usage: 'Activitate',
     usageLead: 'Utilizarea AI din aplicație, în tokeni.',
     usageHint: 'Numărată de aplicație; nu se poate modifica.',
@@ -165,6 +197,37 @@ const T = {
     plan: 'Plan',
     billing: 'Billing and subscription',
     billingHint: 'Your subscription, card and invoices are managed in the Stripe portal.',
+    support: 'Support',
+    supportNote: (
+      <>
+        My reports: what you sent us and our replies. Reports are sent from the DocVex app:{' '}
+        <kbd>Ctrl+Shift+R</kbd> (<kbd>Cmd+Shift+R</kbd> on a Mac) opens one from anywhere in it.
+      </>
+    ),
+    reportCols: {
+      id: 'Report',
+      title: 'Title',
+      category: 'Category',
+      sent: 'Sent',
+      status: 'Status',
+    },
+    reportCategories: {
+      bug: 'Bug',
+      ai_answer: 'AI answer',
+      document: 'Document',
+      billing: 'Billing',
+      feature: 'Idea',
+      other: 'Other',
+    },
+    reportStatuses: { new: 'Received', seen: 'Read', replied: 'Replied', closed: 'Closed' },
+    reportReply: (when) => `Our reply, ${when}`,
+    reportClosed: 'Closed without a written reply.',
+    reportWaiting: 'No reply yet: we read every report and will answer here and by email.',
+    reportsLoading: 'Reading…',
+    reportsFailed: 'Your reports could not be loaded.',
+    reportsEmptyTitle: 'No reports yet',
+    reportsEmpty:
+      "When something doesn't work in the DocVex app, report it there: our reply appears in this list, and by email.",
     usage: 'Activity',
     usageLead: 'AI usage in the app, in tokens.',
     usageHint: 'Counted by the app; it cannot be changed.',
@@ -306,6 +369,137 @@ async function fetchUsage() {
   });
   if (!res.ok) throw new Error(`usage ${res.status}`);
   return res.json();
+}
+
+// The signed-in account's problem reports, sent from the desktop app, with
+// our replies: public.app_reports_mine (only the caller's rows, read with the
+// user's own session). Read-only: reports are sent and answered elsewhere.
+const REPORT_COLUMNS = 'public_id, category, title, status, admin_reply, replied_at, created_at';
+
+function Reports({ t }) {
+  const [rows, setRows] = useState(null);
+  const [failed, setFailed] = useState(false);
+  const [open, setOpen] = useState(null);
+  const load = () => {
+    setFailed(false);
+    getSupabase()
+      .then((supabase) =>
+        supabase
+          .from('app_reports_mine')
+          .select(REPORT_COLUMNS)
+          .order('created_at', { ascending: false })
+          .limit(50),
+      )
+      .then(({ data, error }) => {
+        if (error) throw error;
+        setRows(data ?? []);
+      })
+      .catch(() => setFailed(true));
+  };
+  useEffect(load, []);
+
+  if (failed) {
+    return (
+      <p className="note">
+        {t.reportsFailed}{' '}
+        <button type="button" className="link-button" onClick={load}>
+          {t.retry}
+        </button>
+      </p>
+    );
+  }
+  if (!rows) return <p className="note">{t.reportsLoading}</p>;
+  if (!rows.length) {
+    return (
+      <div className="reports-empty">
+        <b>{t.reportsEmptyTitle}</b>
+        <p className="note">{t.reportsEmpty}</p>
+      </div>
+    );
+  }
+
+  const toggle = (id) => setOpen((o) => (o === id ? null : id));
+  const c = t.reportCols;
+  return (
+    <div className="reports-wrap">
+      <table className="reports">
+        <thead>
+          <tr>
+            <th scope="col">{c.id}</th>
+            <th scope="col">{c.title}</th>
+            <th scope="col" className="report-category">
+              {c.category}
+            </th>
+            <th scope="col" className="report-sent">
+              {c.sent}
+            </th>
+            <th scope="col">{c.status}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => {
+            const expanded = open === r.public_id;
+            return (
+              <Fragment key={r.public_id}>
+                <tr
+                  className={`report-row${expanded ? ' is-open' : ''}`}
+                  tabIndex={0}
+                  aria-expanded={expanded}
+                  onClick={() => toggle(r.public_id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      toggle(r.public_id);
+                    }
+                  }}
+                >
+                  <td className="report-id">{r.public_id}</td>
+                  <td className="report-title">
+                    {r.title || '—'}
+                    {/* Phones: the category and date fold under the title. */}
+                    <small className="report-meta">
+                      {t.reportCategories[r.category] ?? r.category} ·{' '}
+                      {formatDate(r.created_at, t.locale)}
+                    </small>
+                  </td>
+                  <td className="report-category">
+                    {t.reportCategories[r.category] ?? r.category}
+                  </td>
+                  <td className="report-sent">{formatDate(r.created_at, t.locale)}</td>
+                  <td>
+                    <span
+                      className={`badge report-status${r.status === 'replied' ? ' is-replied' : ''}`}
+                    >
+                      {t.reportStatuses[r.status] ?? r.status}
+                    </span>
+                  </td>
+                </tr>
+                {expanded && (
+                  <tr className="report-detail">
+                    <td colSpan={5}>
+                      {r.admin_reply ? (
+                        <>
+                          <b className="report-reply-head">
+                            {t.reportReply(formatDate(r.replied_at, t.locale))}
+                          </b>
+                          {/* Plain text, its line breaks kept: never HTML. */}
+                          <p className="report-reply">{r.admin_reply}</p>
+                        </>
+                      ) : (
+                        <p className="note">
+                          {r.status === 'closed' ? t.reportClosed : t.reportWaiting}
+                        </p>
+                      )}
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
 }
 
 function Usage({ t }) {
@@ -1194,6 +1388,12 @@ function Account({ t, user }) {
       </div>
 
       <SignInMethods t={t} user={user} />
+
+      <section className="account-section">
+        <h2>{t.support}</h2>
+        <p className="note">{t.supportNote}</p>
+        <Reports t={t} />
+      </section>
 
       <section className="account-section">
         <h2>{t.usage}</h2>

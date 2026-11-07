@@ -2300,6 +2300,116 @@ details[open] > .release-head .release-chevron {
   font-size: 16px;
 }
 
+/* ---- My reports (account page) ---------------------------------------- */
+
+.reports-wrap {
+  margin-top: 16px;
+  overflow-x: auto;
+}
+
+.reports {
+  min-width: 560px;
+}
+
+.report-row {
+  cursor: pointer;
+}
+
+.report-row:hover td,
+.report-row.is-open td {
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+}
+
+.report-row:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.report-id {
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.report-title {
+  font-weight: 600;
+}
+
+.report-sent {
+  white-space: nowrap;
+  color: var(--muted);
+}
+
+.report-status {
+  margin-left: 0;
+  white-space: nowrap;
+}
+
+.report-status.is-replied {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  color: var(--text);
+}
+
+.report-detail td {
+  padding: 4px 12px 18px;
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+}
+
+.report-reply-head {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+.report-reply {
+  margin: 0;
+  max-width: 72ch;
+  white-space: pre-wrap;
+}
+
+.report-meta {
+  display: none;
+}
+
+/* Phones: Report, Title (with the category and date under it) and Status. */
+@media (max-width: 640px) {
+  .reports {
+    min-width: 0;
+  }
+
+  .reports .report-category,
+  .reports .report-sent {
+    display: none;
+  }
+
+  .report-meta {
+    display: block;
+    margin-top: 4px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+  }
+}
+
+.reports-empty {
+  margin-top: 16px;
+  padding: 20px;
+  border: 1px dashed var(--line);
+}
+
+.reports-empty .note {
+  margin: 6px 0 0;
+}
+
+kbd {
+  padding: 1px 5px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
 /* ---- Gender and date of birth (optional) ------------------------------ */
 
 .demographics {
