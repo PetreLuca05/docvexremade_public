@@ -418,6 +418,7 @@ const T = {
     testAlert: 'Trimite o alertă de test',
     testSent: 'Trimisă. Ar trebui să apară pe telefon în câteva secunde.',
     testFailed: 'Alerta de test nu a putut fi trimisă.',
+    testPartial: 'Nu a mers pe:',
     recentAlerts: 'Ultimele alerte',
     noAlerts: 'Nicio alertă încă. Verificarea rulează la fiecare 10 minute.',
     stripe: 'Stripe',
@@ -2152,13 +2153,18 @@ function DownloadsSection({ t, f, downloads }) {
 function AlertsCard({ t, f, d, token }) {
   const th = t.health;
   const [test, setTest] = useState(null);
+  // What did not get through (e.g. "ntfy 429"), from the alerts function
+  const [testDetail, setTestDetail] = useState('');
   async function sendTest() {
     setTest('sending');
+    setTestDetail('');
     try {
       const r = await call(token, 'testAlert');
       setTest(r.ok ? 'sent' : 'failed');
-    } catch {
+      setTestDetail(r.ok ? (r.failed ?? []).join('; ') : (r.error ?? ''));
+    } catch (err) {
       setTest('failed');
+      setTestDetail(err instanceof Error ? err.message : '');
     }
   }
   const link = d.ntfyTopic ? `${d.ntfyServer}/${d.ntfyTopic}` : null;
@@ -2186,7 +2192,17 @@ function AlertsCard({ t, f, d, token }) {
               {th.testAlert}
             </button>
             {test === 'sent' && <span className="dev-note">{th.testSent}</span>}
-            {test === 'failed' && <span className="dev-warning">{th.testFailed}</span>}
+            {test === 'sent' && testDetail && (
+              <span className="dev-warning">
+                {th.testPartial} {testDetail}
+              </span>
+            )}
+            {test === 'failed' && (
+              <span className="dev-warning">
+                {th.testFailed}
+                {testDetail && ` (${testDetail})`}
+              </span>
+            )}
           </div>
         </>
       )}

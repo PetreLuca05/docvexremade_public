@@ -182,18 +182,32 @@ async function aiLimits(): Promise<Alert[]> {
   ];
 }
 
+/** One OPTIONS probe: null when the function answers, else what it answered. */
+async function probe(name: string): Promise<string | null> {
+  try {
+    const res = await fetch(`${URL_}/functions/v1/${name}`, {
+      method: 'OPTIONS',
+      headers: { Origin: 'https://docvex.ro' },
+    });
+    await res.body?.cancel();
+    return res.status >= 500 ? String(res.status) : null;
+  } catch {
+    return 'no answer';
+  }
+}
+
+const RETRY_MS = 5_000;
+
 async function functionsDown(): Promise<Alert[]> {
+  // A failure is probed again after RETRY_MS: at the top of the hour every
+  // function is cold at once, and the gateway can give up (504 after 10 s)
+  // before a worker starts. Only a second failure is an outage.
   const results = await Promise.all(
     FUNCTIONS.map(async (name) => {
-      try {
-        const res = await fetch(`${URL_}/functions/v1/${name}`, {
-          method: 'OPTIONS',
-          headers: { Origin: 'https://docvex.ro' },
-        });
-        return res.status >= 500 ? { name, status: String(res.status) } : null;
-      } catch {
-        return { name, status: 'no answer' };
-      }
+      if ((await probe(name)) === null) return null;
+      await new Promise((r) => setTimeout(r, RETRY_MS));
+      const status = await probe(name);
+      return status === null ? null : { name, status };
     }),
   );
   return results.filter(Boolean).map((r) => ({
@@ -218,13 +232,34 @@ const TAGS: Record<string, string> = {
   test: 'white_check_mark',
 };
 
-async function send(alert: Alert) {
+type Sent = { delivered: string[]; failed: string[] };
+
+/**
+ * Sends one alert on every configured channel. Each channel's outcome is
+ * caught as soon as it starts: a channel that fails while another is still
+ * sending must not become an unhandled rejection, which kills the worker
+ * (the runtime answers 503). Throws only when no channel delivered.
+ */
+async function send(alert: Alert): Promise<Sent> {
+  type Outcome = { channel: string; error?: string; skipped?: boolean };
+  const tasks: Promise<Outcome>[] = [];
+  // A task resolves false when it had no one to send to (skipped, not failed)
+  const run = (channel: string, task: () => Promise<boolean | void>) =>
+    tasks.push(
+      task().then(
+        (done) => ({ channel, skipped: done === false }),
+        (err) => ({ channel, error: err instanceof Error ? err.message : String(err) }),
+      ),
+    );
+
   const topic = Deno.env.get('NTFY_TOPIC');
-  const sent: Promise<unknown>[] = [];
   if (topic) {
     const server = Deno.env.get('NTFY_SERVER') ?? 'https://ntfy.sh';
-    sent.push(
-      fetch(`${server}/${topic}`, {
+    // Optional: an ntfy access token. Anonymous publishers are rate-limited by
+    // IP address, which the Edge Functions share (HTTP 429); see supabase/README.md.
+    const token = Deno.env.get('NTFY_TOKEN');
+    run('ntfy', async () => {
+      const r = await fetch(`${server}/${topic}`, {
         method: 'POST',
         body: alert.body,
         headers: {
@@ -233,17 +268,18 @@ async function send(alert: Alert) {
           Priority: alert.priority ?? 'default',
           Tags: TAGS[alert.kind] ?? 'bell',
           Click: `${DASHBOARD}${alert.section ? `#${alert.section}` : ''}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-      }).then((r) => {
-        if (!r.ok) throw new Error(`ntfy ${r.status}`);
-      }),
-    );
+      });
+      await r.body?.cancel();
+      if (!r.ok) throw new Error(`ntfy ${r.status}`);
+    });
   }
   const bot = Deno.env.get('TELEGRAM_BOT_TOKEN');
   const chat = Deno.env.get('TELEGRAM_CHAT_ID');
   if (bot && chat) {
-    sent.push(
-      fetch(`https://api.telegram.org/bot${bot}/sendMessage`, {
+    run('telegram', async () => {
+      const r = await fetch(`https://api.telegram.org/bot${bot}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -251,32 +287,46 @@ async function send(alert: Alert) {
           text: `${alert.title}\n${alert.body}\n${DASHBOARD}`,
           disable_web_page_preview: true,
         }),
-      }).then((r) => {
-        if (!r.ok) throw new Error(`telegram ${r.status}`);
-      }),
-    );
+      });
+      await r.body?.cancel();
+      if (!r.ok) throw new Error(`telegram ${r.status}`);
+    });
   }
   const vapid = vapidFromEnv((name) => Deno.env.get(name));
-  let devices = 0;
   if (vapid) {
-    const pushed = await pushToAdmins(
-      db,
-      {
-        title: alert.title,
-        body: alert.body,
-        url: `${DASHBOARD}${alert.section ? `#${alert.section}` : ''}`,
-        urgent: alert.priority === 'urgent' || alert.priority === 'high',
-        tag: alert.kind,
-      },
-      vapid,
-    );
-    devices = pushed.devices;
+    run('push', async () => {
+      const pushed = await pushToAdmins(
+        db,
+        {
+          title: alert.title,
+          body: alert.body,
+          url: `${DASHBOARD}${alert.section ? `#${alert.section}` : ''}`,
+          urgent: alert.priority === 'urgent' || alert.priority === 'high',
+          tag: alert.kind,
+        },
+        vapid,
+      );
+      return pushed.devices > 0;
+    });
   }
-  if (!sent.length && !devices) throw new Error('No channel configured (NTFY_TOPIC or a device)');
-  await Promise.all(sent);
+
+  const results = await Promise.all(tasks);
+  const delivered = results.filter((r) => !r.error && !r.skipped).map((r) => r.channel);
+  const failed = results.filter((r) => r.error).map((r) => r.error!);
+  if (failed.length) console.error('send', alert.key, failed.join('; '));
+  if (!delivered.length) {
+    throw new Error(failed.join('; ') || 'No channel configured (NTFY_TOPIC, Telegram or a device)');
+  }
+  return { delivered, failed };
 }
 
 // ---- requests ---------------------------------------------------------------
+
+// A safety net: a stray rejection is logged, not a crashed worker (a 503 for the caller).
+addEventListener('unhandledrejection', (e) => {
+  console.error('unhandled rejection', e.reason);
+  e.preventDefault();
+});
 
 Deno.serve(async (req) => {
   const secret = Deno.env.get('ALERTS_SECRET');
@@ -288,13 +338,13 @@ Deno.serve(async (req) => {
   // A test from the dashboard: one message, not logged.
   if (body?.test === true) {
     try {
-      await send({
+      const { delivered, failed } = await send({
         key: 'test',
         kind: 'test',
         title: 'DocVex alerts work',
         body: 'This is a test. Real alerts arrive the same way.',
       });
-      return Response.json({ ok: true });
+      return Response.json({ ok: true, delivered, failed });
     } catch (err) {
       return Response.json({ ok: false, error: String(err) }, { status: 502 });
     }
