@@ -90,6 +90,11 @@ supabase secrets set GITHUB_TOKEN=…                         # optional; a read
 ```sh
 # alerts: a long random topic (anyone who knows it can read it) and the cron's secret
 supabase secrets set NTFY_TOPIC=docvex-<random> ALERTS_SECRET=<random>
+# optional: an ntfy access token, sent as Authorization: Bearer. ntfy.sh rate-limits anonymous
+# publishers by IP address (docs.ntfy.sh/config, "Rate limiting"), and the Edge Functions share
+# theirs with other projects, hence HTTP 429; an account with a tier gets that tier's limits.
+# A 429 on ntfy no longer fails an alert that reached another channel (Web Push).
+supabase secrets set NTFY_TOKEN=tk_…
 supabase secrets set TELEGRAM_BOT_TOKEN=… TELEGRAM_CHAT_ID=…   # optional, a second channel
 supabase secrets set ALERT_ERRORS_PER_HOUR=10 ALERT_LIMIT_USERS=5   # optional thresholds
 
