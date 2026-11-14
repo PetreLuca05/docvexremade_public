@@ -31,26 +31,27 @@ or the admin's token), and answers CORS preflights without a token.
 
 ## Applying the migrations
 
+**Apply each new file once, by hand, as SQL. Do not use `supabase db push`
+here.** The project is shared with the app, whose repository owns the
+migration history (`supabase_migrations.schema_migrations`): it lists only the
+app's migrations, and none of these files. `db push` from this repository
+therefore refuses ("Remote migration versions not found in local migrations
+directory"), and the `migration repair --status reverted …` it suggests would
+mark the app's migrations as reverted and break the app's own `db push`.
+Never run that repair.
+
 With the [Supabase CLI](https://supabase.com/docs/guides/cli), from the
 repository root:
 
 ```sh
 supabase login                      # once, opens the browser
 supabase link --project-ref <ref>   # the project's id, from VITE_SUPABASE_URL
-supabase db push                    # applies what is in supabase/migrations
+supabase db query --linked --file supabase/migrations/007_alerts_schedule.sql
 ```
 
-`db push` keeps track of what it has applied in
-`supabase_migrations.schema_migrations`. `001_ask_usage.sql` was applied by
-hand before that existed. If `db push` offers to apply it again, mark it as
-applied instead:
-
-```sh
-supabase migration repair --status applied 001_ask_usage
-```
-
-Without the CLI, paste the file into the dashboard's SQL editor (Database →
-SQL). Every statement is written to be safe to run twice.
+Or paste the file into the dashboard's SQL editor (Database → SQL). Every
+file is written to be safe to run twice. Note in the table above when each
+was applied; `007` was applied on 2026-11-14.
 
 ## Making someone an admin
 
