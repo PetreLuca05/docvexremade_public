@@ -26,11 +26,12 @@
 //
 // Secrets: PLAUSIBLE_API_KEY, PLAUSIBLE_SITE_ID, optionally PLAUSIBLE_HOST
 // (default https://plausible.io); GITHUB_TOKEN (optional, for the rate
-// limit); STRIPE_SECRET_KEY (read only for its mode). SUPABASE_URL,
-// SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY come with the function.
+// limit); STRIPE_SECRET_KEY (read only for its mode). SUPABASE_URL and the
+// project's API keys come with the function (../_shared/keys.ts).
 //   supabase functions deploy admin --no-verify-jwt
 
 import Anthropic from 'npm:@anthropic-ai/sdk';
+import { publishableKey, secretKey } from '../_shared/keys.ts';
 import { pushToAdmins, vapidFromEnv } from '../_shared/push.ts';
 import { createClient, type SupabaseClient, type User } from 'npm:@supabase/supabase-js@2';
 
@@ -40,8 +41,8 @@ const CACHE_MS = 5 * 60 * 1000;
 const LIVE_CACHE_MS = 30 * 1000;
 
 const URL_ = Deno.env.get('SUPABASE_URL')!;
-const ANON = Deno.env.get('SUPABASE_ANON_KEY')!;
-const service = createClient(URL_, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
+const ANON = publishableKey();
+const service = createClient(URL_, secretKey(), {
   auth: { persistSession: false },
 });
 
