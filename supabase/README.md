@@ -14,6 +14,7 @@ functions). Nothing here changes them.
 | `004_admin_reliability.sql`        | `admin_release_health()`, `admin_law_tools_daily()`, `admin_law_errors()` (reliability per release and the legal sources; admins only)                                  |
 | `005_alerts.sql`                   | `alerts_log`, and the pg_cron job that runs the `alerts` function every 10 minutes (needs the Vault secrets `alerts_url` and `alerts_secret`)                           |
 | `006_admin_push_subscriptions.sql` | `admin_push_subscriptions` (the installed dashboard's push devices; admins manage their own)                                                                            |
+| `007_alerts_schedule.sql`          | Moves the `docvex-alerts` job to minutes 7, 17, … 57, away from the top-of-hour cron burst                                                                              |
 
 | Function        | Purpose                                                           | Deploy                                                    |
 | --------------- | ----------------------------------------------------------------- | --------------------------------------------------------- |
