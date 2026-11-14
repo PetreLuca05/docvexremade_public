@@ -624,6 +624,7 @@ async function app(db: SupabaseClient, range: Range) {
     errors: [...signatures.values()]
       .map((g) => ({
         ...g,
+        count: num(g.count),
         users: (g.users as Set<string>).size,
         versions: [...(g.versions as Set<string>)].sort(),
       }))
