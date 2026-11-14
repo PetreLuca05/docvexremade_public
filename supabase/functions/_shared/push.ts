@@ -32,13 +32,13 @@ export function b64url(bytes: Uint8Array): string {
   return btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-export function fromB64url(text: string): Uint8Array {
+export function fromB64url(text: string): Uint8Array<ArrayBuffer> {
   const s = text.replace(/-/g, '+').replace(/_/g, '/');
   const bin = atob(s + '='.repeat((4 - (s.length % 4)) % 4));
   return Uint8Array.from(bin, (c) => c.charCodeAt(0));
 }
 
-function concat(...parts: Uint8Array[]): Uint8Array {
+function concat(...parts: Uint8Array[]): Uint8Array<ArrayBuffer> {
   const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
   let at = 0;
   for (const p of parts) {
@@ -48,7 +48,12 @@ function concat(...parts: Uint8Array[]): Uint8Array {
   return out;
 }
 
-async function hkdf(salt: Uint8Array, ikm: Uint8Array, info: Uint8Array, length: number) {
+async function hkdf(
+  salt: Uint8Array<ArrayBuffer>,
+  ikm: Uint8Array<ArrayBuffer>,
+  info: Uint8Array<ArrayBuffer>,
+  length: number,
+): Promise<Uint8Array<ArrayBuffer>> {
   const key = await crypto.subtle.importKey('raw', ikm, 'HKDF', false, ['deriveBits']);
   const bits = await crypto.subtle.deriveBits(
     { name: 'HKDF', hash: 'SHA-256', salt, info },
@@ -94,7 +99,10 @@ export async function vapidHeader(endpoint: string, vapid: Vapid): Promise<strin
 }
 
 // The payload encrypted for one subscription (RFC 8291, one aes128gcm record).
-export async function encrypt(sub: PushSubscription, plaintext: Uint8Array): Promise<Uint8Array> {
+export async function encrypt(
+  sub: PushSubscription,
+  plaintext: Uint8Array,
+): Promise<Uint8Array<ArrayBuffer>> {
   const uaPublic = fromB64url(sub.p256dh);
   const authSecret = fromB64url(sub.auth);
   const local = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, [
