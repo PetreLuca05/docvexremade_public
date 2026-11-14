@@ -4,11 +4,12 @@
 // Each visitor gets LIMIT questions a day, counted server-side by a salted
 // hash of their IP address and the day (no address is stored); the whole
 // site gets DAILY_CAP, to keep the cost bounded. Needs the secrets
-// ANTHROPIC_API_KEY and ASK_SALT; SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY
-// come with the function.
+// ANTHROPIC_API_KEY and ASK_SALT; SUPABASE_URL and the project's secret key
+// come with the function (../_shared/keys.ts).
 
 import Anthropic from 'npm:@anthropic-ai/sdk';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { secretKey } from '../_shared/keys.ts';
 // knowledge.md, as a module (scripts/knowledge.mjs writes it), so it is
 // bundled with the function.
 import knowledge from './knowledge.ts';
@@ -36,7 +37,7 @@ ${knowledge}
 // Made on the first question, so a missing key is an error there rather
 // than a crash at start.
 let anthropic: Anthropic | null = null;
-const db = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
+const db = createClient(Deno.env.get('SUPABASE_URL')!, secretKey());
 
 function cors(origin: string | null): HeadersInit {
   return {

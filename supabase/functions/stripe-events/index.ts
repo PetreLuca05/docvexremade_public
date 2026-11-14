@@ -11,12 +11,13 @@
 // stripe-webhook find the account and set its plan.
 //
 // Secrets: STRIPE_SECRET_KEY, STRIPE_EVENTS_WEBHOOK_SECRET (this endpoint's
-// own signing secret); SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY come with
-// the function. Deployed with --no-verify-jwt: Stripe signs its requests.
+// own signing secret); SUPABASE_URL and the project's secret key come with
+// the function (../_shared/keys.ts). Deployed with --no-verify-jwt: Stripe signs its requests.
 //   supabase functions deploy stripe-events --no-verify-jwt
 
 import Stripe from 'npm:stripe@17.7.0';
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { secretKey } from '../_shared/keys.ts';
 
 const env = (name: string) => {
   const value = Deno.env.get(name);
@@ -27,7 +28,7 @@ const env = (name: string) => {
 const stripe = new Stripe(env('STRIPE_SECRET_KEY'), {
   httpClient: Stripe.createFetchHttpClient(),
 });
-const db = createClient(env('SUPABASE_URL'), env('SUPABASE_SERVICE_ROLE_KEY'), {
+const db = createClient(env('SUPABASE_URL'), secretKey(), {
   auth: { persistSession: false },
 });
 

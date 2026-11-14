@@ -20,15 +20,16 @@
 // VAPID_SUBJECT (dashboard push), optionally NTFY_SERVER (default
 // https://ntfy.sh), TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID, and the
 // thresholds ALERT_ERRORS_PER_HOUR (10), ALERT_LIMIT_USERS (5);
-// STRIPE_SECRET_KEY (already set). SUPABASE_URL and
-// SUPABASE_SERVICE_ROLE_KEY come with the function.
+// STRIPE_SECRET_KEY (already set). SUPABASE_URL and the project's secret key
+// come with the function (../_shared/keys.ts).
 //   supabase functions deploy alerts --no-verify-jwt
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { secretKey } from '../_shared/keys.ts';
 import { pushToAdmins, vapidFromEnv } from '../_shared/push.ts';
 
 const URL_ = Deno.env.get('SUPABASE_URL')!;
-const db = createClient(URL_, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!, {
+const db = createClient(URL_, secretKey(), {
   auth: { persistSession: false },
 });
 const DASHBOARD = 'https://docvex.ro/dev.html';
