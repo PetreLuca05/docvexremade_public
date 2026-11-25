@@ -14,10 +14,11 @@ export const SITE = {
   locale: 'ro_RO',
   description:
     'DocVex: aplicație desktop pentru avocați și juriști din România. Proiecte, documente, legislație, CAEN și cercetare juridică asistată de AI.',
-  // Brand colours: the header and dark sections, and the light page.
-  themeDark: '#0d1424',
-  themeLight: '#fbf9f4',
-  accent: '#e6cf9a',
+  // Brand colours, as in the site's design: the header and dark sections
+  // (night), the light page (cream) and the accent on dark (sand).
+  themeDark: '#0f172a',
+  themeLight: '#f5f2ea',
+  accent: '#dcc9a3',
   // Social profiles (Organization.sameAs) and the X/Twitter handle. Empty:
   // the tags are left out.
   sameAs: [],
@@ -42,10 +43,10 @@ export const PAGES = {
   index: {
     title: 'DocVex — documente juridice, organizate',
     description: SITE.description,
-    heading: 'Fiecare dosar. Un singur loc.',
+    heading: 'Întreaga practică juridică, într-o aplicație.',
     kicker: 'Aplicație desktop pentru avocați și juriști',
     imageAlt:
-      'DocVex: „Fiecare dosar. Un singur loc.” — aplicație desktop pentru avocați și juriști din România.',
+      'DocVex: „Întreaga practică juridică, într-o aplicație.” — aplicație desktop pentru avocați și juriști din România.',
   },
   instalare: {
     title: 'Descarcă DocVex pentru Windows și macOS — DocVex',

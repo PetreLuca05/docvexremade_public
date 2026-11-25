@@ -231,14 +231,19 @@ export function headTags(key, ctx) {
     );
   }
 
-  // Icons, the manifest, Apple and Windows. The dashboard keeps its own
-  // manifest and Apple tags (dev.html).
-  out.push(
-    link({ rel: 'icon', href: '/favicon.ico', sizes: '48x48' }),
-    link({ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }),
-    link({ rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' }),
-    link({ rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' }),
-  );
+  // Icons, the manifest, Apple and Windows: the seal (scripts/icons.mjs). The
+  // dashboard keeps its own manifest and Apple tags (dev.html) and its
+  // earlier logo.
+  if (dashboard) {
+    out.push(link({ rel: 'icon', type: 'image/png', sizes: '512x512', href: '/assets/icon.png' }));
+  } else {
+    out.push(
+      link({ rel: 'icon', href: '/favicon.ico', sizes: '48x48' }),
+      link({ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }),
+      link({ rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' }),
+      link({ rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' }),
+    );
+  }
   if (!dashboard) {
     out.push(
       link({ rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' }),

@@ -3093,6 +3093,88 @@ button.progress-name:not(:disabled):hover{text-decoration-color:var(--cognac)}
 .dlh{background:radial-gradient(60% 70% at 78% 46%,#25292d 0%,#16181A 64%)}
 .dlh::before{background:linear-gradient(90deg,#16181A 0%,#16181A 24%,rgba(22,24,26,.72) 38%,transparent 56%)}
 /*end-keep*/
+/* account pill: the signed-in person's picture and name */
+.acct-av{display:none}
+.nav .acct.is-in{padding-left:4px;gap:9px}
+.nav .acct.is-in i{display:none}
+.nav .acct.is-in .acct-av{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;flex:none;background:radial-gradient(circle at 35% 30%,#efe2c4,#cdb487);color:#15213A;font:600 10px/1 var(--body);letter-spacing:.04em;box-shadow:0 0 0 1.5px rgba(245,242,234,.18)}
+.nav .acct.is-in span{margin-right:6px}
+@media (max-width:760px){.nav .acct.is-in{padding:4px}.nav .acct.is-in span{display:none}}
+/* version number: a small v before it */
+.ver-n small{font-size:.24em;letter-spacing:0;margin-right:.1em;color:rgba(220,201,163,.62);font-style:italic;vertical-align:.12em}
+/* the closing scene fills the screen's height */
+.closer.cl2{min-height:100vh;min-height:100svh;display:flex;flex-direction:column;justify-content:center}
+/* hero: the second button sits on the same bottom line as "Descarcă DocVex", like the badges beside them */
+.th .row{align-items:flex-end}
+.th .laurels{align-self:flex-end}
+/* navbar at the very top of the page: a larger logo */
+.nav:not(.scrolled) .brand{gap:18px}
+.nav:not(.scrolled) .brand .seal{width:84px;height:84px}
+.nav:not(.scrolled) .brand .bl,.nav:not(.scrolled) .brand .word{width:204px}
+.nav:not(.scrolled) .brand .br{margin-top:9px}
+.nav:not(.scrolled) .brand .bt{margin-top:7px;font-size:8.6px;max-height:12px}
+@media (max-width:760px){
+  .nav:not(.scrolled) .brand{gap:12px}
+  .nav:not(.scrolled) .brand .seal{width:54px;height:54px}
+  .nav:not(.scrolled) .brand .bl,.nav:not(.scrolled) .brand .word{width:122px}
+  .nav:not(.scrolled) .brand .bt{font-size:5.1px}
+}
+/* while the closing scene is on screen or playing, the navbar loses its backing, as it does at the top of the page */
+.nav{transition:padding .3s var(--ease),background-color .55s ease,box-shadow .55s ease,-webkit-backdrop-filter .55s ease,backdrop-filter .55s ease}
+.nav.scrolled.vx-clear{background-color:transparent!important;box-shadow:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+/* "Versiunea curentă" fills the screen's height, its content centred in it */
+/* "Versiunea curentă" takes exactly the screen's height and its content spreads over all of it: the number grows with the screen,
+   the left column runs from the label at the top to the button at the bottom, and the six items share the height evenly */
+@media (min-width:901px){
+  .s2 .ver.sec{height:100vh;height:100svh;min-height:640px;padding:clamp(86px,11vh,124px) 0 clamp(40px,6vh,72px);display:flex;flex-direction:column;box-sizing:border-box}
+  .s2 .ver.sec>.ver-grid{flex:1;min-height:0;align-items:stretch;margin-left:auto;margin-right:auto}
+  .ver-h{display:flex;flex-direction:column;min-height:0}
+  .ver-n{font-size:clamp(110px,min(15vw,26vh),300px)}
+  .ver-h h2{margin-top:auto}
+  .ver-list{display:flex;flex-direction:column;min-height:0}
+  .ver-list li{flex:1 1 0;min-height:0;align-content:center;padding:0}
+  .ver-list li:first-child{border-top:0}
+}
+/* over the closing scene the navbar keeps only the links and the account pill; "Descarcă" gives its place to "Redă animația" */
+.nav .nav-end{position:relative}
+.nav .brand,.nav nav,.nav .nav-end>.btn{transition:opacity .45s ease,max-width .55s cubic-bezier(.4,0,.2,1),padding .55s cubic-bezier(.4,0,.2,1),margin .55s cubic-bezier(.4,0,.2,1),border-width .55s,background-color .3s,color .3s,border-color .3s,box-shadow .3s}
+.nav .nav-dl{max-width:220px;overflow:hidden;white-space:nowrap}
+.nav .nav-replay{position:absolute;right:0;top:50%;translate:0 -50%;opacity:0;pointer-events:none;white-space:nowrap;display:inline-flex;align-items:center;gap:7px;font-size:12px;padding-left:12px;padding-right:13px;cursor:pointer}
+.nav .nav-replay .ico{width:13px;height:13px}
+.nav.vx-in .brand,.nav.vx-in .nav-dl{opacity:0;pointer-events:none}
+.nav.vx-in .nav-replay{opacity:1;pointer-events:auto}
+.nav.vx-quiet .brand,.nav.vx-quiet nav,.nav.vx-quiet .nav-end>.btn{opacity:0!important;pointer-events:none!important}
+.closer.cl2 .q-replay{display:none!important}
+@media (max-width:760px){.nav .nav-replay span{display:none}.nav .nav-replay{padding:0;width:34px;height:34px;justify-content:center}}
+/* over the hero: no "Descarcă" (the hero has its own) and the bar sits closer to the screen's edges */
+.nav.at-hero .nav-dl{max-width:0;padding-left:0;padding-right:0;margin-left:-8px;border-width:0;opacity:0;pointer-events:none}
+.nav .wrap{transition:width .5s cubic-bezier(.4,0,.2,1)}
+.nav.at-hero .wrap{width:calc(100% - 64px);max-width:1680px}
+@media (max-width:760px){.nav.at-hero .wrap{width:calc(100% - 32px)}}
+/* Funcții: the stage moves on to the next function when clicked */
+.fx-vis{cursor:pointer}
+/* the navbar's changes over the closing scene take as long as the glide that brings the scene in (or their own pace without one) */
+.nav{transition:padding .3s var(--ease),background-color var(--vx-t,.55s) ease,box-shadow var(--vx-t,.55s) ease,-webkit-backdrop-filter var(--vx-t,.55s) ease,backdrop-filter var(--vx-t,.55s) ease}
+.nav .brand,.nav nav,.nav .nav-end>.btn{transition:opacity var(--vx-t,.45s) ease,max-width .55s cubic-bezier(.4,0,.2,1),padding .55s cubic-bezier(.4,0,.2,1),margin .55s cubic-bezier(.4,0,.2,1),border-width .55s,background-color .3s,color .3s,border-color .3s,box-shadow .3s}
+.nav .nav-replay{font-size:11px;gap:6px;padding-left:10px;padding-right:11px;letter-spacing:0}
+.nav .nav-replay .ico{width:12px;height:12px}
+/* Întrebări frecvente: one screen tall, the heading at the top and the five questions sharing the rest of the height */
+@media (min-width:901px){
+  .s2 .sec[data-anchor="faq"]{height:100vh;height:100svh;min-height:640px;padding:clamp(86px,11vh,124px) 0 clamp(40px,6vh,72px);display:flex;flex-direction:column;box-sizing:border-box}
+  .s2 .sec[data-anchor="faq"]>.wrap{flex:1;min-height:0;display:flex;flex-direction:column}
+  .s2 .sec[data-anchor="faq"] .faq{flex:1;min-height:0;display:flex;flex-direction:column;gap:0;margin-top:clamp(24px,4vh,48px)}
+  .s2 .sec[data-anchor="faq"] .faq>div{flex:1 1 0;min-height:0;display:flex;flex-direction:column;justify-content:center;border-top:1px solid var(--line)}
+  .s2 .sec[data-anchor="faq"] .faq>div:last-child{border-bottom:1px solid var(--line)}
+}
+@media (min-width:901px){
+  .s2 .sec[data-anchor="faq"]{height:auto;min-height:100vh;min-height:100svh}
+  .s2 .sec[data-anchor="faq"] .faq>div{flex:1 0 auto;padding:clamp(10px,1.6vh,22px) 0}
+}
+/* over the closing scene "Redă animația" takes the logo's place at the top left; the account pill moves into the place of "Descarcă" */
+.nav .wrap{position:relative}
+.nav .nav-end{position:static}
+.nav .nav-replay{left:0;right:auto;font-size:11.5px;padding-left:11px;padding-right:13px}
+.nav .acct{transition:transform var(--vx-t,.6s) cubic-bezier(.4,0,.2,1),background-color .3s,color .3s,border-color .3s,box-shadow .3s,opacity var(--vx-t,.45s) ease}
 
 /* ---------- the busy desktop before the vortex ---------- */
 .closer.cl2 .cz{zoom:1;translate:none;transition:none;box-shadow:none;font:400 11px/1.35 "Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;color:#1b1f27;transform-origin:center}
@@ -3325,6 +3407,118 @@ button.progress-name:not(:disabled):hover{text-decoration-color:var(--cognac)}
 
 /* the wax of the closing seal breathes very slightly */
 @media (prefers-reduced-motion:no-preference){.closer.cl2 .closer-seal .gv-seal>path{filter:url(#dvWaxLive)}}
+
+/* ============ Windows: a realistic dark Windows 11 desktop, toned to the DocVex palette (ink, slate, sand, cognac) ============ */
+.closer.cl2.os-win .cz{font:400 11px/1.38 "Segoe UI Variable Text","Segoe UI Variable","Segoe UI",Inter,system-ui,sans-serif;color:#1b1f27;-webkit-font-smoothing:antialiased;letter-spacing:.005em}
+/* wallpaper: a dark, quiet bloom in the brand colours */
+.os-win .dk-wall{background:
+  radial-gradient(26% 40% at 57% 52%,rgba(232,214,178,.50) 0,rgba(220,201,163,.16) 46%,rgba(220,201,163,0) 74%),
+  radial-gradient(34% 52% at 44% 60%,rgba(139,94,60,.50) 0,rgba(139,94,60,.14) 50%,rgba(139,94,60,0) 76%),
+  radial-gradient(30% 46% at 66% 38%,rgba(92,116,160,.42) 0,rgba(92,116,160,0) 72%),
+  radial-gradient(90% 110% at 50% 50%,#1b2740 0,#111a2e 55%,#0a101e 100%)}
+/* desktop icons */
+.os-win .dk-ico{gap:6px}
+.os-win .dk-ico span{font-size:10.5px;line-height:1.25;font-weight:400;color:#f4f5f7;text-shadow:0 1px 2px rgba(0,0,0,.85),0 0 4px rgba(0,0,0,.5)}
+.os-win .dk-ico>i{width:31px;height:39px;border-radius:2px;box-shadow:0 2px 5px rgba(0,0,0,.42),inset 0 0 0 .5px rgba(0,0,0,.14);font:700 7px/13px "Segoe UI",Inter,system-ui,sans-serif;letter-spacing:.02em;color:#fff;place-items:end start;padding:0 0 4px 3px;text-indent:4.2px}
+.os-win .dk-ico>i::before{border-width:4.5px;border-color:#dfe3ea transparent transparent #dfe3ea;border-style:solid;right:0;top:0;border-radius:0;filter:drop-shadow(-1px 1px 1px rgba(0,0,0,.18))}
+.os-win .dk-ico>i.g-doc,.os-win .dk-ico>i.g-pdf,.os-win .dk-ico>i.g-xls,.os-win .dk-ico>i.g-zip{background:
+  linear-gradient(var(--b),var(--b)) 3px calc(100% - 4px)/var(--bw,15px) 13px no-repeat,
+  repeating-linear-gradient(180deg,rgba(40,50,70,.20) 0 1px,transparent 1px 4px) 5px 9px/21px 12px no-repeat,
+  linear-gradient(180deg,#ffffff,#eef0f4)!important}
+.os-win .dk-ico>i.g-doc{--b:#2a5599}.os-win .dk-ico>i.g-xls{--b:#1f6f43}.os-win .dk-ico>i.g-pdf{--b:#b3392f;--bw:19px;text-indent:1.6px}.os-win .dk-ico>i.g-zip{--b:#8a6b2a;--bw:19px;text-indent:2.2px}
+.os-win .dk-ico>i.g-txt{background:repeating-linear-gradient(180deg,rgba(40,50,70,.24) 0 1px,transparent 1px 4.5px) 5px 9px/21px 24px no-repeat,linear-gradient(180deg,#fff,#eef0f4)!important}
+.os-win .dk-ico>i.g-img{width:40px!important;height:30px!important;border:2px solid #fff;border-radius:2px;padding:0;background:radial-gradient(circle at 74% 30%,#f3e6c4 0 9%,transparent 10%),linear-gradient(168deg,#7d93b8 0 54%,#55684f 54% 100%)!important}
+.os-win .dk-ico>i.g-img::before{display:none}
+.os-win .dk-ico>i.g-dir{width:42px!important;height:31px!important;padding:0;border-radius:3px!important;background:linear-gradient(180deg,#f7dc8d 0,#eec45a 14%,#e3ae3d 100%)!important;box-shadow:0 2px 5px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,.55)}
+.os-win .dk-ico>i.g-dir::before{left:0!important;top:-5px!important;width:17px!important;height:8px!important;border:0!important;border-radius:3px 5px 0 0!important;background:linear-gradient(180deg,#e2ae3f,#d39a2c)!important;filter:none}
+.os-win .dk-ico>i.g-bin{width:28px!important;height:35px!important;padding:0;border-radius:2px 2px 6px 6px!important;border-top:3px solid rgba(255,255,255,.9);background:linear-gradient(90deg,rgba(255,255,255,.34),rgba(255,255,255,.62) 38%,rgba(255,255,255,.22))!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.55),0 2px 5px rgba(0,0,0,.35)}
+.os-win .dk-ico>i.g-bin::before{display:none}
+/* windows: dark title bars, thin caption glyphs, soft deep shadow */
+.os-win .dk-win{background:#fbfaf7;border-radius:8px;box-shadow:0 0 0 1px rgba(255,255,255,.10),0 34px 68px -20px rgba(0,0,0,.78),0 12px 24px rgba(0,0,0,.36)!important}
+.os-win .dk-tb{height:32px;padding:0 0 0 11px;gap:9px;background:#1b2130;border-bottom:1px solid rgba(255,255,255,.06);font-size:11px}
+.os-win .dk-tb b{color:#dde1e8;font-weight:400}
+.os-win .dk-app{width:15px;height:15px;border-radius:3px;font:700 8.5px/1 "Segoe UI",Inter,system-ui,sans-serif;box-shadow:inset 0 1px 0 rgba(255,255,255,.22)}
+.os-win .a-w{background:linear-gradient(160deg,#3a6cb8,#234a86)}.os-win .a-x{background:linear-gradient(160deg,#2a8a57,#1a5f39)}.os-win .a-o{background:linear-gradient(160deg,#2f7fd0,#1c549a)}.os-win .a-p{background:linear-gradient(160deg,#c9483d,#96281f)}
+.os-win .a-f{background:linear-gradient(180deg,#f3d37c,#dfa93a);color:#6b4a10}.os-win .a-c{background:linear-gradient(160deg,#4a5670,#2c3448)}.os-win .a-t{background:linear-gradient(160deg,#6a70c8,#454aa0)}
+.os-win .a-g{background:radial-gradient(circle at 50% 50%,#eef3fb 0 30%,transparent 31%),conic-gradient(from 210deg,#3d7fc4,#58b0c8,#3fa37a,#3d7fc4);color:transparent;box-shadow:none;border-radius:50%}
+.os-win .dk-wc i{width:44px}
+.os-win .dk-wc i::before{background:#dfe3ea;width:10px}
+.os-win .dk-wc i:nth-child(2)::before{background:none;border:1px solid #dfe3ea;width:8px;height:8px;border-radius:1.5px}
+.os-win .dk-wc i:nth-child(3)::before,.os-win .dk-wc i:nth-child(3)::after{background:#dfe3ea;width:12px}
+/* browser */
+.os-win .dk-tabs{height:30px;padding:6px 8px 0;gap:2px;background:#141925}
+.os-win .dk-tabs span{height:24px;border-radius:7px 7px 0 0;font-size:9.5px;color:#a9b1c0}
+.os-win .dk-tabs span i{background:#5d6880}.os-win .dk-tabs span:nth-child(3n) i{background:#a8564c}.os-win .dk-tabs span:nth-child(4n) i{background:#4f8d6c}
+.os-win .dk-tabs .on{background:#252c3c;color:#f1f3f6}
+.os-win .dk-url{height:32px;background:#252c3c;border-bottom:1px solid rgba(0,0,0,.35)}
+.os-win .dk-url i{border-color:#8f99ab;border-width:1.3px}
+.os-win .dk-url p{background:#141925;color:#cdd3dd;height:22px;line-height:22px}
+.os-win .dk-url b{background:linear-gradient(160deg,#a9794f,#7a4f2e)}
+.os-win .dk-page{background:#fbfaf7}
+.os-win .dk-q{border-color:#dcdfe5;box-shadow:0 1px 3px rgba(20,30,50,.10);background:#fff}
+.os-win .dk-q i{border-color:#5d7fb8;border-width:1.6px}
+.os-win .dk-res em{color:#55705a}.os-win .dk-res b{color:#24478f}.os-win .dk-res span{color:#4a4f58}
+.os-win .dk-band{background:#15213A}.os-win .dk-h{color:#15213A}
+.os-win .dk-grid .h{background:#eeece6}.os-win .dk-grid p{border-bottom-color:#e8e5dd}
+/* file manager: dark, as the system theme */
+.os-win .w-files .dk-bd{background:#181e2b;color:#e2e5eb}
+.os-win .w-files .dk-side{background:#141925;border-right:1px solid rgba(255,255,255,.06)}
+.os-win .w-files .dk-side b{color:#8791a4}.os-win .w-files .dk-side .on{background:rgba(220,201,163,.16);box-shadow:inset 2px 0 0 #DCC9A3;font-weight:500}
+.os-win .w-files .dk-list p{border-bottom-color:rgba(255,255,255,.045)}.os-win .w-files .dk-list .h,.os-win .w-files .dk-list em{color:#8791a4}
+.os-win .dk-list i.g-dir{background:linear-gradient(180deg,#f2d27a,#dfa93a)!important}
+.os-win .dk-list i.g-doc{background:#2a5599!important}.os-win .dk-list i.g-pdf{background:#b3392f!important}.os-win .dk-list i.g-xls{background:#1f6f43!important}
+/* mail */
+.os-win .w-mail .dk-side{background:#f1efe9;border-right-color:#e2dfd6}
+.os-win .w-mail .dk-side .on{background:#e3dccb}.os-win .dk-side em{color:#2a5599}
+.os-win .dk-mail p{border-bottom-color:#ece9e1}.os-win .dk-mail .un{background:#f6f2e8;box-shadow:inset 3px 0 0 #2a5599}
+/* word, sheets, pdf */
+.os-win .dk-rib,.os-win .dk-stat{background:#2a5599}.os-win .w-xls .dk-rib{background:#1f6f43}
+.os-win .dk-tools{background:#f1efe9;border-bottom-color:#e2dfd6}.os-win .dk-tools i{background:#c9c5ba}
+.os-win .dk-tools.dark{background:#262b36}.os-win .dk-tools.dark i{background:#566070}
+.os-win .dk-sheet{background:#e4e2dc}.os-win .dk-sheet.dk-scn{background:#3a3f4a}
+.os-win .dk-cells .h{background:#e6efe8}.os-win .dk-cells .r{background:#f7e2de;color:#96281f}
+/* calculator */
+.os-win .w-calc .dk-bd{background:#1b2130}.os-win .dk-disp{color:#8f99ab}.os-win .dk-disp b{font-weight:600;font-size:25px}
+.os-win .dk-keys i{background:#2a3142;border-radius:4px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}.os-win .dk-keys i:nth-child(4n){background:#222837}.os-win .dk-keys i:nth-child(15){background:#DCC9A3;color:#15213A;font-weight:600}
+/* sticky notes: the system's own notes, straight and quiet */
+.os-win .dk-note{rotate:0deg;width:156px;padding:22px 12px 14px;border-radius:4px;font:400 11px/1.4 "Segoe UI Variable Text","Segoe UI",Inter,system-ui,sans-serif!important;color:#2e2a1a!important;
+  background:linear-gradient(180deg,#e7d27a 0 14px,#f6e9a6 14px)!important;box-shadow:0 0 0 1px rgba(0,0,0,.12),0 18px 30px -12px rgba(0,0,0,.62)!important}
+.os-win .dk-note b{font-weight:600;margin-bottom:4px}
+.os-win .dk-note.n2{rotate:0deg;background:linear-gradient(180deg,#dfa99d 0 14px,#f3d0c7 14px)!important}
+.os-win .dk-note.n3{rotate:0deg;width:140px;background:linear-gradient(180deg,#b3cba1 0 14px,#d5e4c8 14px)!important}
+/* notifications */
+.os-win .dk-toast{width:264px;padding:12px 14px;border-radius:8px;background:rgba(27,33,48,.97);box-shadow:0 0 0 1px rgba(255,255,255,.09),0 20px 36px -12px rgba(0,0,0,.72)!important}
+.os-win .dk-toast>i{width:24px;height:24px;border-radius:6px;background:linear-gradient(160deg,#a9794f,#7a4f2e);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}.os-win .dk-toast.t2>i{background:linear-gradient(160deg,#2f7fd0,#1c549a)}
+.os-win .dk-toast b{font-weight:600;font-size:11px}.os-win .dk-toast span{opacity:.68}
+/* taskbar */
+.os-win .dk-task{height:48px;padding:0 14px;background:rgba(18,23,34,.90);box-shadow:inset 0 1px 0 rgba(255,255,255,.07)!important}
+.os-win .dk-start{grid-template-columns:8.5px 8.5px;gap:1.5px;margin-right:14px}.os-win .dk-start i{width:8.5px;height:8.5px;border-radius:1px;background:linear-gradient(135deg,#7fc4f5,#3f8fd8)}
+.os-win .dk-task .dk-pins{gap:8px}
+.os-win .dk-pins i{width:30px;height:30px;border-radius:7px;font:700 12.5px/1 "Segoe UI",Inter,system-ui,sans-serif;box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 1px 2px rgba(0,0,0,.4)}
+.os-win .dk-pins i.a-g{border-radius:50%;width:27px;height:27px}
+.os-win .dk-pins i::after{bottom:-6px;width:6px;margin-left:-3px;height:2.5px;border-radius:2px;background:#9aa3b3}
+.os-win .dk-pins i:nth-child(2)::after,.os-win .dk-pins i:nth-child(3)::after{width:14px;margin-left:-7px;background:#DCC9A3}
+.os-win .dk-pins em{right:-6px;top:-6px;min-width:14px;height:14px;font:600 8.5px/14px "Segoe UI",Inter,system-ui,sans-serif;background:#c2473c;box-shadow:0 0 0 1.5px rgba(18,23,34,.9)}
+.os-win .dk-tray{gap:13px;font-size:10px;color:#eef0f3}.os-win .dk-tray i:first-child{font-size:9.5px;letter-spacing:.02em}
+.os-win .dk-tray .wifi{width:13px;height:9px;border-width:1.5px}.os-win .dk-tray .vol{border-width:5px;margin-left:-5px}
+.os-win .dk-tray b{line-height:1.3}
+
+/* text colours that must win over the generic "paragraphs inherit" rule */
+.closer.cl2.os-win .dk-url p{color:#cdd3dd}
+.closer.cl2.os-win .dk-band,.closer.cl2.os-win .dk-stat{color:#fff}
+.closer.cl2.os-win .dk-disp{color:#8f99ab}
+.closer.cl2.os-win .dk-n{color:#6d7480}
+.closer.cl2.os-win .w-files .dk-list .h{color:#8791a4}
+/* the browser's own mark: a plain blue globe, not any real product's logo */
+.closer.cl2.os-win .a-g{background:radial-gradient(circle at 34% 30%,#9cc8ee 0,#4f8fcf 46%,#2a5f9f 100%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25);color:transparent;border-radius:50%}
+
+.closer.cl2 .dk-tb .a-g{border:0;width:15px;height:15px}
+.closer.cl2 .dk-pins .a-g::before,.closer.cl2 .dk-dock .a-g::before{inset:0;border:0;border-radius:50%;background:
+  radial-gradient(ellipse 38% 100% at 50% 50%,transparent 0 86%,rgba(255,255,255,.42) 88% 96%,transparent 100%),linear-gradient(transparent 46%,rgba(255,255,255,.42) 47% 53%,transparent 54%)}
+.closer.cl2.os-mac .a-g{background:radial-gradient(circle at 34% 30%,#9cc8ee 0,#4f8fcf 46%,#2a5f9f 100%);box-shadow:none;color:transparent}
+
+/* the closing scene fills the screen's height */
+.closer.cl2,.closer.cl2.q-full{min-height:100vh;min-height:100svh}
 
 .closer.cl2 .closer-fx{background:radial-gradient(70% 80% at 50% 46%,#182544 0%,#111a30 46%,#0c1221 100%)}
 .closer.cl2 .q-vid{mix-blend-mode:lighten}
