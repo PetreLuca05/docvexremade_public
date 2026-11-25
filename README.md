@@ -47,7 +47,11 @@ vulnerability reporting and the list of applicable acts) and `404.html`.
   `src/analytics.js`: Plausible events.
 - `public/`: copied as is: the design's pictures and films (`hero/`, `img/`,
   `shots/`, `video/`, `vortex/`), `CNAME`, `.nojekyll`,
-  `.well-known/security.txt` and `assets/icon.png`.
+  `.well-known/security.txt` and the icons. Every icon (favicons, Apple,
+  Android, Windows tiles, the manifest's, the logo in link previews) is made
+  from the header's wax seal, `public/assets/seal.svg`, by
+  `node scripts/icons.mjs`; `public/assets/icon.png`, the earlier logo, is
+  kept for the admin dashboard.
 - The admin dashboard (`dev.html`) is still React: `src/pages/Dev.jsx`,
   `src/components/`, `src/styles/style.css`.
 
@@ -55,7 +59,7 @@ vulnerability reporting and the list of applicable acts) and `404.html`.
 npm install
 npm run dev       # http://localhost:5173
 npm run dev:phone # the same, also on the Wi-Fi (http://<this computer's IP>:5173)
-node scripts/icons.mjs # the favicon/app-icon set, after changing the logo
+node scripts/icons.mjs # the favicon/app-icon set, after changing public/assets/seal.svg
 npm run build     # into dist/
 npm run preview   # serve dist/
 ```

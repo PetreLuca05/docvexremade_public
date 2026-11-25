@@ -30,7 +30,7 @@ const FONTS = [
 );
 
 const LOGO = `data:image/png;base64,${readFileSync(
-  resolve(import.meta.dirname, '../public/assets/icon.png'),
+  resolve(import.meta.dirname, '../public/assets/seal.png'),
 ).toString('base64')}`;
 
 export const SIZES = {

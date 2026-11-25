@@ -353,6 +353,84 @@ var Gavel = { ok: false }
     addEventListener('scroll', ask, { passive: true }); addEventListener('resize', ask)
     if (still.matches) setStep(0); else { measure(); cur = target; paint() }
   })
+  /* Whole-pixel sections: a section whose height comes out fractional (text, ratios) gets the missing fraction as extra space at its
+     bottom, so every section below starts on a whole pixel and a section resting at the top of the screen never shows a hairline
+     of its neighbour at either edge. Re-measured whenever a section changes size. */
+  ;(function () {
+    var busy = false
+    function snap() {
+      if (busy) return; busy = true
+      document.querySelectorAll('.site.on > *').forEach(function (el) {
+        if (el.dataset.pb == null) el.dataset.pb = parseFloat(getComputedStyle(el).paddingBottom) || 0
+        el.style.paddingBottom = el.dataset.pb + 'px'
+        var h = el.getBoundingClientRect().height, f = Math.ceil(h - .001) - h
+        if (f > .001) el.style.paddingBottom = (+el.dataset.pb + f).toFixed(3) + 'px'
+      })
+      busy = false
+    }
+    var t = 0; function soon() { clearTimeout(t); t = setTimeout(snap, 60) }
+    if ('ResizeObserver' in window) { var ro = new ResizeObserver(soon); document.querySelectorAll('.site > *').forEach(function (el) { ro.observe(el) }) }
+    addEventListener('resize', soon); addEventListener('load', soon); if (document.fonts && document.fonts.ready) document.fonts.ready.then(soon); soon()
+  })()
+  /* Scroll assist: when the visitor stops scrolling close to the start of a section, the page settles the rest of the way so the
+     section sits exactly on the screen. It favours the start of a section (the end of a tall one only when it is all but there),
+     moves softly, never while a finger, the mouse button or a key is down, and gives way the moment the visitor scrolls. */
+  ;(function () {
+    if (reduced) return
+    var idle = 0, raf = 0, own = false, held = false, lastKey = 0, lastIn = 0
+    function targets() {
+      var site = document.querySelector('.site.on'), vh = innerHeight, out = [], max = document.documentElement.scrollHeight - vh, top0 = Math.min(vh * .2, 180)
+      if (!site) return out
+      ;[].forEach.call(site.children, function (el) {
+        var h = el.offsetHeight; if (h < vh * .55 || getComputedStyle(el).position === 'fixed') return
+        var top = el.getBoundingClientRect().top + scrollY, show = el.classList.contains('closer')
+        out.push({ y: Math.min(max, Math.ceil(top)), reach: show ? Math.min(vh * .28, 260) : top0 })   /* the closing scene draws the page to it more readily */
+        if (h > vh * 1.08) out.push({ y: Math.min(max, Math.round(top + h - vh)), reach: 28 })
+      })
+      out.push({ y: max, reach: 28 })
+      return out
+    }
+    function settle() {
+      idle = 0
+      if (held || own || performance.now() - lastKey < 600) return
+      var y = scrollY, best = null, score = 1e9
+      targets().forEach(function (t) { var k = Math.abs(t.y - y); if (k <= t.reach && k / t.reach < score) { score = k / t.reach; best = t.y } })
+      if (best === null || Math.abs(best - y) < .5) return
+      glide(best)
+    }
+    function glide(to) {   /* a soft start and a long, gentle landing */
+      var from = scrollY, dist = to - from, dur = Math.min(950, 480 + Math.abs(dist) * 1.9), t0 = performance.now()
+      own = true; window.__dvGlideTo = { to: to, until: t0 + dur, dur: dur }; dispatchEvent(new Event('dv-glide'))
+      ;(function step(now) {
+        if (!own) return
+        var t = Math.min(1, (now - t0) / dur), e = t < .5 ? 4 * t * t * t * .5 + t * .5 * (1 - t) * 0 : 0
+        e = 1 - Math.pow(1 - t, 3); e = e * e * (3 - 2 * e) * .35 + e * .65
+        window.scrollTo(0, from + dist * e)
+        if (t < 1) raf = requestAnimationFrame(step); else { own = false; raf = 0; window.__dvGlideTo = null }
+      })(t0)
+    }
+    function stop() { if (own) { own = false; cancelAnimationFrame(raf); window.__dvGlideTo = null; dispatchEvent(new Event('dv-glide')) } }
+    /* a request to frame something waits for the visitor's own scrolling to finish; then the usual settling takes it from there */
+    window.__dvGlide = function (to) { if (held) return; if (performance.now() - lastIn < 260) { clearTimeout(idle); idle = setTimeout(settle, 220); return } stop(); glide(Math.min(to, document.documentElement.scrollHeight - innerHeight)) }
+    addEventListener('scroll', function () { if (own) return; lastIn = performance.now(); clearTimeout(idle); idle = setTimeout(settle, 220) }, { passive: true })
+    addEventListener('wheel', function () { lastIn = performance.now(); stop() }, { passive: true })
+    addEventListener('touchstart', function () { held = true; stop() }, { passive: true })
+    addEventListener('touchend', function () { held = false; clearTimeout(idle); idle = setTimeout(settle, 260) }, { passive: true })
+    addEventListener('mousedown', function () { held = true; stop() })
+    addEventListener('mouseup', function () { held = false; clearTimeout(idle); idle = setTimeout(settle, 220) })
+    addEventListener('keydown', function () { lastKey = performance.now(); stop() })
+  })()
+  /* Navbar: over the opening of the page (the hero, or the download page's hero) it drops "Descarcă" and sits closer to the edges;
+     its "Redă animația" button replays the closing scene */
+  document.querySelectorAll('.site').forEach(function (site) {
+    var nv = site.querySelector('.nav'), hero = site.querySelector('.th, .dlh'), q = 0
+    if (!nv) return
+    var rp = nv.querySelector('.nav-replay')
+    if (rp) rp.addEventListener('click', function () { var b = site.querySelector('.closer .q-replay'); if (b) b.click() })
+    if (!hero) return
+    function upd() { q = 0; if (!site.classList.contains('on')) return; nv.classList.toggle('at-hero', scrollY < hero.offsetHeight * .5) }
+    addEventListener('scroll', function () { if (!q) q = requestAnimationFrame(upd) }, { passive: true }); addEventListener('resize', upd); setInterval(upd, 600); upd()
+  })
   /* quotes band: the same pictures pass behind the quote, very faint, cross-fading and drifting like the hero's */
   document.querySelectorAll('.quote').forEach(function (sec) {
     if (reduced) return
@@ -567,6 +645,7 @@ var Gavel = { ok: false }
       })
     })
     fx.querySelector('.fx-again').addEventListener('click', function () { pick(at, true) })
+    fx.querySelector('.fx-vis').addEventListener('click', function (e) { if (e.target.closest('a,button')) return; pick((at + 1) % rows.length, true) })
     pick(0, false)
     if ('IntersectionObserver' in window) new IntersectionObserver(function (e) {
       inView = e[0].isIntersecting
@@ -585,9 +664,18 @@ var Gavel = { ok: false }
   /* Accounts (Supabase, the same accounts as the app): the header's account button, sign-in and the five-step sign-up, the account portal */
   ;(function () {
     var signed = !!storedUser()
+    /* the account pill: signed in, the account's name with its initials; signed out, "Autentificare" */
     function nav() {
-      signed = !!storedUser()
-      document.querySelectorAll('.acct').forEach(function (a) { a.firstElementChild.textContent = signed ? a.dataset.in : a.dataset.out; a.setAttribute('href', signed ? '/cont.html' : authHref()) })
+      var u = storedUser(), name = u ? (u.name || u.email.split('@')[0]) : '', words = name.split(/[\s._-]+/).filter(Boolean)
+      var ini = words.length > 1 ? Array.from(words[0])[0] + Array.from(words[words.length - 1])[0] : Array.from(words[0] || '').slice(0, 2).join('')
+      signed = !!u
+      document.querySelectorAll('.acct').forEach(function (a) {
+        a.querySelector('span').textContent = signed ? name : a.dataset.out
+        var av = a.querySelector('.acct-av'); if (av) av.textContent = ini.toUpperCase()
+        a.classList.toggle('is-in', signed)
+        a.setAttribute('aria-label', signed ? 'Contul meu' : a.dataset.out)
+        a.setAttribute('href', signed ? '/cont.html' : authHref())
+      })
     }
     addEventListener(AUTH_EVENT, nav); addEventListener('storage', nav)
     var UNAVAILABLE = 'Conturile nu sunt disponibile încă pe site. Revino curând.'
@@ -1025,14 +1113,14 @@ var Gavel = { ok: false }
     }
     function A(el, frames, opt) { var a = el.animate(frames, opt); anims.push(a); return a }
     function reset() { anims.forEach(function (a) { a.cancel() }); anims = []; fold.on = false; foldEl.style.opacity = 0; ask.style.visibility = ''; ask.classList.remove('q-folding'); if (vid && vid.src) { try { vid.pause(); if (vid.currentTime > 0) vid.currentTime = 0 } catch (e) {} } fx.classList.add('q-noclones'); sk = []; timers.forEach(clearTimeout); timers = []; dust = 0; state = 'rest'; shape.style.opacity = 0; sec.classList.add('q-pre'); sec.classList.remove('q-done', 'q-lit', 'q-live', 'q-go', 'q-cvrun'); c2.setTransform(1, 0, 0, 1, 0, 0); c2.clearRect(0, 0, cv2.width, cv2.height); hx = hy = 0; hk = 1; fx.style.setProperty('--hx', '0px'); fx.style.setProperty('--hy', '0px'); layout() }
-    var SOFT = 'cubic-bezier(.65,0,.15,1)', OUT = 'cubic-bezier(.16,.84,.24,1)'
+    var SOFT = 'cubic-bezier(.55,0,.2,1)', OUT = 'cubic-bezier(.16,.84,.24,1)'
     /* Before the pull: a quiet DocVex card asks whether to install. The answer is given without a pointer: a line of light
        crosses "Instalează", the words fade, and the card's own hairline border draws in to a ring at the centre, which becomes the rim of the core. */
     /* the wax behind the emblem is never quite still: its outline flows very slightly, like the living body it came from.
        The drawing itself is untouched; a slow displacement is applied on top of it. */
     if (!reduced) {
       var live = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); live.setAttribute('width', '0'); live.setAttribute('height', '0'); live.setAttribute('aria-hidden', 'true'); live.style.position = 'absolute'
-      live.innerHTML = '<filter id="dvWaxLive" x="-12%" y="-12%" width="124%" height="124%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="1" seed="7" result="n"><animate attributeName="baseFrequency" dur="19s" values="0.011;0.0155;0.0125;0.009;0.011" calcMode="spline" keyTimes="0;0.27;0.52;0.78;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1;.4 0 .6 1" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="5.5" xChannelSelector="R" yChannelSelector="G"/></filter>'
+      live.innerHTML = '<filter id="dvWaxLive" x="-12%" y="-12%" width="124%" height="124%" color-interpolation-filters="sRGB"><feTurbulence type="fractalNoise" baseFrequency="0.011" numOctaves="1" seed="7" result="n"><animate attributeName="baseFrequency" dur="10s" values="0.011;0.017;0.0125;0.0085;0.011" calcMode="spline" keyTimes="0;0.27;0.52;0.78;1" keySplines=".4 0 .6 1;.4 0 .6 1;.4 0 .6 1;.4 0 .6 1" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="SourceGraphic" in2="n" scale="9" xChannelSelector="R" yChannelSelector="G" result="d"/><feGaussianBlur in="d" stdDeviation="0.45"/></filter>'
       sec.appendChild(live)
     }
     var ask = fx.querySelector('.q-ask'), askIn = fx.querySelector('.q-ask-in'), foldEl = fx.querySelector('.q-fold'), foldR = foldEl.querySelector('rect'), fold = { on: false }
@@ -1052,8 +1140,9 @@ var Gavel = { ok: false }
       foldEl.style.filter = gl > 0 ? 'drop-shadow(0 0 ' + (29 * gl).toFixed(0) + 'px rgba(255,236,196,' + (.5 * gl).toFixed(2) + '))' : 'none'
       foldEl.style.opacity = 0   /* the card element itself is what is seen drawing in; this only keeps the time */
     }
+    function frame() { var t = sec.getBoundingClientRect().top; if ((t > .01 || t < -1) && t < innerHeight * .75 && t > -innerHeight * .4 && window.__dvGlide) window.__dvGlide(Math.ceil(t + scrollY)) }
     function play() {
-      reset(); state = 'intro'
+      reset(); state = 'intro'; frame()
       sealOutline()
       var go = ask.querySelector('.go'), no = ask.querySelector('.q-ask-f span'), sweep = go.querySelector('i'), PRE = 1650, w0 = ask.offsetWidth, h0 = ask.offsetHeight, ring = Math.max(26, S * .34), cs = getComputedStyle(ask)
       /* the answer */
@@ -1089,11 +1178,11 @@ var Gavel = { ok: false }
     }
     function run() {
       state = 'run'; sec.classList.add('q-go')
-      mode = vidOK ? 'vid' : rasterOK && items.length ? 'cv' : 'dom'
+      mode = vidOK && vid.readyState >= 3 && !vid.error ? 'vid' : rasterOK && items.length ? 'cv' : 'dom'
       if (mode === 'dom') { if (!domBuilt) build(); fx.classList.remove('q-noclones') }
       arrive = []
       if (mode === 'vid') { var vl = []; cards.forEach(function (c) { var s = c._s; if (s && s.show) vl.push({ ang: Math.atan2(s.y - cy, s.x - cx), d: Math.sqrt((s.x - cx) * (s.x - cx) + (s.y - cy) * (s.y - cy)) }) }); vl.sort(function (p, q) { return p.d - q.d }) }
-      var list = mode === 'vid' ? vl : mode === 'cv' ? items.slice().sort(function (p, q) { return p.d - q.d }) : jobs, n = mode === 'vid' ? VX[vxKey] : list.length, RATE = 1.6, SCAN = 680 / RATE, tG = 380 / RATE, STEP = Math.min(34, 1150 / Math.max(1, n - 1)) / RATE, FLY = 860 / RATE, tC = tG + (n - 1) * STEP + FLY, tP = tC + 110 / RATE, PRESS = 620, HOLD = 700, HOME = 1500, tH = tP + PRESS + HOLD
+      var list = mode === 'vid' ? vl : mode === 'cv' ? items.slice().sort(function (p, q) { return p.d - q.d }) : jobs, n = mode === 'vid' ? VX[vxKey] : list.length, RATE = 1.6, SCAN = 680 / RATE, tG = 380 / RATE, STEP = Math.min(34, 1150 / Math.max(1, n - 1)) / RATE, FLY = 860 / RATE, tC = tG + (n - 1) * STEP + FLY, tP = tC + 110 / RATE, PRESS = 460, HOLD = 420, HOME = 900, tH = tP + PRESS + HOLD
       /* 1. a band of light reads across everything on the screen; the wallpaper lets go as the pull begins */
       A(scan, [{ transform: 'translateX(-260px)', opacity: 0 }, { opacity: 1, offset: .12 }, { opacity: 1, offset: .88 }, { transform: 'translateX(' + (W + 260) + 'px)', opacity: 0 }], { duration: SCAN, easing: 'cubic-bezier(.45,0,.55,1)' })
       if (mode !== 'vid') A(wall, [{ opacity: 1, transform: 'scale(1) rotate(0deg)', filter: 'blur(0px) brightness(1)' }, { opacity: .5, transform: 'scale(1.06) rotate(3deg)', filter: 'blur(6px) brightness(.8)', offset: .5 }, { opacity: 0, transform: 'scale(1.25) rotate(14deg)', filter: 'blur(22px) brightness(.5)' }],
@@ -1115,7 +1204,7 @@ var Gavel = { ok: false }
         } else jb.sl.forEach(function (o) { o.pa = 0 })
       })
       if (mode === 'cv') { t0 = performance.now(); cvLive = 1; drawItems(0); sec.classList.add('q-cvrun') }
-      if (mode === 'vid') { try { if (vid.currentTime > 0) vid.currentTime = 0 } catch (e) {} vid.playbackRate = 1; var pr = vid.play(); if (pr && pr.catch) pr.catch(function () {})
+      if (mode === 'vid') { try { if (vid.currentTime > 0) vid.currentTime = 0 } catch (e) {} vid.playbackRate = 1; vT0 = 0; var pr = vid.play(); if (pr && pr.catch) pr.catch(function () {}); vid.addEventListener('playing', function () { vT0 = performance.now() - vid.currentTime * 1000 }, { once: true })
         A(vid, [{ opacity: 1 }, { opacity: 1, offset: (tC - 60) / (tP + 240) }, { opacity: 0 }], { duration: tP + 240, fill: 'forwards' }) }
       var q; sealOutline()
       t0 = performance.now(); tB = tP - BEND; tSwap = tP; tSuck0 = tG; burstAt = tP + 70; burstDone = false; tGrow0 = tG + FLY * .6; tGrow1 = tGrow0 + (n - 1) * STEP + 160; tLand = tH + HOME; sec.classList.add('q-live'); timers.push(setTimeout(function () { sec.classList.remove('q-live') }, tLand + 520))
@@ -1159,7 +1248,7 @@ var Gavel = { ok: false }
       sec.classList.remove('q-pre')
       timers.push(setTimeout(function () { fx.classList.add('q-noclones') }, tP + 400))
        timers.push(setTimeout(function () { sec.classList.add('q-lit') }, tH + HOME * .4))
-      timers.push(setTimeout(function () { state = 'done'; sec.classList.add('q-done') }, tH + HOME + 1400)); timers.push(setTimeout(settle, tH + HOME + 900))
+      timers.push(setTimeout(function () { state = 'done'; sec.classList.add('q-done'); if (cvLive) wipeStrips() }, tH + HOME + 1400)); timers.push(setTimeout(settle, tH + HOME + 900))
       if (!raf) raf = requestAnimationFrame(tick)
     }
     /* a little gold dust hangs in the light afterwards */
@@ -1197,10 +1286,16 @@ var Gavel = { ok: false }
       shp.style.fill = 'rgb(' + mix(7, 220) + ',' + mix(8, 201) + ',' + mix(10, 163) + ')'; shp.style.stroke = 'rgba(255,232,186,' + (.95 * (1 - cu)).toFixed(3) + ')'; shp.style.strokeWidth = (1.2 + 1.6 * g).toFixed(2)
       shape.style.filter = 'drop-shadow(0 0 ' + (16 + 26 * glow).toFixed(0) + 'px rgba(255,236,196,' + Math.min(.95, .3 + .4 * glow).toFixed(2) + ')) drop-shadow(0 12px 16px rgba(0,0,0,.45))'
     }
+    function wipeStrips() { cvLive = 0; c2.setTransform(1, 0, 0, 1, 0, 0); c2.clearRect(0, 0, cv2.width, cv2.height) }
     function tick() {
       raf = 0
       if (settleUntil) { if (performance.now() > settleUntil) settleUntil = 0; var sr = fx.getBoundingClientRect(); if (sr.height && Math.abs(sr.height - H) > .5) { H = sr.height; cy = H / 2; fx.style.setProperty('--cy', cy + 'px') } }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); if (fold.on) drawFold(); follow(); ctx.translate(hx, hy)
+      if (cvLive && (state !== 'run' || performance.now() - t0 > tSwap + 200)) wipeStrips()
+      if (state === 'run' && mode === 'vid' && vT0 && !vid.ended && !skipping && performance.now() - t0 < tSwap - 150) {
+        var lag = (performance.now() - vT0) / 1000 - vid.currentTime
+        if (lag > .35 || (vid.paused && performance.now() - vT0 > 400)) { vT0 = 0; skip(); return }
+      }
       if (state === 'run') {
         if (mode === 'cv' && cvLive) cvLive = drawItems(performance.now() - t0)
         var tq = performance.now() - t0, ccx2 = cx + pX * 10, ccy2 = cy + pY * 7
@@ -1263,7 +1358,7 @@ var Gavel = { ok: false }
       bmp: function (i) { return items[i].bmp } }
     /* The scene takes over the whole screen once, when the visitor reaches it: the page lines the section up with the window, the navbar
        steps aside and scrolling is held until the seal has landed. Afterwards the section settles to its normal height and never replays. */
-    var played = false, locked = false, navEl = null, settleUntil = 0, safeT = 0, busy = false
+    var vT0 = 0, away = false, hush = false, played = false, locked = false, navEl = null, settleUntil = 0, safeT = 0, busy = false
     function hold(e) { if (locked) { e.preventDefault(); skip() } }
     function holdKey(e) { if (locked && /^(ArrowUp|ArrowDown|PageUp|PageDown|Home|End| |Spacebar|Escape|Enter)$/.test(e.key)) { e.preventDefault(); skip() } }
     /* A scroll, a click or a key during the scene skips it: the scene dissolves, everything is taken straight to its final state,
@@ -1290,6 +1385,33 @@ var Gavel = { ok: false }
       }
     }
     sec.addEventListener('click', function (e) { if ((state === 'intro' || state === 'run') && !e.target.closest('.q-replay')) skip() })
+    function leave() { if (state === 'intro' || state === 'run') away = true }
+    function back() { if (!away) return; away = false; if (state === 'intro' || state === 'run') skip() }
+    document.addEventListener('visibilitychange', function () { if (document.hidden) leave(); else back() })
+    addEventListener('pagehide', leave); document.addEventListener('freeze', leave); document.addEventListener('resume', back); addEventListener('pageshow', back)
+    /* the navbar drops its backing whenever it is over this scene, and for as long as the scene is playing */
+    ;(function () {
+      var on = null, q = 0, ins = null, qt = null
+      function upd() {
+        q = 0; var nv = navEl || (navEl = (sec.closest('.site') || document).querySelector('.nav')); if (!nv || sec.offsetParent === null) return
+        var r = sec.getBoundingClientRect(), g = window.__dvGlideTo, top = r.top, bot = r.bottom
+        if (g && performance.now() < g.until) { top = r.top + scrollY - g.to; bot = top + r.height; nv.style.setProperty('--vx-t', Math.round(g.dur) + 'ms') } else nv.style.removeProperty('--vx-t')
+        var inside = Math.abs(top) < 3,   /* only when the page rests on the scene (or is gliding onto it), not merely passing over it */ want = inside || state === 'intro' || state === 'run'
+        if (want !== on) { on = want; nv.classList.toggle('vx-clear', want) }
+        /* while the scene plays, the navbar shows nothing; its links and the account return as the logo settles into its place */
+        if (hush && state === 'run' && sec.classList.contains('q-lit')) hush = false
+        var quiet = hush || state === 'intro' || (state === 'run' && !sec.classList.contains('q-lit'))
+        if (quiet !== qt) { qt = quiet; nv.classList.toggle('vx-quiet', quiet) }
+        if (inside !== ins || inside) {   /* re-measured while inside, so the pill always lands exactly in place */
+          if (inside !== ins) { ins = inside; nv.classList.toggle('vx-in', inside) }   /* the logo gives its place to "Redă animația", "Descarcă" its place to the account pill */
+          var ac = nv.querySelector('.nav-end .acct'), dl = nv.querySelector('.nav-end .nav-dl')
+          if (ac && dl) { var tx = new DOMMatrixReadOnly(getComputedStyle(ac).transform === 'none' ? undefined : getComputedStyle(ac).transform).m41   /* where the pill would be without the slide in progress */
+            ac.style.transform = inside ? 'translateX(' + (dl.getBoundingClientRect().right - ac.getBoundingClientRect().right + tx).toFixed(1) + 'px)' : '' }
+        }
+      }
+      addEventListener('scroll', function () { if (!q) q = requestAnimationFrame(upd) }, { passive: true }); addEventListener('resize', upd); addEventListener('dv-glide', upd)
+      setInterval(upd, 500); upd()
+    })()
     function lock() { if (locked) return; locked = true; addEventListener('wheel', hold, { passive: false }); addEventListener('touchmove', hold, { passive: false }); addEventListener('keydown', holdKey) }
     function unlock() { if (!locked) return; locked = false; removeEventListener('wheel', hold); removeEventListener('touchmove', hold); removeEventListener('keydown', holdKey) }
     function navHide(on) { navEl = navEl || (sec.closest('.site') || document).querySelector('.nav'); if (navEl) navEl.classList.toggle('vx-hide', on) }
@@ -1318,7 +1440,7 @@ var Gavel = { ok: false }
       if (!raf) raf = requestAnimationFrame(tick)
     }
     var again = sec.querySelector('.q-replay'); if (again) again.addEventListener('click', function () {   /* replay in place: the section dissolves, resets and plays again where it is */
-      if (state !== 'done' || busy) return; busy = true
+      if (state !== 'done' || busy) return; busy = true; hush = true; dispatchEvent(new Event('dv-glide'))   /* the navbar goes quiet now and stays so until the logo settles */
       var veil = document.createElement('i'); veil.className = 'vx-veil vx-in'; sec.appendChild(veil)
       veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-in-out', fill: 'forwards' }).onfinish = function () {
         settleUntil = 0; reset()
