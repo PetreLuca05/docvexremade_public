@@ -55,15 +55,14 @@ the `admin` function's `insights` action and the SQL functions in
   calls, failures per day, and failed AI requests by kind.
 
 **Gender and age** are optional, given by the account holder at sign-up
-(the "About you" step, between Password and Plan), on the account page or in
-the app, and kept in the Supabase user's `user_metadata`: `gender`
+(the "Despre tine" step, between Password and Plan) or in the app, and kept in the Supabase user's `user_metadata`: `gender`
 (`female` / `male` / `other`), `birth_date` (`YYYY-MM-DD`, an age from 16 to 100) and `demographics_at` (when given). "Prefer not to say" stores nothing
 (or removes what was there). An earlier `birth_year` is still read and is
 cleared when the date is saved. The dashboard's Accounts section counts
 accounts by gender and by age group (16-24 … 65+), each split into paying
 and not paying, and says how many accounts gave either. Legal basis:
-consent (the privacy policy's `#demografie`). Shared code:
-`src/demographics.js`, `src/components/Demographics.jsx`.
+consent (the privacy policy's `#demografie`). The site's
+sign-up: `src/site/artifact.js`.
 
 **Accounts and downloads** are read when needed: from Supabase Auth and from
 GitHub Releases' download counts. Nothing new is collected for them.
@@ -165,15 +164,13 @@ Site settings → Goals → Add goal → **Custom event**, with exactly these na
 
 | Goal (custom event)        | Fired                                                 | Properties                                                                                                        |
 | -------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `Download Click`           | A download link on `instalare.html`                   | `platform` (windows / mac), `arch` (x64 / arm64 / universal), `version`, `location` (hero / hero-other / history) |
+| `Download Click`           | The download button on `instalare.html`               | `platform` (windows / mac), `arch` (x64 / arm64 / universal), `version`, `location` (hero)                        |
 | `Signup Started`           | The sign-up's first step is shown                     | none                                                                                                              |
 | `Signup Completed`         | An account was created                                | `plan` (start / pro / cabinet)                                                                                    |
 | `Signin`                   | Signed in with email, or left for Google              | `provider` (email / google)                                                                                       |
 | `Password Reset Requested` | A reset link was sent                                 | none                                                                                                              |
 | `Checkout Redirect`        | Sent to a Stripe Payment Link                         | `plan`                                                                                                            |
 | `Payment Return`           | Back from Stripe (`?plata=ok`)                        | none                                                                                                              |
-| `Ask DocVex Question`      | The FAQ assistant answered                            | none                                                                                                              |
-| `Ask DocVex Limit`         | The assistant's daily limit was reached               | none                                                                                                              |
 | `Language Switch`          | RO / EN changed                                       | `to` (ro / en)                                                                                                    |
 | `404`                      | A missing page was opened                             | `path`                                                                                                            |
 | `Outbound Link: Click`     | A link to another site was followed (Plausible's own) | `url`                                                                                                             |

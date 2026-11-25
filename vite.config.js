@@ -10,6 +10,7 @@ const pages = [
   'index',
   'instalare',
   'preturi',
+  'planuri',
   'cont',
   'autentificare',
   'dev',
@@ -139,11 +140,12 @@ async function fetchReleases() {
   }
 }
 
-// `virtual:releases`: every release (the download page); `virtual:latest-release`:
-// just the newest version for each system, { windows, mac } (the header, on
-// every page).
+// `virtual:releases`: every release; `virtual:latest-release`: just the newest
+// version for each system, { windows, mac }; `virtual:latest-downloads`: the
+// newest installer for each system, { windows, mac } with its version and
+// file (the download page's button, which links straight to it).
 function releases() {
-  const ids = ['virtual:releases', 'virtual:latest-release'];
+  const ids = ['virtual:releases', 'virtual:latest-release', 'virtual:latest-downloads'];
   let data;
   return {
     name: 'docvex-releases',
@@ -152,11 +154,49 @@ function releases() {
       if (!ids.some((id) => source === `\0${id}`)) return;
       data ??= await getReleases();
       if (source === `\0${ids[0]}`) return `export default ${JSON.stringify(data)};`;
-      const newest = (os) => {
-        const r = data.find((x) => (os === 'mac' ? x.mac.length : x.windows));
+      const newest = (os) => data.find((x) => (os === 'mac' ? x.mac.length : x.windows));
+      if (source === `\0${ids[2]}`) {
+        const pick = (os) => {
+          const r = newest(os);
+          if (!r) return null;
+          const file = os === 'mac' ? r.mac[0] : r.windows;
+          return { version: r.version, date: r.date, ...file };
+        };
+        return `export default ${JSON.stringify({ windows: pick('windows'), mac: pick('mac') })};`;
+      }
+      const brief = (os) => {
+        const r = newest(os);
         return r ? { version: r.version, date: r.date } : null;
       };
-      return `export default ${JSON.stringify({ windows: newest('windows'), mac: newest('mac') })};`;
+      return `export default ${JSON.stringify({ windows: brief('windows'), mac: brief('mac') })};`;
+    },
+  };
+}
+
+// The header and footer every public page shares (src/site/partials/), put in
+// place of <!--#header--> and <!--#footer PREFIX--> when a page is served or
+// built. PREFIX keeps the contact form's field ids unique to the page.
+function sitePartials() {
+  const dir = resolve(import.meta.dirname, 'src/site/partials');
+  const read = (name) => readFileSync(resolve(dir, `${name}.html`), 'utf8').trim();
+  return {
+    name: 'docvex-partials',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html) {
+        if (!html.includes('<!--#')) return html;
+        const header = read('header');
+        const footer = read('footer');
+        return html
+          .replace('<!--#header-->', header)
+          .replace(/<!--#footer ([\w-]+)-->/, (_, prefix) => footer.replaceAll('{{f}}', prefix));
+      },
+    },
+    configureServer(server) {
+      server.watcher.add(dir);
+      server.watcher.on('change', (file) => {
+        if (file.startsWith(dir)) server.ws.send({ type: 'full-reload' });
+      });
     },
   };
 }
@@ -197,6 +237,7 @@ export default defineConfig(({ mode }) => ({
   // Served from the root of the custom domain in public/CNAME.
   base: '/',
   plugins: [
+    sitePartials(),
     react(),
     releases(),
     plausibleScript(mode),

@@ -4,14 +4,76 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Autentificare — DocVex</title>
-    <meta
-      name="description"
-      content="Creează-ți contul DocVex sau autentifică-te, cu Google sau cu e-mail și parolă."
-    />
+    <meta name="description" content="Creează-ți contul DocVex sau autentifică-te, cu Google sau cu e-mail și parolă." />
     <link rel="icon" href="/assets/icon.png" />
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/entries/autentificare.jsx"></script>
+<main class="site s2 legal on" id="autentificare"><section class="band dark lgh"><!--#header--><div class="wrap"><p class="label">Cont</p><h1 class="h">Autentificare</h1><p class="upd">Același cont te autentifică pe site și în aplicație.</p></div></section>
+<section class="band light lgb"><div class="wrap au" data-plans='{"start": {"name": "Start", "price": "0 lei", "text": "Pentru a încerca DocVex.", "features": ["Proiecte și previzualizare de fișiere", "Legislație și coduri CAEN", "<mark class=\"blank\">[DE COMPLETAT: limita de cercetare AI]</mark>"]}, "pro": {"name": "Solo", "price": "199 lei", "text": "Pentru avocatul sau juristul care lucrează zilnic cu dosare.", "features": ["Tot ce include Start", "Cercetare juridică cu AI", "Scanare de documente în PDF", "<mark class=\"blank\">[DE COMPLETAT: alte funcții]</mark>"]}, "cabinet": {"name": "Cabinet", "price": "499 lei", "text": "Pentru cabinete și echipe juridice.", "features": ["Tot ce include Solo", "<mark class=\"blank\">[DE COMPLETAT: numărul de utilizatori]</mark>", "<mark class=\"blank\">[DE COMPLETAT: asistență]</mark>"]}}'>
+  <div class="au-intro">
+    <div data-intro="signin"><p class="label">Bine ai revenit</p><h2 class="au-title">Intră în contul tău DocVex.</h2>
+      <ul class="au-points"><li>Intră cu Google sau cu e-mailul și parola contului.</li><li>Ai uitat parola? Îți trimitem un link ca să-ți setezi una nouă.</li><li>Același cont te autentifică și în aplicație.</li></ul></div>
+    <div data-intro="signup" hidden><p class="label">Începe</p><h2 class="au-title">Creează-ți contul DocVex.</h2><ol class="progress"><li><span class="progress-dot" aria-hidden="true"><b>1</b><svg class="ico ico-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span class="progress-body"><button type="button" class="progress-name" data-goto="0" disabled>Contul</button><span>Numele și e-mailul tău, sau continuă cu Google, mai jos.</span></span></li><li><span class="progress-dot" aria-hidden="true"><b>2</b><svg class="ico ico-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span class="progress-body"><button type="button" class="progress-name" data-goto="1" disabled>Parola</button><span>O parolă sigură: cel puțin 8 caractere, cu litere și cifre.</span></span></li><li><span class="progress-dot" aria-hidden="true"><b>3</b><svg class="ico ico-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span class="progress-body"><button type="button" class="progress-name" data-goto="2" disabled>Despre tine</button><span>Genul și data nașterii, dacă vrei: amândouă sunt opționale.</span></span></li><li><span class="progress-dot" aria-hidden="true"><b>4</b><svg class="ico ico-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span class="progress-body"><button type="button" class="progress-name" data-goto="3" disabled>Planul</button><span>Alegi planul; cele plătite se plătesc online, prin Stripe.</span><div class="plan-mini" hidden></div></span></li><li><span class="progress-dot" aria-hidden="true"><b>5</b><svg class="ico ico-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg></span><span class="progress-body"><button type="button" class="progress-name" data-goto="4" disabled>Verificare</button><span>Verifici toate datele, accepți termenii și creezi contul.</span></span></li></ol></div>
+  </div>
+  <div class="auth-column">
+    <div class="auth-card">
+      <div class="auth-tabs" role="tablist"><button type="button" role="tab" data-mode="signin" aria-selected="true">Autentificare</button><button type="button" role="tab" data-mode="signup" aria-selected="false">Cont nou</button></div>
+      <form data-view="signin" novalidate>
+        <div class="field"><label for="si-email">E-mail</label><input type="email" id="si-email" autocomplete="email" placeholder="nume@exemplu.ro"><small class="err"></small></div>
+        <div class="field"><label for="si-pass">Parolă</label><div class="pw"><input type="password" id="si-pass" autocomplete="current-password" placeholder="Parola ta"><button type="button" class="pw-eye" data-eye aria-label="Arată parola">Arată</button></div><small class="caps" hidden>Caps Lock este activat.</small><small class="err"></small></div>
+        <button type="button" class="au-link" data-forgot>Ai uitat parola?</button>
+        <button class="btn" type="submit">Intră în cont <i><svg class="ico ico-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i></button>
+      </form>
+      <form data-view="forgot" novalidate hidden>
+        <h3>Resetează parola</h3><p class="au-lead">Îți trimitem un link cu care îți setezi o parolă nouă.</p>
+        <div class="field"><label for="fg-email">E-mail</label><input type="email" id="fg-email" autocomplete="email" placeholder="nume@exemplu.ro"><small class="err"></small></div>
+        <button class="btn" type="submit">Trimite linkul <i><svg class="ico ico-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i></button>
+        <button type="button" class="au-link" data-backin>Înapoi la autentificare</button>
+      </form>
+      <form data-view="sent" novalidate hidden>
+        <h3>Verifică-ți e-mailul</h3><p class="au-lead" data-sent-text></p>
+        <button class="btn" type="submit" data-resend><span>Retrimite e-mailul</span> <i><svg class="ico ico-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i></button>
+        <button type="button" class="au-link" data-wrong>Ai greșit adresa?</button>
+      </form>
+      <form data-view="signup" novalidate hidden>
+        <p class="au-stepof">Pasul 1 din 5</p>
+        <div data-step="0">
+          <div class="field"><label for="su-name">Nume și prenume</label><input type="text" id="su-name" autocomplete="name" placeholder="ex. Andrei Popescu"><small class="err"></small></div>
+          <div class="field"><label for="su-email">E-mail</label><input type="email" id="su-email" autocomplete="email" placeholder="nume@exemplu.ro"><small class="err"></small></div>
+          <label class="au-check" for="su-news"><input type="checkbox" id="su-news">Trimite-mi newsletterul DocVex: noutăți despre produs și sfaturi, pe e-mail. Te poți dezabona oricând.</label>
+        </div>
+        <div data-step="1" hidden>
+          <div class="field"><label for="su-pass">Parolă</label><div class="pw"><input type="password" id="su-pass" autocomplete="new-password" placeholder="Cel puțin 8 caractere"><button type="button" class="pw-eye" data-eye aria-label="Arată parola">Arată</button></div><small class="caps" hidden>Caps Lock este activat.</small><small class="err"></small></div>
+          <div class="strength" data-level="0"><div class="strength-bar"><span></span><span></span><span></span><span></span></div><small>Puterea parolei: <b>Prea slabă</b></small></div>
+          <ul class="rules"><li data-rule="length">Cel puțin 8 caractere</li><li data-rule="letters">Cel puțin o literă</li><li data-rule="digit">Cel puțin o cifră</li><li data-rule="cases" class="is-optional">Litere mari și mici (recomandat)</li><li data-rule="symbol" class="is-optional">Un simbol, de exemplu ! ? # (recomandat)</li><li data-rule="personal">Nu conține numele sau e-mailul tău</li><li data-rule="common">Nu este o parolă des folosită</li><li data-rule="edges">Nu începe și nu se termină cu spațiu</li></ul>
+          <button type="button" class="au-link" data-gen>Sugerează o parolă puternică</button>
+          <div class="field"><label for="su-again">Repetă parola</label><div class="pw"><input type="password" id="su-again" autocomplete="new-password" placeholder="Scrie parola din nou"><button type="button" class="pw-eye" data-eye aria-label="Arată parola">Arată</button></div><small class="ok" hidden>Parolele coincid.</small><small class="err"></small></div>
+        </div>
+        <div data-step="2" hidden>
+          <p class="au-lead">Opțional: genul și data nașterii, pentru statisticile noastre. Poți trece peste acest pas.</p>
+          <fieldset class="field"><legend>Genul</legend><div class="pills-pick">
+            <label for="su-g-f"><input type="radio" name="gender" id="su-g-f" value="Feminin"><span>Feminin</span></label><label for="su-g-m"><input type="radio" name="gender" id="su-g-m" value="Masculin"><span>Masculin</span></label>
+            <label for="su-g-o"><input type="radio" name="gender" id="su-g-o" value="Altul"><span>Altul</span></label><label for="su-g-n"><input type="radio" name="gender" id="su-g-n" value="" checked><span>Prefer să nu spun</span></label></div></fieldset>
+          <fieldset class="field"><legend>Data nașterii</legend><div class="date-pick">
+            <select id="su-day" aria-label="Ziua"><option value="">Zi</option></select><select id="su-month" aria-label="Luna"><option value="">Lună</option><option value="1">ianuarie</option><option value="2">februarie</option><option value="3">martie</option><option value="4">aprilie</option><option value="5">mai</option><option value="6">iunie</option><option value="7">iulie</option><option value="8">august</option><option value="9">septembrie</option><option value="10">octombrie</option><option value="11">noiembrie</option><option value="12">decembrie</option></select><select id="su-year" aria-label="Anul"><option value="">An</option></select></div><small class="err"></small></fieldset>
+        </div>
+        <div data-step="3" hidden>
+          <fieldset class="field"><legend>Alege planul</legend><div class="plan-picks"><label class="plan-pick" for="au-plan-start"><input type="radio" name="plan" id="au-plan-start" value="start" checked><span><b>Start</b><em>0 lei / lună</em></span></label><label class="plan-pick" for="au-plan-pro"><input type="radio" name="plan" id="au-plan-pro" value="pro"><span><b>Solo</b> <i>Recomandat</i><em>199 lei / lună</em></span></label><label class="plan-pick" for="au-plan-cabinet"><input type="radio" name="plan" id="au-plan-cabinet" value="cabinet"><span><b>Cabinet</b><em>499 lei / lună</em></span></label></div></fieldset>
+          <p class="au-hint">Ce include planul ales vezi în stânga. Îl poți schimba oricând din pagina contului.</p>
+        </div>
+        <div data-step="4" hidden>
+          <p class="au-lead">Verifică datele înainte de a crea contul. Poți modifica orice pas.</p>
+          <dl class="review"></dl>
+          <label class="au-check" for="su-terms"><input type="checkbox" id="su-terms"><span>Am citit și accept <a href="/termeni.html" target="_blank" rel="noopener">termenii și condițiile</a> și <a href="/confidentialitate.html#confidentialitate--cont" target="_blank" rel="noopener">politica de confidențialitate</a>.</span></label><small class="err" data-terms-err></small>
+        </div>
+        <div class="au-actions"><button type="button" class="btn ghost small" data-back hidden><svg class="ico ico-left" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Înapoi</button><button class="btn small" type="submit"><span data-next>Continuă</span> <i><svg class="ico ico-right" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></i></button></div>
+      </form>
+      <output class="au-out" aria-live="polite"></output>
+    </div>
+    <p class="auth-or">sau</p>
+    <button type="button" class="btn ghost au-google" data-google>Continuă cu Google</button>
+  </div>
+</div></section><!--#footer sautentificare--></main>
+    <script type="module" src="/src/site/main.js"></script>
   </body>
 </html>

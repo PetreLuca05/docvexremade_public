@@ -64,6 +64,14 @@ export const PAGES = {
     crumb: 'Prețuri',
     type: 'product',
   },
+  planuri: {
+    title: 'Planuri de viitor — DocVex',
+    description:
+      'Încotro merge DocVex: etapele aplicației, în ordinea în care le construim, de la testarea internă la lansare și mai departe.',
+    heading: 'Încotro merge DocVex',
+    kicker: 'Planuri de viitor',
+    crumb: 'Planuri de viitor',
+  },
   autentificare: {
     title: 'Autentificare — DocVex',
     description: 'Creează-ți contul DocVex sau autentifică-te, cu Google sau cu e-mail și parolă.',
